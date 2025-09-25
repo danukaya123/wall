@@ -172,6 +172,81 @@
             background-color: var(--primary-dark);
         }
 
+        /* Mobile Menu Button */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            cursor: pointer;
+        }
+
+        .menu-toggle span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: var(--dark);
+            border-radius: 3px;
+            transition: var(--transition);
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            background-color: var(--light);
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            z-index: 999;
+        }
+
+        .mobile-nav.active {
+            display: flex;
+        }
+
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .mobile-nav-links a {
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        .mobile-nav-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .mobile-nav-btn {
+            padding: 12px;
+            border-radius: var(--radius-small);
+            font-weight: 600;
+            text-align: center;
+            width: 100%;
+        }
+
+        .mobile-login-btn {
+            color: var(--dark);
+            background-color: var(--gray-light);
+        }
+
+        .mobile-join-btn {
+            background-color: var(--primary);
+            color: var(--light);
+        }
+
         /* Search Section */
         .search-section {
             padding: 40px 0;
@@ -703,13 +778,19 @@
         }
 
         @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                gap: 20px;
+            /* Hide desktop navigation */
+            .nav-links, .nav-actions {
+                display: none;
             }
-
-            .nav-links {
-                gap: 20px;
+            
+            /* Show mobile menu button */
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .navbar {
+                flex-direction: row;
+                gap: 0;
             }
 
             .search-section h1 {
@@ -731,11 +812,6 @@
         }
 
         @media (max-width: 576px) {
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
             .search-section h1 {
                 font-size: 2rem;
             }
@@ -762,6 +838,16 @@
                 width: 100%;
                 justify-content: space-between;
             }
+            
+            .filter-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .filter-options {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -773,15 +859,37 @@
                 <a href="https://wall.quizontal.cc/" class="logo">
                     <i class="fas fa-camera"></i> QUIZONTAL
                 </a>
+                
+                <!-- Desktop Navigation -->
                 <div class="nav-links">
                     <a href="https://wall.quizontal.cc/">Explore</a>
                     <a href="licence.html">License</a>
                 </div>
-              <div class="nav-actions">
-  <a href="https://quizontal.cc" class="nav-btn login-btn">More Services</a>
-  <a href="/blog" class="nav-btn join-btn">Blog</a>
-</div>
+                
+                <div class="nav-actions">
+                    <a href="https://quizontal.cc" class="nav-btn login-btn">More Services</a>
+                    <a href="/blog" class="nav-btn join-btn">Blog</a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <div class="menu-toggle" id="menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </nav>
+            
+            <!-- Mobile Navigation -->
+            <div class="mobile-nav" id="mobile-nav">
+                <div class="mobile-nav-links">
+                    <a href="https://wall.quizontal.cc/">Explore</a>
+                    <a href="licence.html">License</a>
+                </div>
+                <div class="mobile-nav-actions">
+                    <a href="https://quizontal.cc" class="mobile-nav-btn mobile-login-btn">More Services</a>
+                    <a href="/blog" class="mobile-nav-btn mobile-join-btn">Blog</a>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -938,6 +1046,34 @@
     </footer>
 
     <script>
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileNav = document.getElementById('mobile-nav');
+            
+            menuToggle.addEventListener('click', function() {
+                mobileNav.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.navbar') && mobileNav.classList.contains('active')) {
+                    mobileNav.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                }
+            });
+            
+            // Close mobile menu when clicking on a link
+            const mobileLinks = document.querySelectorAll('.mobile-nav-links a, .mobile-nav-actions a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileNav.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                });
+            });
+        });
+
         // Pexels API configuration
         // IMPORTANT: In production, this should be handled by a backend to keep the API key secure
         const API_KEY = 'BaCBEeB2Y1gNaCYddJaRoFaVgCdDNhYu51qQe5JMUcPU56RMiJ5M3FOZ';
