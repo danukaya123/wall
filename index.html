@@ -202,6 +202,97 @@
             background-color: var(--primary-dark);
         }
 
+        /* Categories Section */
+        .categories-section {
+            padding: 40px 0;
+            background-color: var(--gray-light);
+        }
+
+        .categories-section h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+            transition: var(--transition);
+            position: relative;
+            height: 150px;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .category-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .category-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            color: var(--light);
+            font-weight: 600;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--gray-border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-title {
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background-color: var(--gray-light);
+            border-radius: 30px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: var(--light);
+        }
+
+        .filter-btn:hover:not(.active) {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
         /* Recent Searches */
         .recent-searches {
             max-width: 700px;
@@ -580,6 +671,9 @@
             .content-grid {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             }
+            .categories-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
         }
 
         @media (max-width: 768px) {
@@ -599,6 +693,10 @@
             .content-grid {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
                 gap: 20px;
+            }
+            
+            .categories-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
 
             .modal-content {
@@ -622,6 +720,10 @@
 
             .content-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .modal-footer {
@@ -675,6 +777,31 @@
             </div>
         </div>
     </section>
+
+    <!-- Categories Section -->
+    <section class="categories-section">
+        <div class="container">
+            <h2>Popular Categories</h2>
+            <div class="categories-grid" id="categories-grid">
+                <!-- Categories will be populated here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <div class="container">
+        <div class="filter-section" id="filter-section">
+            <div class="filter-title">Filter by:</div>
+            <div class="filter-options">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="nature">Nature</button>
+                <button class="filter-btn" data-filter="people">People</button>
+                <button class="filter-btn" data-filter="technology">Technology</button>
+                <button class="filter-btn" data-filter="travel">Travel</button>
+                <button class="filter-btn" data-filter="business">Business</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Content Tabs -->
     <div class="container">
@@ -813,7 +940,8 @@
 
     <script>
         // Pexels API configuration
-        const API_KEY = 'BaCBEeB2Y1gNaCYddJaRoFaVgCdDNhYu51qQe5JMUcPU56RMiJ5M3FOZ'; // Free demo key
+        // IMPORTANT: In production, this should be handled by a backend to keep the API key secure
+        const API_KEY = 'BaCBEeB2Y1gNaCYddJaRoFaVgCdDNhYu51qQe5JMUcPU56RMiJ5M3FOZ';
         const BASE_URL = 'https://api.pexels.com/v1/';
         const VIDEO_URL = 'https://api.pexels.com/videos/';
 
@@ -821,6 +949,9 @@
         const searchInput = document.getElementById('search-input');
         const searchBtn = document.getElementById('search-btn');
         const recentSearchesEl = document.getElementById('recent-searches');
+        const categoriesGrid = document.getElementById('categories-grid');
+        const filterSection = document.getElementById('filter-section');
+        const filterBtns = document.querySelectorAll('.filter-btn');
         const contentTabs = document.querySelectorAll('.content-tab');
         const contentSections = document.querySelectorAll('.content-section');
         
@@ -849,13 +980,27 @@
         let currentPhotosPage = 1;
         let currentVideosPage = 1;
         let currentQuery = 'nature';
+        let currentFilter = 'all';
         let currentMedia = null;
         let recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
         let isPhotosLoading = false;
         let isVideosLoading = false;
 
+        // Default categories with sample images
+        const categories = [
+            { name: 'Nature', query: 'nature', image: 'https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+            { name: 'People', query: 'people', image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+            { name: 'Technology', query: 'technology', image: 'https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+            { name: 'Travel', query: 'travel', image: 'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+            { name: 'Business', query: 'business', image: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+            { name: 'Animals', query: 'animals', image: 'https://images.pexels.com/photos/247502/pexels-photo-247502.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+            { name: 'Food', query: 'food', image: 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+            { name: 'Sports', query: 'sports', image: 'https://images.pexels.com/photos/248547/pexels-photo-248547.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' }
+        ];
+
         // Initialize the app
         document.addEventListener('DOMContentLoaded', () => {
+            loadCategories();
             loadMedia('photos', 'nature');
             loadMedia('videos', 'nature');
             updateRecentSearches();
@@ -868,6 +1013,23 @@
             searchBtn.addEventListener('click', performSearch);
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') performSearch();
+            });
+
+            // Filter buttons
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active filter button
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Set current filter and perform search
+                    currentFilter = btn.getAttribute('data-filter');
+                    if (currentFilter !== 'all') {
+                        currentQuery = currentFilter;
+                        searchInput.value = currentQuery;
+                        performSearch();
+                    }
+                });
             });
 
             // Content tabs
@@ -920,6 +1082,24 @@
             // Download functionality
             downloadBtn.addEventListener('click', downloadMedia);
             qualitySelector.addEventListener('change', updateDownloadUrl);
+        }
+
+        // Load categories
+        function loadCategories() {
+            categories.forEach(category => {
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.innerHTML = `
+                    <img src="${category.image}" alt="${category.name}" class="category-image">
+                    <div class="category-name">${category.name}</div>
+                `;
+                card.addEventListener('click', () => {
+                    currentQuery = category.query;
+                    searchInput.value = currentQuery;
+                    performSearch();
+                });
+                categoriesGrid.appendChild(card);
+            });
         }
 
         // Perform search
@@ -1190,33 +1370,95 @@
         }
 
         // Update download URL based on quality selection
-        function updateDownloadUrl() {
-            if (!currentMedia) return;
-            
-            const downloadUrl = qualitySelector.value;
-            downloadBtn.setAttribute('data-url', downloadUrl);
-        }
+function updateDownloadUrl() {
+    if (!currentMedia) return;
+    
+    const downloadUrl = qualitySelector.value;
+    downloadBtn.setAttribute('data-url', downloadUrl);
+}
 
-        // Download media from modal
-        function downloadMedia() {
-            if (!currentMedia) return;
-            
-            const downloadUrl = downloadBtn.getAttribute('data-url');
-            const isVideo = modalVideo.style.display !== 'none';
-            const fileName = isVideo ? `video-${currentMedia.id}.mp4` : `photo-${currentMedia.id}.jpg`;
-            
-            downloadMediaDirect(downloadUrl, fileName);
-        }
+// Download media from modal
+function downloadMedia() {
+    if (!currentMedia) return;
+    
+    const downloadUrl = downloadBtn.getAttribute('data-url');
+    const isVideo = modalVideo.style.display !== 'none';
+    const fileExtension = isVideo ? 'mp4' : 'jpg';
+    const fileName = `${isVideo ? 'video' : 'photo'}-${currentMedia.id}.${fileExtension}`;
+    
+    downloadMediaDirect(downloadUrl, fileName);
+}
 
-        // Direct download function
-        function downloadMediaDirect(url, filename) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+// Enhanced download function with better error handling
+function downloadMediaDirect(url, filename) {
+    // Check if it's an image URL that might need special handling
+    if (url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+        downloadImageWithFallback(url, filename);
+    } else {
+        // For videos or other files, use the standard method
+        downloadUsingAnchor(url, filename);
+    }
+}
+
+// Special handling for images to fix common download issues
+function downloadImageWithFallback(url, filename) {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous'; // Important for CORS issues
+    
+    img.onload = function() {
+        try {
+            // Method 1: Try using canvas to handle CORS issues
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            
+            canvas.toBlob(function(blob) {
+                const blobUrl = URL.createObjectURL(blob);
+                downloadUsingAnchor(blobUrl, filename);
+                
+                // Clean up the URL after download
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+            }, 'image/jpeg');
+        } catch (error) {
+            console.warn('Canvas method failed, trying direct download:', error);
+            // Fallback to direct download
+            downloadUsingAnchor(url, filename);
         }
+    };
+    
+    img.onerror = function() {
+        console.warn('Image loading failed, trying direct download');
+        // Fallback to direct download if image fails to load
+        downloadUsingAnchor(url, filename);
+    };
+    
+    img.src = url;
+    
+    // Add timeout fallback
+    setTimeout(() => {
+        if (!img.complete) {
+            console.warn('Image load timeout, trying direct download');
+            downloadUsingAnchor(url, filename);
+        }
+    }, 5000);
+}
+
+// Standard download using anchor tag
+function downloadUsingAnchor(url, filename) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    
+    // Add target="_blank" for same-origin security issues
+    a.setAttribute('target', '_blank');
+    
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
     </script>
 </body>
 </html>
