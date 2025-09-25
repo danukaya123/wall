@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Information - QUIZONTAL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #05a081;
+            --primary-dark: #048c6f;
+            --primary-light: #e6f7f3;
+            --dark: #222;
+            --light: #fff;
+            --gray: #767676;
+            --gray-light: #f5f5f5;
+            --gray-border: #e5e5e5;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-small: 6px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            outline: none;
+            background: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--light);
+            box-shadow: var(--shadow-light);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            padding: 8px 0;
+            position: relative;
+        }
+
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-small);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .login-btn {
+            color: var(--dark);
+        }
+
+        .login-btn:hover {
+            background-color: var(--gray-light);
+        }
+
+        .join-btn {
+            background-color: var(--primary);
+            color: var(--light);
+        }
+
+        .join-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary), #1a73e8);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        /* License Content */
+        .license-content {
+            padding: 40px 0;
+        }
+
+        .license-section {
+            margin-bottom: 50px;
+        }
+
+        .license-section h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .license-section h2 i {
+            color: var(--primary);
+        }
+
+        .license-section p {
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+
+        .license-section ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        .license-section li {
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+        }
+
+        .license-card {
+            background-color: var(--light);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-light);
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .license-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .license-card p {
+            margin-bottom: 15px;
+        }
+
+        .license-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: var(--shadow-light);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .license-table th {
+            background-color: var(--primary);
+            color: white;
+            text-align: left;
+            padding: 15px;
+            font-weight: 600;
+        }
+
+        .license-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        .license-table tr:nth-child(even) {
+            background-color: var(--gray-light);
+        }
+
+        .license-table tr:hover {
+            background-color: var(--primary-light);
+        }
+
+        .license-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            background-color: var(--gray-light);
+            padding: 50px 0;
+            border-radius: var(--radius);
+            margin: 40px 0;
+        }
+
+        .faq-item {
+            margin-bottom: 25px;
+            background-color: var(--light);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-light);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .faq-question:hover {
+            background-color: var(--primary-light);
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 20px 20px;
+            max-height: 500px;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: var(--light);
+            padding: 60px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #b0b0b0;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--light);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .license-table {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-links {
+                gap: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 2.2rem;
+            }
+
+            .page-header p {
+                font-size: 1rem;
+            }
+
+            .license-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .license-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .license-card {
+                padding: 15px;
+            }
+
+            .faq-question {
+                padding: 15px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="https://wall.quizontal.cc/" class="logo">
+                    <i class="fas fa-camera"></i> QUIZONTAL
+                </a>
+                <div class="nav-links">
+                    <a href="https://wall.quizontal.cc/">Explore</a>
+                    <a href="#" class="active">License</a>
+                    <a href="#">Upload</a>
+                    <a href="#">Blog</a>
+                </div>
+                <div class="nav-actions">
+                    <button class="nav-btn login-btn">Log in</button>
+                    <button class="nav-btn join-btn">Join Free</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>License Information</h1>
+            <p>Understand how you can use the free photos and videos from QUIZONTAL</p>
+        </div>
+    </section>
+
+    <!-- License Content -->
+    <section class="license-content">
+        <div class="container">
+            <div class="license-section">
+                <h2><i class="fas fa-balance-scale"></i> Our Licensing Model</h2>
+                <p>QUIZONTAL provides a unique licensing model that allows free use of our extensive collection of high-quality photos and videos. Our mission is to support creativity by removing barriers to access visual content.</p>
+                
+                <div class="license-card">
+                    <h3>Free Content License</h3>
+                    <p>All content on QUIZONTAL is available under our Free Content License, which allows:</p>
+                    <ul>
+                        <li>Free commercial and non-commercial use</li>
+                        <li>No attribution required (though appreciated)</li>
+                        <li>Modification and adaptation of content</li>
+                        <li>Distribution of unmodified content</li>
+                    </ul>
+                    <p><strong>Restrictions:</strong> You may not sell unmodified copies of our content, claim content as your own, or use content in illegal contexts.</p>
+                </div>
+            </div>
+
+            <div class="license-section">
+                <h2><i class="fas fa-images"></i> Photo & Video Usage Rights</h2>
+                <p>Our content comes from a community of talented photographers and videographers who have chosen to share their work freely. Here's what you need to know about usage rights:</p>
+                
+                <table class="license-table">
+                    <thead>
+                        <tr>
+                            <th>Usage Type</th>
+                            <th>Allowed</th>
+                            <th>Restrictions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Commercial Websites</td>
+                            <td><i class="fas fa-check" style="color: var(--primary);"></i> Yes</td>
+                            <td>No reselling of unmodified content</td>
+                        </tr>
+                        <tr>
+                            <td>Social Media</td>
+                            <td><i class="fas fa-check" style="color: var(--primary);"></i> Yes</td>
+                            <td>No false representation of ownership</td>
+                        </tr>
+                        <tr>
+                            <td>Print Materials</td>
+                            <td><i class="fas fa-check" style="color: var(--primary);"></i> Yes</td>
+                            <td>No mass distribution without modification</td>
+                        </tr>
+                        <tr>
+                            <td>Video Productions</td>
+                            <td><i class="fas fa-check" style="color: var(--primary);"></i> Yes</td>
+                            <td>No competing stock video services</td>
+                        </tr>
+                        <tr>
+                            <td>Mobile Applications</td>
+                            <td><i class="fas fa-check" style="color: var(--primary);"></i> Yes</td>
+                            <td>No redistribution in app stores as standalone content</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="license-section">
+                <h2><i class="fas fa-user-plus"></i> Contributor Licensing</h2>
+                <p>When you contribute content to QUIZONTAL, you retain your copyright while granting QUIZONTAL a license to distribute your work. Our contributor agreement ensures:</p>
+                
+                <div class="license-card">
+                    <h3>For Content Contributors</h3>
+                    <p>By uploading content to QUIZONTAL, you grant us a non-exclusive, worldwide, royalty-free license to:</p>
+                    <ul>
+                        <li>Display, distribute, and promote your content on our platform</li>
+                        <li>Allow others to use your content under our Free Content License</li>
+                        <li>Modify content for technical purposes (formatting, optimization)</li>
+                    </ul>
+                    <p>You maintain ownership of your content and can continue to use it for any purpose, including licensing it through other platforms.</p>
+                </div>
+                
+                <p><strong>Content Requirements:</strong> All uploaded content must be your original work or work you have permission to share. Content should not infringe on any copyrights, trademarks, or privacy rights.</p>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="faq-section">
+                <div class="container">
+                    <h2 style="text-align: center; margin-bottom: 40px; color: var(--dark);"><i class="fas fa-question-circle"></i> Frequently Asked Questions</h2>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Do I need to credit the photographer or QUIZONTAL?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Attribution is not required but is always appreciated. If you choose to provide attribution, you can credit the photographer and/or QUIZONTAL. For example: "Photo by John Doe from QUIZONTAL"</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Can I use QUIZONTAL content in client projects?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes, you can use our content in client projects without any additional licensing requirements. The Free Content License covers commercial use, including work for clients.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Are there any restrictions on the number of downloads?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>No, there are no limits on how many images or videos you can download from QUIZONTAL. You can use our platform as much as you need for your projects.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>What about recognizable people or private property in photos?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Our contributors are responsible for obtaining necessary releases for recognizable people and private property. However, we recommend exercising caution when using such content for commercial purposes.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Can I redistribute QUIZONTAL content on my own website?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>You can redistribute unmodified content as long as it's not in a competing service. If you're creating a collection or gallery, we recommend linking back to the original content on QUIZONTAL.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="license-section">
+                <h2><i class="fas fa-exclamation-triangle"></i> Prohibited Uses</h2>
+                <p>To protect our community and maintain the integrity of our platform, the following uses are prohibited:</p>
+                
+                <div class="license-card">
+                    <h3>Restricted Activities</h3>
+                    <ul>
+                        <li>Using content in a way that violates applicable laws or regulations</li>
+                        <li>Using content to create a competing stock photo or video service</li>
+                        <li>Using content in hate speech, defamatory, or pornographic contexts</li>
+                        <li>Claiming authorship or ownership of unmodified content</li>
+                        <li>Redistributing content as digital wallpapers or stock content without significant modification</li>
+                    </ul>
+                </div>
+                
+                <p>If you're unsure whether your intended use is allowed, please <a href="#" style="color: var(--primary);">contact our support team</a> for clarification.</p>
+            </div>
+
+            <div class="license-section">
+                <h2><i class="fas fa-gavel"></i> Legal Information</h2>
+                <p>QUIZONTAL operates under international copyright laws. While we strive to ensure all content on our platform is properly licensed, we cannot guarantee that all content is free from copyright claims.</p>
+                
+                <div class="license-card">
+                    <h3>Disclaimer</h3>
+                    <p>QUIZONTAL provides content "as is" without warranties of any kind. We are not liable for any damages resulting from the use of our platform or content. Users are responsible for ensuring their use of content complies with all applicable laws.</p>
+                </div>
+                
+                <p>For complete terms of service, please visit our <a href="#" style="color: var(--primary);">Terms of Service</a> page. For privacy-related information, see our <a href="#" style="color: var(--primary);">Privacy Policy</a>.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>QUIZONTAL</h3>
+                    <p>The internet's source of freely usable images and videos. Powered by creators everywhere.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Community</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Photographers</a></li>
+                        <li><a href="#">Videographers</a></li>
+                        <li><a href="#">Forums</a></li>
+                        <li><a href="#">Meetups</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="https://wall.quizontal.cc/">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 QUIZONTAL. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                
+                question.addEventListener('click', () => {
+                    // Close all other FAQ items
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle current item
+                    item.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
