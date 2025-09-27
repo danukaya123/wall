@@ -849,6 +849,132 @@
                 justify-content: center;
             }
         }
+
+
+
+      .wallpaper-ratio {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+}
+
+.wallpaper-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.wallpaper-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color: var(--light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wallpaper-resolution {
+    font-size: 0.8rem;
+    background-color: rgba(0,0,0,0.5);
+    padding: 3px 8px;
+    border-radius: 12px;
+}
+
+.wallpaper-favorites {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+}
+
+/* Aspect ratio filters */
+.aspect-ratio-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.aspect-ratio-btn {
+    padding: 6px 12px;
+    background-color: var(--gray-light);
+    border-radius: 30px;
+    font-size: 0.85rem;
+    transition: var(--transition);
+}
+
+.aspect-ratio-btn.active {
+    background-color: var(--primary);
+    color: var(--light);
+}
+
+.aspect-ratio-btn:hover:not(.active) {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+/* Modal enhancements for wallpapers */
+.wallpaper-details {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.wallpaper-detail {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.wallpaper-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.wallpaper-tag {
+    padding: 4px 10px;
+    background-color: var(--primary-light);
+    color: var(--primary);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.wallpaper-tag:hover {
+    background-color: var(--primary);
+    color: var(--light);
+}
+
+/* Responsive adjustments for wallpapers */
+@media (max-width: 768px) {
+    .wallpaper-info {
+        padding: 10px;
+    }
+    
+    .wallpaper-resolution {
+        font-size: 0.7rem;
+    }
+    
+    .wallpaper-favorites {
+        font-size: 0.8rem;
+    }
+}
+
+      
     </style>
 </head>
 <body>
@@ -940,6 +1066,7 @@
         <div class="content-tabs">
             <div class="content-tab active" data-tab="photos">Photos</div>
             <div class="content-tab" data-tab="videos">Videos</div>
+            <div class="content-tab" data-tab="wallpapers">Wallpapers</div>
         </div>
     </div>
 
@@ -988,6 +1115,54 @@
             </div>
         </div>
     </section>
+
+  <section class="content-section" id="wallpapers-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Free HD Wallpapers</h2>
+            <a href="#" class="view-all">View all <i class="fas fa-arrow-right"></i></a>
+        </div>
+        
+        <!-- Wallpaper Filter Options -->
+        <div class="filter-section" id="wallpaper-filter-section">
+            <div class="filter-title">Filter by:</div>
+            <div class="filter-options">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="general">General</button>
+                <button class="filter-btn" data-filter="anime">Anime</button>
+                <button class="filter-btn" data-filter="people">People</button>
+                <button class="filter-btn" data-filter="nature">Nature</button>
+                <button class="filter-btn" data-filter="abstract">Abstract</button>
+            </div>
+            
+            <!-- Sorting Options -->
+            <div class="filter-options" style="margin-left: auto;">
+                <div class="filter-title">Sort by:</div>
+                <select class="quality-selector" id="wallpaper-sort">
+                    <option value="relevance">Relevance</option>
+                    <option value="date_added">Date Added</option>
+                    <option value="favorites">Favorites</option>
+                    <option value="toplist">Top List</option>
+                    <option value="hot">Hot</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="content-grid" id="wallpapers-grid">
+            <!-- Wallpaper cards will be dynamically inserted here -->
+        </div>
+        
+        <!-- Loading Spinner -->
+        <div class="spinner" id="wallpapers-spinner"></div>
+        
+        <!-- Load More Button -->
+        <div style="text-align: center;">
+            <button class="download-btn" id="wallpapers-load-more">
+                <i class="fas fa-plus"></i> Load More Wallpapers
+            </button>
+        </div>
+    </div>
+</section>
 
     <!-- Modal for viewing media -->
     <div class="modal" id="media-modal">
@@ -1594,6 +1769,280 @@ function downloadUsingAnchor(url, filename) {
     a.click();
     document.body.removeChild(a);
 }
+
+      const WALLHAVEN_URL = 'https://wallhaven.cc/api/v1/';
+let currentWallpapersPage = 1;
+let currentWallpaperQuery = 'nature';
+let currentWallpaperFilter = 'all';
+let currentWallpaperSort = 'relevance';
+let currentWallpaperAspectRatio = 'all';
+let isWallpapersLoading = false;
+
+// Add this to your DOM elements section
+const wallpapersGrid = document.getElementById('wallpapers-grid');
+const wallpapersSpinner = document.getElementById('wallpapers-spinner');
+const wallpapersLoadMoreBtn = document.getElementById('wallpapers-load-more');
+const wallpaperSort = document.getElementById('wallpaper-sort');
+
+// Add this to your setupEventListeners function
+// Wallpaper tab functionality
+const wallpaperTab = document.querySelector('[data-tab="wallpapers"]');
+if (wallpaperTab) {
+    wallpaperTab.addEventListener('click', () => {
+        // Update active tab
+        contentTabs.forEach(t => t.classList.remove('active'));
+        wallpaperTab.classList.add('active');
+        
+        // Show wallpaper section
+        contentSections.forEach(section => {
+            section.classList.remove('active');
+            if (section.id === 'wallpapers-section') {
+                section.classList.add('active');
+            }
+        });
+    });
+}
+
+// Wallpaper load more button
+wallpapersLoadMoreBtn.addEventListener('click', () => {
+    currentWallpapersPage++;
+    loadWallpapers(currentWallpaperQuery, false);
+});
+
+// Wallpaper sort change
+wallpaperSort.addEventListener('change', () => {
+    currentWallpaperSort = wallpaperSort.value;
+    currentWallpapersPage = 1;
+    wallpapersGrid.innerHTML = '';
+    loadWallpapers(currentWallpaperQuery);
+});
+
+// Add aspect ratio filter functionality (you'll need to add these buttons to your HTML)
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('aspect-ratio-btn')) {
+        document.querySelectorAll('.aspect-ratio-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        e.target.classList.add('active');
+        currentWallpaperAspectRatio = e.target.getAttribute('data-ratio');
+        currentWallpapersPage = 1;
+        wallpapersGrid.innerHTML = '';
+        loadWallpapers(currentWallpaperQuery);
+    }
+});
+
+// Add this function to load wallpapers
+async function loadWallpapers(query, reset = true) {
+    if (isWallpapersLoading) return;
+    
+    isWallpapersLoading = true;
+    wallpapersSpinner.style.display = 'block';
+    wallpapersLoadMoreBtn.style.display = 'none';
+
+    try {
+        // Build the API URL with parameters
+        let url = `${WALLHAVEN_URL}search?q=${encodeURIComponent(query)}&page=${currentWallpapersPage}`;
+        
+        // Add sorting
+        if (currentWallpaperSort !== 'relevance') {
+            url += `&sorting=${currentWallpaperSort}`;
+        }
+        
+        // Add category filtering
+        if (currentWallpaperFilter !== 'all') {
+            url += `&categories=${currentWallpaperFilter}`;
+        }
+        
+        // Add aspect ratio filtering
+        if (currentWallpaperAspectRatio !== 'all') {
+            url += `&ratios=${currentWallpaperAspectRatio}`;
+        }
+
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`WallHaven API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const wallpapers = data.data;
+
+        if (reset) {
+            wallpapersGrid.innerHTML = '';
+        }
+
+        displayWallpapers(wallpapers);
+
+        // Show/hide load more button based on whether there are more results
+        if (wallpapers.length === 24) { // WallHaven returns 24 results per page by default
+            wallpapersLoadMoreBtn.style.display = 'inline-flex';
+        }
+
+    } catch (error) {
+        console.error('Error fetching wallpapers:', error);
+        wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px;">Sorry, there was an error loading wallpapers. Please try again later.</p>';
+    } finally {
+        isWallpapersLoading = false;
+        wallpapersSpinner.style.display = 'none';
+    }
+}
+
+// Function to display wallpapers in the grid
+function displayWallpapers(wallpapers) {
+    wallpapers.forEach(wallpaper => {
+        const card = document.createElement('div');
+        card.className = 'media-card';
+        
+        // Use thumbnail for faster loading
+        const thumbnailUrl = wallpaper.thumbs ? wallpaper.thumbs.large : wallpaper.path;
+        
+        card.innerHTML = `
+            <div class="wallpaper-ratio">
+                <img src="${thumbnailUrl}" alt="${wallpaper.id}" class="wallpaper-image" loading="lazy">
+                <div class="wallpaper-info">
+                    <span class="wallpaper-resolution">${wallpaper.resolution}</span>
+                    <div class="wallpaper-favorites">
+                        <i class="fas fa-heart"></i> ${wallpaper.favorites}
+                    </div>
+                </div>
+                <div class="media-overlay">
+                    <div class="media-actions">
+                        <button class="action-btn view-btn" data-id="${wallpaper.id}">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <button class="action-btn like-btn">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="action-btn download-btn" data-url="${wallpaper.path}">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        wallpapersGrid.appendChild(card);
+        
+        // Add event listeners to action buttons
+        const viewBtn = card.querySelector('.view-btn');
+        const downloadBtn = card.querySelector('.download-btn');
+        
+        viewBtn.addEventListener('click', () => viewWallpaper(wallpaper));
+        downloadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            downloadMediaDirect(wallpaper.path, `wallpaper-${wallpaper.id}.jpg`);
+        });
+    });
+}
+
+// Function to view wallpaper in modal
+function viewWallpaper(wallpaper) {
+    currentMedia = wallpaper;
+    modal.style.display = 'block';
+    
+    // Set modal content for wallpaper
+    modalImage.style.display = 'block';
+    modalVideo.style.display = 'none';
+    modalImage.src = wallpaper.path;
+    
+    modalTitle.textContent = `Wallpaper by ${wallpaper.author || 'Unknown'}`;
+    modalAuthor.textContent = wallpaper.author || 'Unknown';
+    modalAvatar.src = 'https://wallhaven.cc/images/layout/avatar.png'; // Default avatar
+    
+    // Update quality selector for wallpapers
+    qualitySelector.innerHTML = `
+        <option value="${wallpaper.thumbs ? wallpaper.thumbs.small : wallpaper.path}">Small</option>
+        <option value="${wallpaper.thumbs ? wallpaper.thumbs.large : wallpaper.path}">Medium</option>
+        <option value="${wallpaper.path}" selected>Original (${wallpaper.resolution})</option>
+    `;
+    
+    // Add wallpaper details to modal
+    const modalFooter = document.querySelector('.modal-footer');
+    let detailsHtml = `
+        <div class="wallpaper-details">
+            <div class="wallpaper-detail">
+                <i class="fas fa-heart"></i> ${wallpaper.favorites} Favorites
+            </div>
+            <div class="wallpaper-detail">
+                <i class="fas fa-eye"></i> ${wallpaper.views} Views
+            </div>
+            <div class="wallpaper-detail">
+                <i class="fas fa-palette"></i> ${wallpaper.colors ? wallpaper.colors.join(', ') : 'N/A'}
+            </div>
+        </div>
+    `;
+    
+    // Add tags if available
+    if (wallpaper.tags && wallpaper.tags.length > 0) {
+        detailsHtml += `
+            <div class="wallpaper-tags">
+                ${wallpaper.tags.slice(0, 5).map(tag => 
+                    `<span class="wallpaper-tag">${tag.name}</span>`
+                ).join('')}
+            </div>
+        `;
+    }
+    
+    // Insert details after the existing modal footer content
+    const existingContent = modalFooter.innerHTML;
+    modalFooter.innerHTML = detailsHtml + existingContent;
+    
+    // Update download URL
+    updateDownloadUrl();
+}
+
+// Modify your performSearch function to include wallpapers
+function performSearch() {
+    const query = searchInput.value.trim();
+    if (query) {
+        currentQuery = query;
+        currentPhotosPage = 1;
+        currentVideosPage = 1;
+        currentWallpapersPage = 1;
+        
+        // Add to recent searches
+        if (!recentSearches.includes(query)) {
+            recentSearches.unshift(query);
+            if (recentSearches.length > 5) {
+                recentSearches.pop();
+            }
+            localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+            updateRecentSearches();
+        }
+        
+        // Clear grids and load new content
+        photosGrid.innerHTML = '';
+        videosGrid.innerHTML = '';
+        wallpapersGrid.innerHTML = '';
+        loadMedia('photos', query);
+        loadMedia('videos', query);
+        loadWallpapers(query);
+    }
+}
+
+// Add wallpaper category buttons functionality
+document.addEventListener('DOMContentLoaded', () => {
+    // Add wallpaper filter buttons event listeners
+    const wallpaperFilterBtns = document.querySelectorAll('#wallpaper-filter-section .filter-btn');
+    wallpaperFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Update active filter button
+            wallpaperFilterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Set current filter and perform search
+            currentWallpaperFilter = btn.getAttribute('data-filter');
+            if (currentWallpaperFilter !== 'all') {
+                currentWallpaperQuery = currentWallpaperFilter;
+                searchInput.value = currentWallpaperQuery;
+                loadWallpapers(currentWallpaperQuery);
+            }
+        });
+    });
+    
+    // Initial load of wallpapers
+    loadWallpapers('nature');
+});
     </script>
 </body>
 </html>
