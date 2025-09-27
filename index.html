@@ -1775,7 +1775,6 @@ let currentWallpapersPage = 1;
 let currentWallpaperQuery = 'nature';
 let currentWallpaperFilter = 'all';
 let currentWallpaperSort = 'relevance';
-let currentWallpaperAspectRatio = 'all';
 let isWallpapersLoading = false;
 
 // DOM elements
@@ -1811,54 +1810,42 @@ wallpaperSort.addEventListener('change', () => {
   loadWallpapers(currentWallpaperQuery);
 });
 
-// Aspect ratio buttons
-document.addEventListener('click', (e) => {
-  if (e.target.classList.contains('aspect-ratio-btn')) {
-    document.querySelectorAll('.aspect-ratio-btn').forEach(btn => btn.classList.remove('active'));
-    e.target.classList.add('active');
-    currentWallpaperAspectRatio = e.target.getAttribute('data-ratio');
-    currentWallpapersPage = 1;
-    wallpapersGrid.innerHTML = '';
-    loadWallpapers(currentWallpaperQuery);
-  }
-});
-
-// Load wallpapers using your Vercel proxy
+// Load wallpapers using proxy
 async function loadWallpapers(query, reset = true) {
   if (isWallpapersLoading) return;
-
   isWallpapersLoading = true;
   wallpapersSpinner.style.display = 'block';
   wallpapersLoadMoreBtn.style.display = 'none';
 
   try {
-    // Build proxy URL with query params
     let url = `${WALLHAVEN_URL}?q=${encodeURIComponent(query)}&page=${currentWallpapersPage}`;
-
     if (currentWallpaperSort !== 'relevance') url += `&sorting=${currentWallpaperSort}`;
     if (currentWallpaperFilter !== 'all') url += `&categories=${currentWallpaperFilter}`;
-    // Wall-proxy does not support aspect ratio filtering directly
-    // Optionally, handle aspect ratio filtering in frontend after fetch
 
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Proxy API error: ${response.status}`);
+
     const data = await response.json();
-    const wallpapers = data.data || [];
+    const wallpapers = Array.isArray(data.data) ? data.data : [];
 
     if (reset) wallpapersGrid.innerHTML = '';
-    displayWallpapers(wallpapers);
 
-    if (wallpapers.length === 24) wallpapersLoadMoreBtn.style.display = 'inline-flex';
+    if (wallpapers.length === 0) {
+      wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px;">No wallpapers found for this search.</p>';
+    } else {
+      displayWallpapers(wallpapers);
+      if (wallpapers.length === 24) wallpapersLoadMoreBtn.style.display = 'inline-flex';
+    }
   } catch (error) {
     console.error('Error fetching wallpapers:', error);
-    wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px;">Sorry, there was an error loading wallpapers. Please try again later.</p>';
+    wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px;">Sorry, there was an error loading wallpapers. Please try again later.</p>';
   } finally {
     isWallpapersLoading = false;
     wallpapersSpinner.style.display = 'none';
   }
 }
 
-// Display wallpapers in grid
+// Display wallpapers
 function displayWallpapers(wallpapers) {
   wallpapers.forEach(wallpaper => {
     const card = document.createElement('div');
@@ -1903,6 +1890,11 @@ function displayWallpapers(wallpapers) {
     });
   });
 }
+
+// Initial load
+document.addEventListener('DOMContentLoaded', () => {
+  loadWallpapers('nature');
+});
     </script>
 </body>
 </html>
