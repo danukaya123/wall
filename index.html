@@ -1694,20 +1694,47 @@ async function loadWallpapers(query, reset = true) {
         console.log('Fetching wallpapers from:', url);
 
         const response = await fetch(url);
-        
+        console.log('Response status:', response.status, response.ok);
+
         if (!response.ok) {
-            throw new Error(`Proxy API error: ${response.status} ${response.statusText}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error(`Expected JSON but got: ${contentType}`);
         }
 
         const data = await response.json();
-        console.log('API response received:', data);
+        console.log('API response data:', data);
 
-        // Extract wallpapers from the correct path: data.data
-        const wallpapers = data.data || [];
-        const meta = data.meta || {};
-        
-        console.log(`Found ${wallpapers.length} wallpapers`);
-        console.log('Pagination info:', meta);
+        // Check if data structure is correct
+        if (!data || typeof data !== 'object') {
+            throw new Error('Invalid response format: expected object');
+        }
+
+        // Extract wallpapers - handle both data.data and direct array
+        let wallpapers = [];
+        if (Array.isArray(data)) {
+            wallpapers = data;
+        } else if (data.data && Array.isArray(data.data)) {
+            wallpapers = data.data;
+        } else if (data.wallpapers && Array.isArray(data.wallpapers)) {
+            wallpapers = data.wallpapers;
+        } else {
+            console.warn('Unexpected data structure:', data);
+            // Try to find any array in the response
+            for (const key in data) {
+                if (Array.isArray(data[key])) {
+                    wallpapers = data[key];
+                    console.log(`Found wallpapers in key: ${key}`);
+                    break;
+                }
+            }
+        }
+
+        console.log(`Processing ${wallpapers.length} wallpapers`);
 
         if (reset) {
             wallpapersGrid.innerHTML = '';
@@ -1718,27 +1745,66 @@ async function loadWallpapers(query, reset = true) {
         } else {
             displayWallpapers(wallpapers);
             
-            // Show load more button if there are more pages
-            if (meta.current_page && meta.last_page && meta.current_page < meta.last_page) {
-                wallpapersLoadMoreBtn.style.display = 'inline-flex';
-            } else {
-                wallpapersLoadMoreBtn.style.display = 'none';
-            }
+            // Show load more button
+            wallpapersLoadMoreBtn.style.display = 'inline-flex';
         }
+
     } catch (error) {
-        console.error('Error fetching wallpapers:', error);
+        console.error('Error in loadWallpapers:', error);
+        console.error('Error stack:', error.stack);
+        
         wallpapersGrid.innerHTML = `
             <div style="grid-column: 1/-1; text-align:center; padding:40px; color: var(--gray);">
-                <p>Sorry, there was an error loading wallpapers.</p>
+                <p>Sorry, there was an error processing wallpapers.</p>
                 <p style="font-size: 0.9rem; margin-top: 10px;">Error: ${error.message}</p>
-                <button onclick="loadWallpapers('${currentWallpaperQuery}')" style="margin-top: 15px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    Try Again
+                <p style="font-size: 0.8rem; margin-top: 5px;">Check console for details</p>
+                <button onclick="debugWallpaperLoad()" style="margin-top: 15px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Debug This
                 </button>
             </div>
         `;
     } finally {
         isWallpapersLoading = false;
         wallpapersSpinner.style.display = 'none';
+    }
+}
+
+// Debug function to test the API response
+async function debugWallpaperLoad() {
+    console.clear();
+    console.log('=== DEBUG WALLPAPER LOAD ===');
+    
+    const testUrl = 'https://wall-proxy.vercel.app/api/wallpapers?q=nature&page=1';
+    
+    try {
+        console.log('1. Testing fetch...');
+        const response = await fetch(testUrl);
+        console.log('2. Response status:', response.status, response.statusText);
+        console.log('3. Response headers:', Object.fromEntries(response.headers.entries()));
+        
+        console.log('4. Reading response text...');
+        const responseText = await response.text();
+        console.log('5. Raw response length:', responseText.length);
+        console.log('6. First 500 chars of response:', responseText.substring(0, 500));
+        
+        console.log('7. Parsing JSON...');
+        const data = JSON.parse(responseText);
+        console.log('8. Parsed data structure:', data);
+        
+        console.log('9. Data keys:', Object.keys(data));
+        if (data.data) {
+            console.log('10. data.data type:', typeof data.data);
+            console.log('11. data.data length:', data.data.length);
+            if (data.data.length > 0) {
+                console.log('12. First wallpaper:', data.data[0]);
+            }
+        }
+        
+        alert('Debug complete! Check console for details.');
+        
+    } catch (error) {
+        console.error('Debug error:', error);
+        alert(`Debug failed: ${error.message}`);
     }
 }
 
