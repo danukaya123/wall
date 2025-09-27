@@ -1220,772 +1220,701 @@
         </div>
     </footer>
 
-    <script>
-        // Mobile menu toggle functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.getElementById('menu-toggle');
-            const mobileNav = document.getElementById('mobile-nav');
-            
-            menuToggle.addEventListener('click', function() {
-                mobileNav.classList.toggle('active');
-                menuToggle.classList.toggle('active');
+<script>
+    // Mobile menu toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileNav = document.getElementById('mobile-nav');
+        
+        menuToggle.addEventListener('click', function() {
+            mobileNav.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.navbar') && mobileNav.classList.contains('active')) {
+                mobileNav.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        });
+        
+        // Close mobile menu when clicking on a link
+        const mobileLinks = document.querySelectorAll('.mobile-nav-links a, .mobile-nav-actions a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileNav.classList.remove('active');
+                menuToggle.classList.remove('active');
             });
-            
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!event.target.closest('.navbar') && mobileNav.classList.contains('active')) {
-                    mobileNav.classList.remove('active');
-                    menuToggle.classList.remove('active');
+        });
+    });
+
+    // Pexels API configuration
+    const API_KEY = 'BaCBEeB2Y1gNaCYddJaRoFaVgCdDNhYu51qQe5JMUcPU56RMiJ5M3FOZ';
+    const BASE_URL = 'https://api.pexels.com/v1/';
+    const VIDEO_URL = 'https://api.pexels.com/videos/';
+    const WALLHAVEN_URL = 'https://wall-proxy.vercel.app/api/wallpapers';
+
+    // DOM Elements
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    const recentSearchesEl = document.getElementById('recent-searches');
+    const categoriesGrid = document.getElementById('categories-grid');
+    const filterSection = document.getElementById('filter-section');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const contentTabs = document.querySelectorAll('.content-tab');
+    const contentSections = document.querySelectorAll('.content-section');
+    
+    // Photos elements
+    const photosGrid = document.getElementById('photos-grid');
+    const photosSpinner = document.getElementById('photos-spinner');
+    const photosLoadMoreBtn = document.getElementById('photos-load-more');
+    
+    // Videos elements
+    const videosGrid = document.getElementById('videos-grid');
+    const videosSpinner = document.getElementById('videos-spinner');
+    const videosLoadMoreBtn = document.getElementById('videos-load-more');
+    
+    // Wallpapers elements
+    const wallpapersGrid = document.getElementById('wallpapers-grid');
+    const wallpapersSpinner = document.getElementById('wallpapers-spinner');
+    const wallpapersLoadMoreBtn = document.getElementById('wallpapers-load-more');
+    const wallpaperSort = document.getElementById('wallpaper-sort');
+    const wallpaperFilterBtns = document.querySelectorAll('#wallpaper-filter-section .filter-btn');
+    
+    // Modal elements
+    const modal = document.getElementById('media-modal');
+    const modalClose = document.getElementById('modal-close');
+    const modalImage = document.getElementById('modal-image');
+    const modalVideo = document.getElementById('modal-video');
+    const modalTitle = document.getElementById('modal-title');
+    const modalAuthor = document.getElementById('modal-author');
+    const modalAvatar = document.getElementById('modal-avatar');
+    const qualitySelector = document.getElementById('quality-selector');
+    const downloadBtn = document.getElementById('download-btn');
+
+    // App State
+    let currentPhotosPage = 1;
+    let currentVideosPage = 1;
+    let currentWallpapersPage = 1;
+    let currentQuery = 'nature';
+    let currentWallpaperQuery = 'nature';
+    let currentFilter = 'all';
+    let currentWallpaperFilter = 'all';
+    let currentWallpaperSort = 'relevance';
+    let currentMedia = null;
+    let recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
+    let isPhotosLoading = false;
+    let isVideosLoading = false;
+    let isWallpapersLoading = false;
+
+    // Default categories with sample images
+    const categories = [
+        { name: 'Nature', query: 'nature', image: 'https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'People', query: 'people', image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'Technology', query: 'technology', image: 'https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'Travel', query: 'travel', image: 'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'Business', query: 'business', image: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'Animals', query: 'animals', image: 'https://images.pexels.com/photos/247502/pexels-photo-247502.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'Food', query: 'food', image: 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'Sports', query: 'sports', image: 'https://images.pexels.com/photos/248547/pexels-photo-248547.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' }
+    ];
+
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCategories();
+        loadMedia('photos', 'nature');
+        loadMedia('videos', 'nature');
+        loadWallpapers('nature');
+        updateRecentSearches();
+        setupEventListeners();
+        setupWallpaperEventListeners();
+    });
+
+    // Set up main event listeners
+    function setupEventListeners() {
+        // Search functionality
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        // Filter buttons
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                currentFilter = btn.getAttribute('data-filter');
+                if (currentFilter !== 'all') {
+                    currentQuery = currentFilter;
+                    searchInput.value = currentQuery;
+                    performSearch();
                 }
             });
-            
-            // Close mobile menu when clicking on a link
-            const mobileLinks = document.querySelectorAll('.mobile-nav-links a, .mobile-nav-actions a');
-            mobileLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    mobileNav.classList.remove('active');
-                    menuToggle.classList.remove('active');
-                });
-            });
         });
 
-        // Pexels API configuration
-        // IMPORTANT: In production, this should be handled by a backend to keep the API key secure
-        const API_KEY = 'BaCBEeB2Y1gNaCYddJaRoFaVgCdDNhYu51qQe5JMUcPU56RMiJ5M3FOZ';
-        const BASE_URL = 'https://api.pexels.com/v1/';
-        const VIDEO_URL = 'https://api.pexels.com/videos/';
-
-        // DOM Elements
-        const searchInput = document.getElementById('search-input');
-        const searchBtn = document.getElementById('search-btn');
-        const recentSearchesEl = document.getElementById('recent-searches');
-        const categoriesGrid = document.getElementById('categories-grid');
-        const filterSection = document.getElementById('filter-section');
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        const contentTabs = document.querySelectorAll('.content-tab');
-        const contentSections = document.querySelectorAll('.content-section');
-        
-        // Photos elements
-        const photosGrid = document.getElementById('photos-grid');
-        const photosSpinner = document.getElementById('photos-spinner');
-        const photosLoadMoreBtn = document.getElementById('photos-load-more');
-        
-        // Videos elements
-        const videosGrid = document.getElementById('videos-grid');
-        const videosSpinner = document.getElementById('videos-spinner');
-        const videosLoadMoreBtn = document.getElementById('videos-load-more');
-        
-        // Modal elements
-        const modal = document.getElementById('media-modal');
-        const modalClose = document.getElementById('modal-close');
-        const modalImage = document.getElementById('modal-image');
-        const modalVideo = document.getElementById('modal-video');
-        const modalTitle = document.getElementById('modal-title');
-        const modalAuthor = document.getElementById('modal-author');
-        const modalAvatar = document.getElementById('modal-avatar');
-        const qualitySelector = document.getElementById('quality-selector');
-        const downloadBtn = document.getElementById('download-btn');
-
-        // App State
-        let currentPhotosPage = 1;
-        let currentVideosPage = 1;
-        let currentQuery = 'nature';
-        let currentFilter = 'all';
-        let currentMedia = null;
-        let recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
-        let isPhotosLoading = false;
-        let isVideosLoading = false;
-
-        // Default categories with sample images
-        const categories = [
-            { name: 'Nature', query: 'nature', image: 'https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-            { name: 'People', query: 'people', image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-            { name: 'Technology', query: 'technology', image: 'https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-            { name: 'Travel', query: 'travel', image: 'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-            { name: 'Business', query: 'business', image: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-            { name: 'Animals', query: 'animals', image: 'https://images.pexels.com/photos/247502/pexels-photo-247502.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-            { name: 'Food', query: 'food', image: 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-            { name: 'Sports', query: 'sports', image: 'https://images.pexels.com/photos/248547/pexels-photo-248547.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' }
-        ];
-
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCategories();
-            loadMedia('photos', 'nature');
-            loadMedia('videos', 'nature');
-            updateRecentSearches();
-            setupEventListeners();
-        });
-
-        // Set up event listeners
-        function setupEventListeners() {
-            // Search functionality
-            searchBtn.addEventListener('click', performSearch);
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') performSearch();
-            });
-
-            // Filter buttons
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // Update active filter button
-                    filterBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    
-                    // Set current filter and perform search
-                    currentFilter = btn.getAttribute('data-filter');
-                    if (currentFilter !== 'all') {
-                        currentQuery = currentFilter;
-                        searchInput.value = currentQuery;
-                        performSearch();
+        // Content tabs
+        contentTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabType = tab.getAttribute('data-tab');
+                
+                contentTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === `${tabType}-section`) {
+                        section.classList.add('active');
                     }
                 });
             });
+        });
 
-            // Content tabs
-            contentTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabType = tab.getAttribute('data-tab');
-                    
-                    // Update active tab
-                    contentTabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    // Show corresponding section
-                    contentSections.forEach(section => {
-                        section.classList.remove('active');
-                        if (section.id === `${tabType}-section`) {
-                            section.classList.add('active');
-                        }
-                    });
-                });
-            });
+        // Load more buttons
+        photosLoadMoreBtn.addEventListener('click', () => {
+            currentPhotosPage++;
+            loadMedia('photos', currentQuery, false);
+        });
 
-            // Load more buttons
-            photosLoadMoreBtn.addEventListener('click', () => {
-                currentPhotosPage++;
-                loadMedia('photos', currentQuery, false);
-            });
+        videosLoadMoreBtn.addEventListener('click', () => {
+            currentVideosPage++;
+            loadMedia('videos', currentQuery, false);
+        });
 
-            videosLoadMoreBtn.addEventListener('click', () => {
-                currentVideosPage++;
-                loadMedia('videos', currentQuery, false);
-            });
+        // Modal functionality
+        modalClose.addEventListener('click', () => {
+            modal.style.display = 'none';
+            if (modalVideo.style.display !== 'none') {
+                modalVideo.pause();
+            }
+        });
 
-            // Modal functionality
-            modalClose.addEventListener('click', () => {
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
                 modal.style.display = 'none';
                 if (modalVideo.style.display !== 'none') {
                     modalVideo.pause();
                 }
-            });
-
-            window.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                    if (modalVideo.style.display !== 'none') {
-                        modalVideo.pause();
-                    }
-                }
-            });
-
-            // Download functionality
-            downloadBtn.addEventListener('click', downloadMedia);
-            qualitySelector.addEventListener('change', updateDownloadUrl);
-        }
-
-        // Load categories
-        function loadCategories() {
-            categories.forEach(category => {
-                const card = document.createElement('div');
-                card.className = 'category-card';
-                card.innerHTML = `
-                    <img src="${category.image}" alt="${category.name}" class="category-image">
-                    <div class="category-name">${category.name}</div>
-                `;
-                card.addEventListener('click', () => {
-                    currentQuery = category.query;
-                    searchInput.value = currentQuery;
-                    performSearch();
-                });
-                categoriesGrid.appendChild(card);
-            });
-        }
-
-        // Perform search
-function performSearch() {
-    const query = searchInput.value.trim();
-    if (query) {
-        currentQuery = query;
-        currentPhotosPage = 1;
-        currentVideosPage = 1;
-        currentWallpaperQuery = query;
-        currentWallpapersPage = 1;
-        
-        // Add to recent searches
-        if (!recentSearches.includes(query)) {
-            recentSearches.unshift(query);
-            if (recentSearches.length > 5) {
-                recentSearches.pop();
-            }
-            localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
-            updateRecentSearches();
-        }
-        
-        // Clear grids and load new content for active section
-        const activeSection = document.querySelector('.content-section.active');
-        if (activeSection.id === 'photos-section') {
-            photosGrid.innerHTML = '';
-            loadMedia('photos', query);
-        } else if (activeSection.id === 'videos-section') {
-            videosGrid.innerHTML = '';
-            loadMedia('videos', query);
-        } else if (activeSection.id === 'wallpapers-section') {
-            wallpapersGrid.innerHTML = '';
-            loadWallpapers(query);
-        }
-    }
-}
-
-        // Update recent searches display
-        function updateRecentSearches() {
-            if (recentSearches.length === 0) {
-                recentSearchesEl.innerHTML = '';
-                return;
-            }
-            
-            recentSearchesEl.innerHTML = '<span style="margin-right: 10px; color: var(--gray);">Recent:</span>';
-            recentSearches.forEach(search => {
-                const tag = document.createElement('span');
-                tag.className = 'recent-tag';
-                tag.textContent = search;
-                tag.addEventListener('click', () => {
-                    searchInput.value = search;
-                    performSearch();
-                });
-                recentSearchesEl.appendChild(tag);
-            });
-        }
-
-        // Load media from Pexels API
-        async function loadMedia(type, query, reset = true) {
-            if ((type === 'photos' && isPhotosLoading) || (type === 'videos' && isVideosLoading)) return;
-            
-            if (type === 'photos') {
-                isPhotosLoading = true;
-                photosSpinner.style.display = 'block';
-                photosLoadMoreBtn.style.display = 'none';
-            } else {
-                isVideosLoading = true;
-                videosSpinner.style.display = 'block';
-                videosLoadMoreBtn.style.display = 'none';
-            }
-
-            try {
-                const url = type === 'photos' 
-                    ? `${BASE_URL}search?query=${query}&per_page=15&page=${currentPhotosPage}`
-                    : `${VIDEO_URL}search?query=${query}&per_page=15&page=${currentVideosPage}`;
-
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': API_KEY
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API error: ${response.status}`);
-                }
-
-                const data = await response.json();
-                const grid = type === 'photos' ? photosGrid : videosGrid;
-
-                if (reset) {
-                    grid.innerHTML = '';
-                }
-
-                if (type === 'photos') {
-                    displayPhotos(data.photos, grid);
-                } else {
-                    displayVideos(data.videos, grid);
-                }
-
-                // Show/hide load more button based on whether there are more results
-                if (data.next_page) {
-                    if (type === 'photos') {
-                        photosLoadMoreBtn.style.display = 'inline-flex';
-                    } else {
-                        videosLoadMoreBtn.style.display = 'inline-flex';
-                    }
-                }
-
-            } catch (error) {
-                console.error('Error fetching media:', error);
-                const grid = type === 'photos' ? photosGrid : videosGrid;
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px;">Sorry, there was an error loading content. Please try again later.</p>';
-            } finally {
-                if (type === 'photos') {
-                    isPhotosLoading = false;
-                    photosSpinner.style.display = 'none';
-                } else {
-                    isVideosLoading = false;
-                    videosSpinner.style.display = 'none';
-                }
-            }
-        }
-
-        // Display photos in the grid
-        function displayPhotos(photos, grid) {
-            photos.forEach(photo => {
-                const card = document.createElement('div');
-                card.className = 'media-card';
-                card.innerHTML = `
-                    <img src="${photo.src.medium}" alt="${photo.photographer}" class="media-image">
-                    <div class="media-overlay">
-                        <div class="media-actions">
-                            <button class="action-btn view-btn" data-id="${photo.id}">
-                                <i class="fas fa-expand"></i>
-                            </button>
-                            <button class="action-btn like-btn">
-                                <i class="far fa-heart"></i>
-                            </button>
-                            <button class="action-btn download-btn" data-url="${photo.src.original}">
-                                <i class="fas fa-download"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="media-info">
-                        <div class="media-author">
-                            <img src="${photo.src.tiny}" alt="${photo.photographer}" class="author-avatar">
-                            <div class="author-name">${photo.photographer}</div>
-                        </div>
-                        <div class="media-like">
-                            <i class="far fa-heart"></i> ${photo.liked ? photo.liked : Math.floor(Math.random() * 100)}
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-                
-                // Add event listeners to action buttons
-                const viewBtn = card.querySelector('.view-btn');
-                const downloadBtn = card.querySelector('.download-btn');
-                
-                viewBtn.addEventListener('click', () => viewMedia(photo, 'photo'));
-                downloadBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    downloadMediaDirect(photo.src.original, `photo-${photo.id}.jpg`);
-                });
-            });
-        }
-
-        // Display videos in the grid
-        function displayVideos(videos, grid) {
-            videos.forEach(video => {
-                // Find the medium quality video file
-                const videoFile = video.video_files.find(file => file.quality === 'hd' && file.width <= 1280) || 
-                                 video.video_files[0];
-                
-                const card = document.createElement('div');
-                card.className = 'media-card';
-                card.innerHTML = `
-                    <video class="media-video" muted loop poster="${video.image}">
-                        <source src="${videoFile.link}" type="video/mp4">
-                    </video>
-                    <div class="media-overlay">
-                        <div class="media-actions">
-                            <button class="action-btn view-btn" data-id="${video.id}">
-                                <i class="fas fa-expand"></i>
-                            </button>
-                            <button class="action-btn like-btn">
-                                <i class="far fa-heart"></i>
-                            </button>
-                            <button class="action-btn download-btn" data-url="${videoFile.link}">
-                                <i class="fas fa-download"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="media-info">
-                        <div class="media-author">
-                            <img src="${video.user.url}" alt="${video.user.name}" class="author-avatar">
-                            <div class="author-name">${video.user.name}</div>
-                        </div>
-                        <div class="media-like">
-                            <i class="far fa-heart"></i> ${video.liked ? video.liked : Math.floor(Math.random() * 100)}
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-                
-                // Add event listeners to action buttons
-                const viewBtn = card.querySelector('.view-btn');
-                const downloadBtn = card.querySelector('.download-btn');
-                const videoElement = card.querySelector('video');
-                
-                // Auto-play on hover
-                card.addEventListener('mouseenter', () => {
-                    videoElement.play();
-                });
-                
-                card.addEventListener('mouseleave', () => {
-                    videoElement.pause();
-                    videoElement.currentTime = 0;
-                });
-                
-                viewBtn.addEventListener('click', () => viewMedia(video, 'video'));
-                downloadBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    downloadMediaDirect(videoFile.link, `video-${video.id}.mp4`);
-                });
-            });
-        }
-
-        // View media in modal
-        function viewMedia(media, type) {
-            currentMedia = media;
-            modal.style.display = 'block';
-            
-            // Set modal content based on media type
-            if (type === 'video') {
-                modalImage.style.display = 'none';
-                modalVideo.style.display = 'block';
-                
-                // Find the best quality video file
-                const videoFile = media.video_files.find(file => file.quality === 'hd' && file.width <= 1280) || 
-                                 media.video_files[0];
-                modalVideo.src = videoFile.link;
-                modalVideo.load();
-                
-                modalTitle.textContent = `Video by ${media.user.name}`;
-                modalAuthor.textContent = media.user.name;
-                modalAvatar.src = media.user.url;
-                
-                // Update quality selector for videos
-                qualitySelector.innerHTML = '';
-                media.video_files.forEach(file => {
-                    const option = document.createElement('option');
-                    option.value = file.link;
-                    option.textContent = `${file.quality} (${file.width}x${file.height})`;
-                    qualitySelector.appendChild(option);
-                });
-            } else {
-                modalImage.style.display = 'block';
-                modalVideo.style.display = 'none';
-                modalImage.src = media.src.large;
-                
-                modalTitle.textContent = `Photo by ${media.photographer}`;
-                modalAuthor.textContent = media.photographer;
-                modalAvatar.src = media.src.tiny;
-                
-                // Update quality selector for photos
-                qualitySelector.innerHTML = `
-                    <option value="${media.src.small}">Small (${Math.round(media.width/4)}x${Math.round(media.height/4)})</option>
-                    <option value="${media.src.medium}">Medium (${Math.round(media.width/2)}x${Math.round(media.height/2)})</option>
-                    <option value="${media.src.large}">Large (${media.width}x${media.height})</option>
-                    <option value="${media.src.original}" selected>Original (${media.width}x${media.height})</option>
-                `;
-            }
-            
-            // Update download URL
-            updateDownloadUrl();
-        }
-
-        // Update download URL based on quality selection
-function updateDownloadUrl() {
-    if (!currentMedia) return;
-    
-    const downloadUrl = qualitySelector.value;
-    downloadBtn.setAttribute('data-url', downloadUrl);
-}
-
-// Download media from modal
-function downloadMedia() {
-    if (!currentMedia) return;
-    
-    const downloadUrl = downloadBtn.getAttribute('data-url');
-    const isVideo = modalVideo.style.display !== 'none';
-    const fileExtension = isVideo ? 'mp4' : 'jpg';
-    const fileName = `${isVideo ? 'video' : 'photo'}-${currentMedia.id}.${fileExtension}`;
-    
-    downloadMediaDirect(downloadUrl, fileName);
-}
-
-// Enhanced download function with better error handling
-function downloadMediaDirect(url, filename) {
-    // Check if it's an image URL that might need special handling
-    if (url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-        downloadImageWithFallback(url, filename);
-    } else {
-        // For videos or other files, use the standard method
-        downloadUsingAnchor(url, filename);
-    }
-}
-
-// Special handling for images to fix common download issues
-function downloadImageWithFallback(url, filename) {
-    const img = new Image();
-    img.crossOrigin = 'Anonymous'; // Important for CORS issues
-    
-    img.onload = function() {
-        try {
-            // Method 1: Try using canvas to handle CORS issues
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            
-            canvas.toBlob(function(blob) {
-                const blobUrl = URL.createObjectURL(blob);
-                downloadUsingAnchor(blobUrl, filename);
-                
-                // Clean up the URL after download
-                setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-            }, 'image/jpeg');
-        } catch (error) {
-            console.warn('Canvas method failed, trying direct download:', error);
-            // Fallback to direct download
-            downloadUsingAnchor(url, filename);
-        }
-    };
-    
-    img.onerror = function() {
-        console.warn('Image loading failed, trying direct download');
-        // Fallback to direct download if image fails to load
-        downloadUsingAnchor(url, filename);
-    };
-    
-    img.src = url;
-    
-    // Add timeout fallback
-    setTimeout(() => {
-        if (!img.complete) {
-            console.warn('Image load timeout, trying direct download');
-            downloadUsingAnchor(url, filename);
-        }
-    }, 5000);
-}
-
-// Standard download using anchor tag
-function downloadUsingAnchor(url, filename) {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.style.display = 'none';
-    
-    // Add target="_blank" for same-origin security issues
-    a.setAttribute('target', '_blank');
-    
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-
-const WALLHAVEN_URL = 'https://wall-proxy.vercel.app/api/wallpapers';
-let currentWallpapersPage = 1;
-let currentWallpaperQuery = 'nature';
-let currentWallpaperFilter = 'all';
-let currentWallpaperSort = 'relevance';
-let isWallpapersLoading = false;
-
-// DOM elements
-const wallpapersGrid = document.getElementById('wallpapers-grid');
-const wallpapersSpinner = document.getElementById('wallpapers-spinner');
-const wallpapersLoadMoreBtn = document.getElementById('wallpapers-load-more');
-const wallpaperSort = document.getElementById('wallpaper-sort');
-const wallpaperFilterBtns = document.querySelectorAll('#wallpaper-filter-section .filter-btn');
-
-// Initialize wallpapers when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    setupWallpaperEventListeners();
-    loadWallpapers(currentWallpaperQuery);
-});
-
-// Set up wallpaper event listeners
-function setupWallpaperEventListeners() {
-    // Wallpaper tab click
-    const wallpaperTab = document.querySelector('[data-tab="wallpapers"]');
-    if (wallpaperTab) {
-        wallpaperTab.addEventListener('click', () => {
-            // Load wallpapers when tab is clicked if grid is empty
-            if (wallpapersGrid.children.length === 0) {
-                loadWallpapers(currentWallpaperQuery);
             }
         });
+
+        // Download functionality
+        downloadBtn.addEventListener('click', downloadMedia);
+        qualitySelector.addEventListener('change', updateDownloadUrl);
     }
 
-    // Load more button
-    wallpapersLoadMoreBtn.addEventListener('click', () => {
-        currentWallpapersPage++;
-        loadWallpapers(currentWallpaperQuery, false);
-    });
+    // Set up wallpaper event listeners
+    function setupWallpaperEventListeners() {
+        // Load more button
+        wallpapersLoadMoreBtn.addEventListener('click', () => {
+            currentWallpapersPage++;
+            loadWallpapers(currentWallpaperQuery, false);
+        });
 
-    // Sort change
-    wallpaperSort.addEventListener('change', () => {
-        currentWallpaperSort = wallpaperSort.value;
-        currentWallpapersPage = 1;
-        wallpapersGrid.innerHTML = '';
-        loadWallpapers(currentWallpaperQuery);
-    });
-
-    // Filter buttons
-    wallpaperFilterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Update active filter button
-            wallpaperFilterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            // Set current filter and reload
-            currentWallpaperFilter = btn.getAttribute('data-filter');
+        // Sort change
+        wallpaperSort.addEventListener('change', () => {
+            currentWallpaperSort = wallpaperSort.value;
             currentWallpapersPage = 1;
             wallpapersGrid.innerHTML = '';
             loadWallpapers(currentWallpaperQuery);
         });
-    });
 
-    // Connect search to wallpapers
-    searchBtn.addEventListener('click', performWallpaperSearch);
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') performWallpaperSearch();
-    });
-}
+        // Filter buttons
+        wallpaperFilterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                wallpaperFilterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                currentWallpaperFilter = btn.getAttribute('data-filter');
+                currentWallpapersPage = 1;
+                wallpapersGrid.innerHTML = '';
+                loadWallpapers(currentWallpaperQuery);
+            });
+        });
+    }
 
-// Perform search for wallpapers
-function performWallpaperSearch() {
-    const query = searchInput.value.trim();
-    if (query) {
-        currentWallpaperQuery = query;
-        currentWallpapersPage = 1;
-        wallpapersGrid.innerHTML = '';
-        loadWallpapers(query);
+    // Load categories
+    function loadCategories() {
+        categories.forEach(category => {
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.innerHTML = `
+                <img src="${category.image}" alt="${category.name}" class="category-image">
+                <div class="category-name">${category.name}</div>
+            `;
+            card.addEventListener('click', () => {
+                currentQuery = category.query;
+                currentWallpaperQuery = category.query;
+                searchInput.value = currentQuery;
+                performSearch();
+            });
+            categoriesGrid.appendChild(card);
+        });
+    }
+
+    // Perform search for all content types
+    function performSearch() {
+        const query = searchInput.value.trim();
+        if (query) {
+            currentQuery = query;
+            currentWallpaperQuery = query;
+            currentPhotosPage = 1;
+            currentVideosPage = 1;
+            currentWallpapersPage = 1;
+            
+            // Add to recent searches
+            if (!recentSearches.includes(query)) {
+                recentSearches.unshift(query);
+                if (recentSearches.length > 5) {
+                    recentSearches.pop();
+                }
+                localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+                updateRecentSearches();
+            }
+            
+            // Clear grids and load new content for active section
+            const activeSection = document.querySelector('.content-section.active');
+            if (activeSection.id === 'photos-section') {
+                photosGrid.innerHTML = '';
+                loadMedia('photos', query);
+            } else if (activeSection.id === 'videos-section') {
+                videosGrid.innerHTML = '';
+                loadMedia('videos', query);
+            } else if (activeSection.id === 'wallpapers-section') {
+                wallpapersGrid.innerHTML = '';
+                loadWallpapers(query);
+            }
+        }
+    }
+
+    // Update recent searches display
+    function updateRecentSearches() {
+        if (recentSearches.length === 0) {
+            recentSearchesEl.innerHTML = '';
+            return;
+        }
         
-        // Add to recent searches
-        if (!recentSearches.includes(query)) {
-            recentSearches.unshift(query);
-            if (recentSearches.length > 5) {
-                recentSearches.pop();
-            }
-            localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
-            updateRecentSearches();
-        }
+        recentSearchesEl.innerHTML = '<span style="margin-right: 10px; color: var(--gray);">Recent:</span>';
+        recentSearches.forEach(search => {
+            const tag = document.createElement('span');
+            tag.className = 'recent-tag';
+            tag.textContent = search;
+            tag.addEventListener('click', () => {
+                searchInput.value = search;
+                performSearch();
+            });
+            recentSearchesEl.appendChild(tag);
+        });
     }
-}
 
-// Load wallpapers using proxy
-async function loadWallpapers(query, reset = true) {
-    if (isWallpapersLoading) return;
-    isWallpapersLoading = true;
-    wallpapersSpinner.style.display = 'block';
-    wallpapersLoadMoreBtn.style.display = 'none';
-
-    try {
-        let url = `${WALLHAVEN_URL}?q=${encodeURIComponent(query)}&page=${currentWallpapersPage}`;
-        if (currentWallpaperSort !== 'relevance') {
-            url += `&sorting=${currentWallpaperSort}`;
-        }
-        if (currentWallpaperFilter !== 'all') {
-            url += `&categories=${currentWallpaperFilter}`;
-        }
-
-        console.log('Fetching wallpapers from:', url); // Debug log
-
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`Proxy API error: ${response.status}`);
-
-        const data = await response.json();
-        console.log('Wallpaper API response:', data); // Debug log
-
-        const wallpapers = Array.isArray(data.data) ? data.data : [];
-
-        if (reset) wallpapersGrid.innerHTML = '';
-
-        if (wallpapers.length === 0) {
-            wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px; color: var(--gray);">No wallpapers found for this search. Try a different keyword.</p>';
+    // Load media from Pexels API
+    async function loadMedia(type, query, reset = true) {
+        if ((type === 'photos' && isPhotosLoading) || (type === 'videos' && isVideosLoading)) return;
+        
+        if (type === 'photos') {
+            isPhotosLoading = true;
+            photosSpinner.style.display = 'block';
+            photosLoadMoreBtn.style.display = 'none';
         } else {
-            displayWallpapers(wallpapers);
-            // Show load more button if we got a full page
-            if (wallpapers.length === 24) {
-                wallpapersLoadMoreBtn.style.display = 'inline-flex';
+            isVideosLoading = true;
+            videosSpinner.style.display = 'block';
+            videosLoadMoreBtn.style.display = 'none';
+        }
+
+        try {
+            const url = type === 'photos' 
+                ? `${BASE_URL}search?query=${query}&per_page=15&page=${currentPhotosPage}`
+                : `${VIDEO_URL}search?query=${query}&per_page=15&page=${currentVideosPage}`;
+
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': API_KEY
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const grid = type === 'photos' ? photosGrid : videosGrid;
+
+            if (reset) {
+                grid.innerHTML = '';
+            }
+
+            if (type === 'photos') {
+                displayPhotos(data.photos, grid);
+            } else {
+                displayVideos(data.videos, grid);
+            }
+
+            // Show/hide load more button
+            if (data.next_page) {
+                if (type === 'photos') {
+                    photosLoadMoreBtn.style.display = 'inline-flex';
+                } else {
+                    videosLoadMoreBtn.style.display = 'inline-flex';
+                }
+            }
+
+        } catch (error) {
+            console.error('Error fetching media:', error);
+            const grid = type === 'photos' ? photosGrid : videosGrid;
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px;">Sorry, there was an error loading content. Please try again later.</p>';
+        } finally {
+            if (type === 'photos') {
+                isPhotosLoading = false;
+                photosSpinner.style.display = 'none';
+            } else {
+                isVideosLoading = false;
+                videosSpinner.style.display = 'none';
             }
         }
-    } catch (error) {
-        console.error('Error fetching wallpapers:', error);
-        wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px; color: var(--gray);">Sorry, there was an error loading wallpapers. Please check your connection and try again.</p>';
-    } finally {
-        isWallpapersLoading = false;
-        wallpapersSpinner.style.display = 'none';
     }
-}
 
-// Display wallpapers
-function displayWallpapers(wallpapers) {
-    wallpapers.forEach(wallpaper => {
-        const card = document.createElement('div');
-        card.className = 'media-card';
-
-        // Use thumbnail if available, otherwise use main image
-        const thumbnailUrl = wallpaper.thumbs ? wallpaper.thumbs.large : (wallpaper.path || '');
-        const resolution = wallpaper.resolution || '1920x1080';
-        const favorites = wallpaper.favorites || 0;
-
-        card.innerHTML = `
-            <div class="wallpaper-ratio">
-                <img src="${thumbnailUrl}" alt="Wallpaper ${wallpaper.id}" class="wallpaper-image" loading="lazy" onerror="this.src='https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200'">
-                <div class="wallpaper-info">
-                    <span class="wallpaper-resolution">${resolution}</span>
-                    <div class="wallpaper-favorites">
-                        <i class="fas fa-heart"></i> ${favorites}
-                    </div>
-                </div>
+    // Display photos in the grid
+    function displayPhotos(photos, grid) {
+        photos.forEach(photo => {
+            const card = document.createElement('div');
+            card.className = 'media-card';
+            card.innerHTML = `
+                <img src="${photo.src.medium}" alt="${photo.photographer}" class="media-image">
                 <div class="media-overlay">
                     <div class="media-actions">
-                        <button class="action-btn view-btn" data-id="${wallpaper.id}">
+                        <button class="action-btn view-btn" data-id="${photo.id}">
                             <i class="fas fa-expand"></i>
                         </button>
                         <button class="action-btn like-btn">
                             <i class="far fa-heart"></i>
                         </button>
-                        <button class="action-btn download-btn" data-url="${wallpaper.path}">
+                        <button class="action-btn download-btn" data-url="${photo.src.original}">
                             <i class="fas fa-download"></i>
                         </button>
                     </div>
                 </div>
-            </div>
-        `;
-
-        wallpapersGrid.appendChild(card);
-
-        const viewBtn = card.querySelector('.view-btn');
-        const downloadBtn = card.querySelector('.download-btn');
-
-        viewBtn.addEventListener('click', () => viewWallpaper(wallpaper));
-        downloadBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (wallpaper.path) {
-                downloadMediaDirect(wallpaper.path, `wallpaper-${wallpaper.id}.jpg`);
-            }
+                <div class="media-info">
+                    <div class="media-author">
+                        <img src="${photo.src.tiny}" alt="${photo.photographer}" class="author-avatar">
+                        <div class="author-name">${photo.photographer}</div>
+                    </div>
+                    <div class="media-like">
+                        <i class="far fa-heart"></i> ${photo.liked ? photo.liked : Math.floor(Math.random() * 100)}
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+            
+            const viewBtn = card.querySelector('.view-btn');
+            const downloadBtn = card.querySelector('.download-btn');
+            
+            viewBtn.addEventListener('click', () => viewMedia(photo, 'photo'));
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadMediaDirect(photo.src.original, `photo-${photo.id}.jpg`);
+            });
         });
-    });
-}
+    }
 
-// View wallpaper in modal (you'll need to implement this)
-function viewWallpaper(wallpaper) {
-    currentMedia = wallpaper;
-    modal.style.display = 'block';
-    
-    modalImage.style.display = 'block';
-    modalVideo.style.display = 'none';
-    modalImage.src = wallpaper.path;
-    
-    modalTitle.textContent = `Wallpaper ${wallpaper.id}`;
-    modalAuthor.textContent = 'Wallhaven';
-    modalAvatar.src = 'https://github.com/danukaya123/wall/blob/main/favicon-32x32.png?raw=true';
-    
-    // Update quality selector
-    qualitySelector.innerHTML = `
-        <option value="${wallpaper.path}" selected>Original (${wallpaper.resolution || '1920x1080'})</option>
-    `;
-    
-    updateDownloadUrl();
-}
-    </script>
+    // Display videos in the grid
+    function displayVideos(videos, grid) {
+        videos.forEach(video => {
+            const videoFile = video.video_files.find(file => file.quality === 'hd' && file.width <= 1280) || 
+                             video.video_files[0];
+            
+            const card = document.createElement('div');
+            card.className = 'media-card';
+            card.innerHTML = `
+                <video class="media-video" muted loop poster="${video.image}">
+                    <source src="${videoFile.link}" type="video/mp4">
+                </video>
+                <div class="media-overlay">
+                    <div class="media-actions">
+                        <button class="action-btn view-btn" data-id="${video.id}">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <button class="action-btn like-btn">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="action-btn download-btn" data-url="${videoFile.link}">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="media-info">
+                    <div class="media-author">
+                        <img src="${video.user.url}" alt="${video.user.name}" class="author-avatar">
+                        <div class="author-name">${video.user.name}</div>
+                    </div>
+                    <div class="media-like">
+                        <i class="far fa-heart"></i> ${video.liked ? video.liked : Math.floor(Math.random() * 100)}
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+            
+            const viewBtn = card.querySelector('.view-btn');
+            const downloadBtn = card.querySelector('.download-btn');
+            const videoElement = card.querySelector('video');
+            
+            card.addEventListener('mouseenter', () => {
+                videoElement.play();
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                videoElement.pause();
+                videoElement.currentTime = 0;
+            });
+            
+            viewBtn.addEventListener('click', () => viewMedia(video, 'video'));
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadMediaDirect(videoFile.link, `video-${video.id}.mp4`);
+            });
+        });
+    }
+
+    // Load wallpapers using proxy
+    async function loadWallpapers(query, reset = true) {
+        if (isWallpapersLoading) return;
+        isWallpapersLoading = true;
+        wallpapersSpinner.style.display = 'block';
+        wallpapersLoadMoreBtn.style.display = 'none';
+
+        try {
+            let url = `${WALLHAVEN_URL}?q=${encodeURIComponent(query)}&page=${currentWallpapersPage}`;
+            if (currentWallpaperSort !== 'relevance') {
+                url += `&sorting=${currentWallpaperSort}`;
+            }
+            if (currentWallpaperFilter !== 'all') {
+                url += `&categories=${currentWallpaperFilter}`;
+            }
+
+            console.log('Fetching wallpapers from:', url);
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Proxy API error: ${response.status}`);
+
+            const data = await response.json();
+            console.log('Wallpaper API response:', data);
+
+            const wallpapers = Array.isArray(data.data) ? data.data : [];
+
+            if (reset) wallpapersGrid.innerHTML = '';
+
+            if (wallpapers.length === 0) {
+                wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px; color: var(--gray);">No wallpapers found for this search. Try a different keyword.</p>';
+            } else {
+                displayWallpapers(wallpapers);
+                if (wallpapers.length === 24) {
+                    wallpapersLoadMoreBtn.style.display = 'inline-flex';
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching wallpapers:', error);
+            wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px; color: var(--gray);">Sorry, there was an error loading wallpapers. Please check your connection and try again.</p>';
+        } finally {
+            isWallpapersLoading = false;
+            wallpapersSpinner.style.display = 'none';
+        }
+    }
+
+    // Display wallpapers
+    function displayWallpapers(wallpapers) {
+        wallpapers.forEach(wallpaper => {
+            const card = document.createElement('div');
+            card.className = 'media-card';
+
+            const thumbnailUrl = wallpaper.thumbs ? wallpaper.thumbs.large : (wallpaper.path || '');
+            const resolution = wallpaper.resolution || '1920x1080';
+            const favorites = wallpaper.favorites || 0;
+
+            card.innerHTML = `
+                <div class="wallpaper-ratio">
+                    <img src="${thumbnailUrl}" alt="Wallpaper ${wallpaper.id}" class="wallpaper-image" loading="lazy" onerror="this.src='https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200'">
+                    <div class="wallpaper-info">
+                        <span class="wallpaper-resolution">${resolution}</span>
+                        <div class="wallpaper-favorites">
+                            <i class="fas fa-heart"></i> ${favorites}
+                        </div>
+                    </div>
+                    <div class="media-overlay">
+                        <div class="media-actions">
+                            <button class="action-btn view-btn" data-id="${wallpaper.id}">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button class="action-btn like-btn">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <button class="action-btn download-btn" data-url="${wallpaper.path}">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            wallpapersGrid.appendChild(card);
+
+            const viewBtn = card.querySelector('.view-btn');
+            const downloadBtn = card.querySelector('.download-btn');
+
+            viewBtn.addEventListener('click', () => viewWallpaper(wallpaper));
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (wallpaper.path) {
+                    downloadMediaDirect(wallpaper.path, `wallpaper-${wallpaper.id}.jpg`);
+                }
+            });
+        });
+    }
+
+    // View media in modal
+    function viewMedia(media, type) {
+        currentMedia = media;
+        modal.style.display = 'block';
+        
+        if (type === 'video') {
+            modalImage.style.display = 'none';
+            modalVideo.style.display = 'block';
+            
+            const videoFile = media.video_files.find(file => file.quality === 'hd' && file.width <= 1280) || 
+                             media.video_files[0];
+            modalVideo.src = videoFile.link;
+            modalVideo.load();
+            
+            modalTitle.textContent = `Video by ${media.user.name}`;
+            modalAuthor.textContent = media.user.name;
+            modalAvatar.src = media.user.url;
+            
+            qualitySelector.innerHTML = '';
+            media.video_files.forEach(file => {
+                const option = document.createElement('option');
+                option.value = file.link;
+                option.textContent = `${file.quality} (${file.width}x${file.height})`;
+                qualitySelector.appendChild(option);
+            });
+        } else {
+            modalImage.style.display = 'block';
+            modalVideo.style.display = 'none';
+            modalImage.src = media.src.large;
+            
+            modalTitle.textContent = `Photo by ${media.photographer}`;
+            modalAuthor.textContent = media.photographer;
+            modalAvatar.src = media.src.tiny;
+            
+            qualitySelector.innerHTML = `
+                <option value="${media.src.small}">Small (${Math.round(media.width/4)}x${Math.round(media.height/4)})</option>
+                <option value="${media.src.medium}">Medium (${Math.round(media.width/2)}x${Math.round(media.height/2)})</option>
+                <option value="${media.src.large}">Large (${media.width}x${media.height})</option>
+                <option value="${media.src.original}" selected>Original (${media.width}x${media.height})</option>
+            `;
+        }
+        
+        updateDownloadUrl();
+    }
+
+    // View wallpaper in modal
+    function viewWallpaper(wallpaper) {
+        currentMedia = wallpaper;
+        modal.style.display = 'block';
+        
+        modalImage.style.display = 'block';
+        modalVideo.style.display = 'none';
+        modalImage.src = wallpaper.path;
+        
+        modalTitle.textContent = `Wallpaper ${wallpaper.id}`;
+        modalAuthor.textContent = 'Wallhaven';
+        modalAvatar.src = 'https://github.com/danukaya123/wall/blob/main/favicon-32x32.png?raw=true';
+        
+        qualitySelector.innerHTML = `
+            <option value="${wallpaper.path}" selected>Original (${wallpaper.resolution || '1920x1080'})</option>
+        `;
+        
+        updateDownloadUrl();
+    }
+
+    // Update download URL based on quality selection
+    function updateDownloadUrl() {
+        if (!currentMedia) return;
+        
+        const downloadUrl = qualitySelector.value;
+        downloadBtn.setAttribute('data-url', downloadUrl);
+    }
+
+    // Download media from modal
+    function downloadMedia() {
+        if (!currentMedia) return;
+        
+        const downloadUrl = downloadBtn.getAttribute('data-url');
+        const isVideo = modalVideo.style.display !== 'none';
+        const fileExtension = isVideo ? 'mp4' : 'jpg';
+        const fileName = `${isVideo ? 'video' : 'photo'}-${currentMedia.id}.${fileExtension}`;
+        
+        downloadMediaDirect(downloadUrl, fileName);
+    }
+
+    // Enhanced download function
+    function downloadMediaDirect(url, filename) {
+        if (url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+            downloadImageWithFallback(url, filename);
+        } else {
+            downloadUsingAnchor(url, filename);
+        }
+    }
+
+    // Special handling for images
+    function downloadImageWithFallback(url, filename) {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        
+        img.onload = function() {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                canvas.toBlob(function(blob) {
+                    const blobUrl = URL.createObjectURL(blob);
+                    downloadUsingAnchor(blobUrl, filename);
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                }, 'image/jpeg');
+            } catch (error) {
+                console.warn('Canvas method failed, trying direct download:', error);
+                downloadUsingAnchor(url, filename);
+            }
+        };
+        
+        img.onerror = function() {
+            console.warn('Image loading failed, trying direct download');
+            downloadUsingAnchor(url, filename);
+        };
+        
+        img.src = url;
+        
+        setTimeout(() => {
+            if (!img.complete) {
+                console.warn('Image load timeout, trying direct download');
+                downloadUsingAnchor(url, filename);
+            }
+        }, 5000);
+    }
+
+    // Standard download using anchor tag
+    function downloadUsingAnchor(url, filename) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        a.setAttribute('target', '_blank');
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+</script>
 </body>
 </html>
