@@ -1676,99 +1676,122 @@
     }
 
     // Load wallpapers using proxy
-    async function loadWallpapers(query, reset = true) {
-        if (isWallpapersLoading) return;
-        isWallpapersLoading = true;
-        wallpapersSpinner.style.display = 'block';
-        wallpapersLoadMoreBtn.style.display = 'none';
+async function loadWallpapers(query, reset = true) {
+    if (isWallpapersLoading) return;
+    isWallpapersLoading = true;
+    wallpapersSpinner.style.display = 'block';
+    wallpapersLoadMoreBtn.style.display = 'none';
 
-        try {
-            let url = `${WALLHAVEN_URL}?q=${encodeURIComponent(query)}&page=${currentWallpapersPage}`;
-            if (currentWallpaperSort !== 'relevance') {
-                url += `&sorting=${currentWallpaperSort}`;
-            }
-            if (currentWallpaperFilter !== 'all') {
-                url += `&categories=${currentWallpaperFilter}`;
-            }
-
-            console.log('Fetching wallpapers from:', url);
-
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Proxy API error: ${response.status}`);
-
-            const data = await response.json();
-            console.log('Wallpaper API response:', data);
-
-            const wallpapers = Array.isArray(data.data) ? data.data : [];
-
-            if (reset) wallpapersGrid.innerHTML = '';
-
-            if (wallpapers.length === 0) {
-                wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px; color: var(--gray);">No wallpapers found for this search. Try a different keyword.</p>';
-            } else {
-                displayWallpapers(wallpapers);
-                if (wallpapers.length === 24) {
-                    wallpapersLoadMoreBtn.style.display = 'inline-flex';
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching wallpapers:', error);
-            wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px; color: var(--gray);">Sorry, there was an error loading wallpapers. Please check your connection and try again.</p>';
-        } finally {
-            isWallpapersLoading = false;
-            wallpapersSpinner.style.display = 'none';
+    try {
+        let url = `${WALLHAVEN_URL}?q=${encodeURIComponent(query)}&page=${currentWallpapersPage}`;
+        if (currentWallpaperSort !== 'relevance') {
+            url += `&sorting=${currentWallpaperSort}`;
         }
+        if (currentWallpaperFilter !== 'all') {
+            url += `&categories=${currentWallpaperFilter}`;
+        }
+
+        console.log('Fetching wallpapers from:', url);
+
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`Proxy API error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log('API response received:', data);
+
+        // Extract wallpapers from the correct path: data.data
+        const wallpapers = data.data || [];
+        const meta = data.meta || {};
+        
+        console.log(`Found ${wallpapers.length} wallpapers`);
+        console.log('Pagination info:', meta);
+
+        if (reset) {
+            wallpapersGrid.innerHTML = '';
+        }
+
+        if (wallpapers.length === 0) {
+            wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px; color: var(--gray);">No wallpapers found for this search. Try a different keyword.</p>';
+        } else {
+            displayWallpapers(wallpapers);
+            
+            // Show load more button if there are more pages
+            if (meta.current_page && meta.last_page && meta.current_page < meta.last_page) {
+                wallpapersLoadMoreBtn.style.display = 'inline-flex';
+            } else {
+                wallpapersLoadMoreBtn.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching wallpapers:', error);
+        wallpapersGrid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align:center; padding:40px; color: var(--gray);">
+                <p>Sorry, there was an error loading wallpapers.</p>
+                <p style="font-size: 0.9rem; margin-top: 10px;">Error: ${error.message}</p>
+                <button onclick="loadWallpapers('${currentWallpaperQuery}')" style="margin-top: 15px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Try Again
+                </button>
+            </div>
+        `;
+    } finally {
+        isWallpapersLoading = false;
+        wallpapersSpinner.style.display = 'none';
     }
+}
 
     // Display wallpapers
-    function displayWallpapers(wallpapers) {
-        wallpapers.forEach(wallpaper => {
-            const card = document.createElement('div');
-            card.className = 'media-card';
+function displayWallpapers(wallpapers) {
+    wallpapers.forEach(wallpaper => {
+        const card = document.createElement('div');
+        card.className = 'media-card';
 
-            const thumbnailUrl = wallpaper.thumbs ? wallpaper.thumbs.large : (wallpaper.path || '');
-            const resolution = wallpaper.resolution || '1920x1080';
-            const favorites = wallpaper.favorites || 0;
+        // Use the correct properties from your API response
+        const thumbnailUrl = wallpaper.thumbs?.large || wallpaper.path || '';
+        const resolution = wallpaper.resolution || `${wallpaper.dimension_x}x${wallpaper.dimension_y}` || '1920x1080';
+        const favorites = wallpaper.favorites || 0;
 
-            card.innerHTML = `
-                <div class="wallpaper-ratio">
-                    <img src="${thumbnailUrl}" alt="Wallpaper ${wallpaper.id}" class="wallpaper-image" loading="lazy" onerror="this.src='https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200'">
-                    <div class="wallpaper-info">
-                        <span class="wallpaper-resolution">${resolution}</span>
-                        <div class="wallpaper-favorites">
-                            <i class="fas fa-heart"></i> ${favorites}
-                        </div>
-                    </div>
-                    <div class="media-overlay">
-                        <div class="media-actions">
-                            <button class="action-btn view-btn" data-id="${wallpaper.id}">
-                                <i class="fas fa-expand"></i>
-                            </button>
-                            <button class="action-btn like-btn">
-                                <i class="far fa-heart"></i>
-                            </button>
-                            <button class="action-btn download-btn" data-url="${wallpaper.path}">
-                                <i class="fas fa-download"></i>
-                            </button>
-                        </div>
+        card.innerHTML = `
+            <div class="wallpaper-ratio">
+                <img src="${thumbnailUrl}" alt="Wallpaper ${wallpaper.id}" class="wallpaper-image" loading="lazy" onerror="this.src='https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200'">
+                <div class="wallpaper-info">
+                    <span class="wallpaper-resolution">${resolution}</span>
+                    <div class="wallpaper-favorites">
+                        <i class="fas fa-heart"></i> ${favorites}
                     </div>
                 </div>
-            `;
+                <div class="media-overlay">
+                    <div class="media-actions">
+                        <button class="action-btn view-btn" data-id="${wallpaper.id}">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <button class="action-btn like-btn">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="action-btn download-btn" data-url="${wallpaper.path}">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
 
-            wallpapersGrid.appendChild(card);
+        wallpapersGrid.appendChild(card);
 
-            const viewBtn = card.querySelector('.view-btn');
-            const downloadBtn = card.querySelector('.download-btn');
+        const viewBtn = card.querySelector('.view-btn');
+        const downloadBtn = card.querySelector('.download-btn');
 
-            viewBtn.addEventListener('click', () => viewWallpaper(wallpaper));
-            downloadBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (wallpaper.path) {
-                    downloadMediaDirect(wallpaper.path, `wallpaper-${wallpaper.id}.jpg`);
-                }
-            });
+        viewBtn.addEventListener('click', () => viewWallpaper(wallpaper));
+        downloadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (wallpaper.path) {
+                downloadMediaDirect(wallpaper.path, `wallpaper-${wallpaper.id}.jpg`);
+            }
         });
-    }
+    });
+}
 
     // View media in modal
     function viewMedia(media, type) {
@@ -1816,24 +1839,24 @@
     }
 
     // View wallpaper in modal
-    function viewWallpaper(wallpaper) {
-        currentMedia = wallpaper;
-        modal.style.display = 'block';
-        
-        modalImage.style.display = 'block';
-        modalVideo.style.display = 'none';
-        modalImage.src = wallpaper.path;
-        
-        modalTitle.textContent = `Wallpaper ${wallpaper.id}`;
-        modalAuthor.textContent = 'Wallhaven';
-        modalAvatar.src = 'https://github.com/danukaya123/wall/blob/main/favicon-32x32.png?raw=true';
-        
-        qualitySelector.innerHTML = `
-            <option value="${wallpaper.path}" selected>Original (${wallpaper.resolution || '1920x1080'})</option>
-        `;
-        
-        updateDownloadUrl();
-    }
+function viewWallpaper(wallpaper) {
+    currentMedia = wallpaper;
+    modal.style.display = 'block';
+    
+    modalImage.style.display = 'block';
+    modalVideo.style.display = 'none';
+    modalImage.src = wallpaper.path;
+    
+    modalTitle.textContent = `Wallpaper ${wallpaper.id}`;
+    modalAuthor.textContent = 'Wallhaven';
+    modalAvatar.src = 'https://github.com/danukaya123/wall/blob/main/favicon-32x32.png?raw=true';
+    
+    qualitySelector.innerHTML = `
+        <option value="${wallpaper.path}" selected>Original (${wallpaper.resolution || '1920x1080'})</option>
+    `;
+    
+    updateDownloadUrl();
+}
 
     // Update download URL based on quality selection
     function updateDownloadUrl() {
