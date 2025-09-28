@@ -1915,7 +1915,7 @@
     </footer>
 
 <script>
-  contentTabs.forEach(tab => {
+contentTabs.forEach(tab => {
     tab.addEventListener('click', () => {
         const tabType = tab.getAttribute('data-tab');
         
@@ -1936,51 +1936,20 @@
     });
 });
 
-// Function to show/hide categories and filters based on active tab
 function handleSectionVisibility(activeTab) {
     const categoriesSection = document.querySelector('.categories-section');
     const filterSection = document.querySelector('.filter-section');
-    const searchSection = document.querySelector('.search-section');
     
     if (activeTab === 'ai') {
         // Hide categories and filters for AI tab
         if (categoriesSection) categoriesSection.style.display = 'none';
         if (filterSection) filterSection.style.display = 'none';
-        // Keep search section visible but you can hide it too if needed
-        // if (searchSection) searchSection.style.display = 'none';
     } else {
         // Show categories and filters for other tabs
         if (categoriesSection) categoriesSection.style.display = 'block';
         if (filterSection) filterSection.style.display = 'flex';
-        // if (searchSection) searchSection.style.display = 'block';
     }
 }
-
-// Also update your existing tab click handlers to include this
-function setupEventListeners() {
-    // Your existing event listeners...
-    
-    // Enhanced content tabs with section hiding
-    contentTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const tabType = tab.getAttribute('data-tab');
-            
-            // Update active tab
-            contentTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            
-            // Show corresponding section
-            contentSections.forEach(section => {
-                section.classList.remove('active');
-                if (section.id === `${tabType}-section`) {
-                    section.classList.add('active');
-                }
-            });
-            
-            // Handle category and filter visibility
-            handleSectionVisibility(tabType);
-        });
-    });
     // Mobile menu toggle functionality
     document.addEventListener('DOMContentLoaded', function() {
         const menuToggle = document.getElementById('menu-toggle');
