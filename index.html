@@ -1895,41 +1895,7 @@
     </footer>
 
 <script>
-contentTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-        const tabType = tab.getAttribute('data-tab');
-        
-        // Update active tab
-        contentTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        
-        // Show corresponding section
-        contentSections.forEach(section => {
-            section.classList.remove('active');
-            if (section.id === `${tabType}-section`) {
-                section.classList.add('active');
-            }
-        });
-        
-        // Handle category and filter visibility
-        handleSectionVisibility(tabType);
-    });
-});
 
-function handleSectionVisibility(activeTab) {
-    const categoriesSection = document.querySelector('.categories-section');
-    const filterSection = document.querySelector('.filter-section');
-    
-    if (activeTab === 'ai') {
-        // Hide categories and filters for AI tab
-        if (categoriesSection) categoriesSection.style.display = 'none';
-        if (filterSection) filterSection.style.display = 'none';
-    } else {
-        // Show categories and filters for other tabs
-        if (categoriesSection) categoriesSection.style.display = 'block';
-        if (filterSection) filterSection.style.display = 'flex';
-    }
-}
     // Mobile menu toggle functionality
     document.addEventListener('DOMContentLoaded', function() {
         const menuToggle = document.getElementById('menu-toggle');
