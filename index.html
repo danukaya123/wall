@@ -1922,8 +1922,9 @@
             });
         });
 
-        // Initialize Android interface helper
+        // Initialize Android interface and permission system
         setupAndroidInterface();
+        initializePermissionSystem();
     });
 
     // Pexels API configuration
@@ -1983,6 +1984,8 @@
     let isPhotosLoading = false;
     let isVideosLoading = false;
     let isWallpapersLoading = false;
+    let hasStoragePermission = false;
+    let permissionRequested = false;
 
     // Default categories with sample images
     const categories = [
@@ -1996,54 +1999,260 @@
         { name: 'Sports', query: 'sports', image: 'https://images.pexels.com/photos/248547/pexels-photo-248547.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' }
     ];
 
-    // CRASH-PROOF DOWNLOAD SYSTEM
+    // ANDROID STORAGE PERMISSION SYSTEM
     function setupAndroidInterface() {
         if (!window.Android) {
             window.Android = {
+                // Check if storage permission is granted
+                hasStoragePermission: function() {
+                    console.log('Checking storage permission...');
+                    return false;
+                },
+                
+                // Request storage permission from user
+                requestStoragePermission: function() {
+                    console.log('Requesting storage permission...');
+                    return new Promise((resolve) => {
+                        // This will be handled by Android WebView
+                        setTimeout(() => resolve(false), 100);
+                    });
+                },
+                
+                // Download file with proper storage handling
                 downloadFile: function(url, filename) {
-                    console.log('Android download interface:', url, filename);
+                    console.log('Android download:', url, filename);
+                    return true;
+                },
+                
+                // Save file to downloads folder
+                saveToDownloads: function(url, filename) {
+                    console.log('Saving to downloads:', filename);
                     return true;
                 }
             };
         }
     }
 
-    // SAFE DOWNLOAD FUNCTION - WORKS ON BOTH WEBSITE AND ANDROID
-    function downloadMediaDirect(url, filename) {
-        console.log('Safe download attempt:', filename);
-        
-        // Method 1: Try Android interface first (for WebView apps)
-        if (window.Android && typeof Android.downloadFile === 'function') {
+    // Initialize permission system
+    function initializePermissionSystem() {
+        // Check if we're in Android WebView
+        if (window.Android) {
+            // Check current permission status
             try {
-                Android.downloadFile(url, filename);
-                console.log('Android download initiated');
-                return;
+                hasStoragePermission = window.Android.hasStoragePermission();
+                console.log('Storage permission status:', hasStoragePermission);
             } catch (e) {
-                console.log('Android interface failed:', e);
+                console.log('Permission check not available');
+            }
+        }
+    }
+
+    // Request storage permission from user
+    async function requestStoragePermission() {
+        if (permissionRequested) {
+            return hasStoragePermission;
+        }
+        
+        permissionRequested = true;
+        
+        // Show permission request dialog
+        const permissionGranted = await showPermissionDialog();
+        
+        if (permissionGranted) {
+            hasStoragePermission = true;
+            console.log('Storage permission granted by user');
+            
+            // Save permission preference
+            localStorage.setItem('storagePermission', 'granted');
+            
+            // Show success message
+            showToast('Storage permission granted! You can now download files.');
+        } else {
+            hasStoragePermission = false;
+            console.log('Storage permission denied by user');
+            
+            // Show info message
+            showToast('Downloads will open in browser instead.');
+        }
+        
+        return hasStoragePermission;
+    }
+
+    // Show permission request dialog
+    function showPermissionDialog() {
+        return new Promise((resolve) => {
+            // Create permission dialog
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                font-family: 'Segoe UI', system-ui, sans-serif;
+            `;
+            
+            dialog.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    max-width: 400px;
+                    margin: 20px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                    text-align: center;
+                ">
+                    <div style="font-size: 48px; color: #05a081; margin-bottom: 15px;">
+                        <i class="fas fa-folder-plus"></i>
+                    </div>
+                    <h3 style="margin: 0 0 15px 0; color: #222;">Storage Permission Required</h3>
+                    <p style="color: #666; line-height: 1.5; margin-bottom: 25px;">
+                        Quizontal needs access to your device storage to save downloads to your Downloads folder. 
+                        This allows you to access your downloaded files easily.
+                    </p>
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button id="permission-deny" style="
+                            padding: 12px 25px;
+                            background: #f5f5f5;
+                            color: #222;
+                            border: none;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            flex: 1;
+                        ">Deny</button>
+                        <button id="permission-allow" style="
+                            padding: 12px 25px;
+                            background: #05a081;
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            flex: 1;
+                        ">Allow</button>
+                    </div>
+                    <p style="font-size: 12px; color: #999; margin-top: 15px;">
+                        You can change this later in app settings
+                    </p>
+                </div>
+            `;
+            
+            document.body.appendChild(dialog);
+            
+            // Add event listeners
+            document.getElementById('permission-allow').addEventListener('click', () => {
+                document.body.removeChild(dialog);
+                
+                // Try Android permission request if available
+                if (window.Android && window.Android.requestStoragePermission) {
+                    window.Android.requestStoragePermission().then((result) => {
+                        resolve(result);
+                    }).catch(() => {
+                        resolve(true); // Fallback to true for web
+                    });
+                } else {
+                    resolve(true); // For web browser
+                }
+            });
+            
+            document.getElementById('permission-deny').addEventListener('click', () => {
+                document.body.removeChild(dialog);
+                resolve(false);
+            });
+        });
+    }
+
+    // Show toast message
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        const backgroundColor = type === 'success' ? '#05a081' : type === 'error' ? '#ff6b6b' : '#333';
+        
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: ${backgroundColor};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            z-index: 10001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+        `;
+        
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            if (document.body.contains(toast)) {
+                document.body.removeChild(toast);
+            }
+        }, 3000);
+    }
+
+    // ENHANCED DOWNLOAD FUNCTION WITH PERMISSION HANDLING
+    async function downloadMediaDirect(url, filename) {
+        console.log('Download attempt:', filename);
+        
+        // Method 1: Android with storage permission
+        if (window.Android && window.Android.downloadFile) {
+            try {
+                // Request permission if not already granted
+                if (!hasStoragePermission) {
+                    const granted = await requestStoragePermission();
+                    if (!granted) {
+                        // User denied permission, fallback to browser download
+                        console.log('Permission denied, using browser download');
+                        downloadUsingBrowser(url, filename);
+                        return;
+                    }
+                }
+                
+                // Use Android download with storage permission
+                const result = window.Android.downloadFile(url, filename);
+                if (result) {
+                    showToast(`Downloading ${filename}...`, 'success');
+                    return;
+                }
+            } catch (e) {
+                console.log('Android download failed:', e);
             }
         }
         
-        // Method 2: Simple anchor download with fallbacks
+        // Method 2: Browser download (fallback)
+        downloadUsingBrowser(url, filename);
+    }
+
+    // Browser-based download (works everywhere)
+    function downloadUsingBrowser(url, filename) {
         try {
             const a = document.createElement('a');
             a.href = url;
             a.download = filename;
             a.style.display = 'none';
-            a.target = '_blank'; // Important for mobile
+            a.target = '_blank';
             
             document.body.appendChild(a);
             
-            // Use timeout to prevent blocking
             setTimeout(() => {
                 try {
                     a.click();
-                    console.log('Anchor download initiated');
+                    showToast(`Downloading ${filename}...`, 'success');
                 } catch (clickError) {
-                    console.log('Click failed, opening in new tab:', clickError);
+                    console.log('Click failed, opening in new tab');
                     window.open(url, '_blank');
+                    showToast('File opened in new tab', 'info');
                 }
                 
-                // Clean up with delay
+                // Clean up
                 setTimeout(() => {
                     if (document.body.contains(a)) {
                         document.body.removeChild(a);
@@ -2052,13 +2261,14 @@
             }, 100);
             
         } catch (error) {
-            console.error('Download error:', error);
-            // Final fallback - open in new tab (guaranteed no crash)
+            console.error('Browser download failed:', error);
+            // Final fallback
             window.open(url, '_blank');
+            showToast('File opened in new tab', 'info');
         }
     }
 
-    // SAFE AI IMAGE DOWNLOAD
+    // Safe AI Image Download
     function downloadAiImage(url, prompt) {
         const filename = `ai-image-${Date.now()}.jpg`;
         downloadMediaDirect(url, filename);
@@ -2072,6 +2282,13 @@
         loadWallpapers('nature');
         updateRecentSearches();
         setupEventListeners();
+        
+        // Check for previously granted permission
+        const savedPermission = localStorage.getItem('storagePermission');
+        if (savedPermission === 'granted') {
+            hasStoragePermission = true;
+            console.log('Storage permission restored from previous session');
+        }
     });
 
     // Set up event listeners
@@ -2168,7 +2385,7 @@
             }
         });
 
-        // SAFE DOWNLOAD FUNCTIONALITY
+        // Enhanced download functionality with permission handling
         downloadBtn.addEventListener('click', function() {
             if (!currentMedia) return;
             
@@ -2181,6 +2398,7 @@
                 downloadMediaDirect(downloadUrl, fileName);
             } catch (error) {
                 console.error('Modal download failed:', error);
+                showToast('Download failed. Please try again.', 'error');
                 window.open(downloadUrl, '_blank');
             }
         });
@@ -2362,6 +2580,7 @@
                     downloadMediaDirect(photo.src.original, `photo-${photo.id}.jpg`);
                 } catch (error) {
                     console.error('Photo download failed:', error);
+                    showToast('Download failed. Please try again.', 'error');
                     window.open(photo.src.original, '_blank');
                 }
             });
@@ -2425,6 +2644,7 @@
                     downloadMediaDirect(videoFile.link, `video-${video.id}.mp4`);
                 } catch (error) {
                     console.error('Video download failed:', error);
+                    showToast('Download failed. Please try again.', 'error');
                     window.open(videoFile.link, '_blank');
                 }
             });
@@ -2586,13 +2806,30 @@
                     downloadMediaDirect(wallpaper.path, `wallpaper-${wallpaper.id}.jpg`);
                 } catch (error) {
                     console.error('Wallpaper download failed:', error);
+                    showToast('Download failed. Please try again.', 'error');
                     window.open(wallpaper.path, '_blank');
                 }
             });
         });
     }
 
-    // AI Image Generation JavaScript (with safe downloads)
+    // Add CSS for animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // AI Image Generation JavaScript (with permission handling)
     const BACKEND_URL = "https://cors-for-ai.vercel.app/generate";
 
     // DOM Elements
