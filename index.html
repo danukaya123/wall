@@ -1895,6 +1895,7 @@
     </footer>
 
 <script>
+
     // Mobile menu toggle functionality
     document.addEventListener('DOMContentLoaded', function() {
         const menuToggle = document.getElementById('menu-toggle');
@@ -1921,10 +1922,6 @@
                 menuToggle.classList.remove('active');
             });
         });
-
-        // Initialize Android interface and permission system
-        setupAndroidInterface();
-        initializePermissionSystem();
     });
 
     // Pexels API configuration
@@ -1984,8 +1981,6 @@
     let isPhotosLoading = false;
     let isVideosLoading = false;
     let isWallpapersLoading = false;
-    let hasStoragePermission = false;
-    let permissionRequested = false;
 
     // Default categories with sample images
     const categories = [
@@ -1999,281 +1994,6 @@
         { name: 'Sports', query: 'sports', image: 'https://images.pexels.com/photos/248547/pexels-photo-248547.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' }
     ];
 
-    // ANDROID STORAGE PERMISSION SYSTEM
-    function setupAndroidInterface() {
-        if (!window.Android) {
-            window.Android = {
-                // Check if storage permission is granted
-                hasStoragePermission: function() {
-                    console.log('Checking storage permission...');
-                    return false;
-                },
-                
-                // Request storage permission from user
-                requestStoragePermission: function() {
-                    console.log('Requesting storage permission...');
-                    return new Promise((resolve) => {
-                        // This will be handled by Android WebView
-                        setTimeout(() => resolve(false), 100);
-                    });
-                },
-                
-                // Download file with proper storage handling
-                downloadFile: function(url, filename) {
-                    console.log('Android download:', url, filename);
-                    return true;
-                },
-                
-                // Save file to downloads folder
-                saveToDownloads: function(url, filename) {
-                    console.log('Saving to downloads:', filename);
-                    return true;
-                }
-            };
-        }
-    }
-
-    // Initialize permission system
-    function initializePermissionSystem() {
-        // Check if we're in Android WebView
-        if (window.Android) {
-            // Check current permission status
-            try {
-                hasStoragePermission = window.Android.hasStoragePermission();
-                console.log('Storage permission status:', hasStoragePermission);
-            } catch (e) {
-                console.log('Permission check not available');
-            }
-        }
-    }
-
-    // Request storage permission from user
-    async function requestStoragePermission() {
-        if (permissionRequested) {
-            return hasStoragePermission;
-        }
-        
-        permissionRequested = true;
-        
-        // Show permission request dialog
-        const permissionGranted = await showPermissionDialog();
-        
-        if (permissionGranted) {
-            hasStoragePermission = true;
-            console.log('Storage permission granted by user');
-            
-            // Save permission preference
-            localStorage.setItem('storagePermission', 'granted');
-            
-            // Show success message
-            showToast('Storage permission granted! You can now download files.');
-        } else {
-            hasStoragePermission = false;
-            console.log('Storage permission denied by user');
-            
-            // Show info message
-            showToast('Downloads will open in browser instead.');
-        }
-        
-        return hasStoragePermission;
-    }
-
-    // Show permission request dialog
-    function showPermissionDialog() {
-        return new Promise((resolve) => {
-            // Create permission dialog
-            const dialog = document.createElement('div');
-            dialog.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.7);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 10000;
-                font-family: 'Segoe UI', system-ui, sans-serif;
-            `;
-            
-            dialog.innerHTML = `
-                <div style="
-                    background: white;
-                    padding: 30px;
-                    border-radius: 15px;
-                    max-width: 400px;
-                    margin: 20px;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                    text-align: center;
-                ">
-                    <div style="font-size: 48px; color: #05a081; margin-bottom: 15px;">
-                        <i class="fas fa-folder-plus"></i>
-                    </div>
-                    <h3 style="margin: 0 0 15px 0; color: #222;">Storage Permission Required</h3>
-                    <p style="color: #666; line-height: 1.5; margin-bottom: 25px;">
-                        Quizontal needs access to your device storage to save downloads to your Downloads folder. 
-                        This allows you to access your downloaded files easily.
-                    </p>
-                    <div style="display: flex; gap: 10px; justify-content: center;">
-                        <button id="permission-deny" style="
-                            padding: 12px 25px;
-                            background: #f5f5f5;
-                            color: #222;
-                            border: none;
-                            border-radius: 8px;
-                            font-weight: 600;
-                            cursor: pointer;
-                            flex: 1;
-                        ">Deny</button>
-                        <button id="permission-allow" style="
-                            padding: 12px 25px;
-                            background: #05a081;
-                            color: white;
-                            border: none;
-                            border-radius: 8px;
-                            font-weight: 600;
-                            cursor: pointer;
-                            flex: 1;
-                        ">Allow</button>
-                    </div>
-                    <p style="font-size: 12px; color: #999; margin-top: 15px;">
-                        You can change this later in app settings
-                    </p>
-                </div>
-            `;
-            
-            document.body.appendChild(dialog);
-            
-            // Add event listeners
-            document.getElementById('permission-allow').addEventListener('click', () => {
-                document.body.removeChild(dialog);
-                
-                // Try Android permission request if available
-                if (window.Android && window.Android.requestStoragePermission) {
-                    window.Android.requestStoragePermission().then((result) => {
-                        resolve(result);
-                    }).catch(() => {
-                        resolve(true); // Fallback to true for web
-                    });
-                } else {
-                    resolve(true); // For web browser
-                }
-            });
-            
-            document.getElementById('permission-deny').addEventListener('click', () => {
-                document.body.removeChild(dialog);
-                resolve(false);
-            });
-        });
-    }
-
-    // Show toast message
-    function showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        const backgroundColor = type === 'success' ? '#05a081' : type === 'error' ? '#ff6b6b' : '#333';
-        
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: ${backgroundColor};
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            z-index: 10001;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            animation: slideUp 0.3s ease;
-        `;
-        
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-            if (document.body.contains(toast)) {
-                document.body.removeChild(toast);
-            }
-        }, 3000);
-    }
-
-    // ENHANCED DOWNLOAD FUNCTION WITH PERMISSION HANDLING
-    async function downloadMediaDirect(url, filename) {
-        console.log('Download attempt:', filename);
-        
-        // Method 1: Android with storage permission
-        if (window.Android && window.Android.downloadFile) {
-            try {
-                // Request permission if not already granted
-                if (!hasStoragePermission) {
-                    const granted = await requestStoragePermission();
-                    if (!granted) {
-                        // User denied permission, fallback to browser download
-                        console.log('Permission denied, using browser download');
-                        downloadUsingBrowser(url, filename);
-                        return;
-                    }
-                }
-                
-                // Use Android download with storage permission
-                const result = window.Android.downloadFile(url, filename);
-                if (result) {
-                    showToast(`Downloading ${filename}...`, 'success');
-                    return;
-                }
-            } catch (e) {
-                console.log('Android download failed:', e);
-            }
-        }
-        
-        // Method 2: Browser download (fallback)
-        downloadUsingBrowser(url, filename);
-    }
-
-    // Browser-based download (works everywhere)
-    function downloadUsingBrowser(url, filename) {
-        try {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.style.display = 'none';
-            a.target = '_blank';
-            
-            document.body.appendChild(a);
-            
-            setTimeout(() => {
-                try {
-                    a.click();
-                    showToast(`Downloading ${filename}...`, 'success');
-                } catch (clickError) {
-                    console.log('Click failed, opening in new tab');
-                    window.open(url, '_blank');
-                    showToast('File opened in new tab', 'info');
-                }
-                
-                // Clean up
-                setTimeout(() => {
-                    if (document.body.contains(a)) {
-                        document.body.removeChild(a);
-                    }
-                }, 1000);
-            }, 100);
-            
-        } catch (error) {
-            console.error('Browser download failed:', error);
-            // Final fallback
-            window.open(url, '_blank');
-            showToast('File opened in new tab', 'info');
-        }
-    }
-
-    // Safe AI Image Download
-    function downloadAiImage(url, prompt) {
-        const filename = `ai-image-${Date.now()}.jpg`;
-        downloadMediaDirect(url, filename);
-    }
-
     // Initialize the app
     document.addEventListener('DOMContentLoaded', () => {
         loadCategories();
@@ -2282,13 +2002,6 @@
         loadWallpapers('nature');
         updateRecentSearches();
         setupEventListeners();
-        
-        // Check for previously granted permission
-        const savedPermission = localStorage.getItem('storagePermission');
-        if (savedPermission === 'granted') {
-            hasStoragePermission = true;
-            console.log('Storage permission restored from previous session');
-        }
     });
 
     // Set up event listeners
@@ -2302,9 +2015,11 @@
         // Filter buttons
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
+                // Update active filter button
                 filterBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 
+                // Set current filter and perform search
                 currentFilter = btn.getAttribute('data-filter');
                 if (currentFilter !== 'all') {
                     currentQuery = currentFilter;
@@ -2319,9 +2034,11 @@
             tab.addEventListener('click', () => {
                 const tabType = tab.getAttribute('data-tab');
                 
+                // Update active tab
                 contentTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 
+                // Show corresponding section
                 contentSections.forEach(section => {
                     section.classList.remove('active');
                     if (section.id === `${tabType}-section`) {
@@ -2385,24 +2102,8 @@
             }
         });
 
-        // Enhanced download functionality with permission handling
-        downloadBtn.addEventListener('click', function() {
-            if (!currentMedia) return;
-            
-            const downloadUrl = downloadBtn.getAttribute('data-url');
-            const isVideo = modalVideo.style.display !== 'none';
-            const fileExtension = isVideo ? 'mp4' : 'jpg';
-            const fileName = `${isVideo ? 'video' : 'photo'}-${currentMedia.id}.${fileExtension}`;
-            
-            try {
-                downloadMediaDirect(downloadUrl, fileName);
-            } catch (error) {
-                console.error('Modal download failed:', error);
-                showToast('Download failed. Please try again.', 'error');
-                window.open(downloadUrl, '_blank');
-            }
-        });
-        
+        // Download functionality
+        downloadBtn.addEventListener('click', downloadMedia);
         qualitySelector.addEventListener('change', updateDownloadUrl);
     }
 
@@ -2435,6 +2136,7 @@
             currentVideosPage = 1;
             currentWallpapersPage = 1;
             
+            // Add to recent searches
             if (!recentSearches.includes(query)) {
                 recentSearches.unshift(query);
                 if (recentSearches.length > 5) {
@@ -2444,6 +2146,7 @@
                 updateRecentSearches();
             }
             
+            // Clear grids and load new content
             photosGrid.innerHTML = '';
             videosGrid.innerHTML = '';
             wallpapersGrid.innerHTML = '';
@@ -2515,6 +2218,7 @@
                 displayVideos(data.videos, grid);
             }
 
+            // Show/hide load more button based on whether there are more results
             if (data.next_page) {
                 if (type === 'photos') {
                     photosLoadMoreBtn.style.display = 'inline-flex';
@@ -2570,19 +2274,14 @@
             `;
             grid.appendChild(card);
             
+            // Add event listeners to action buttons
             const viewBtn = card.querySelector('.view-btn');
             const downloadBtn = card.querySelector('.download-btn');
             
             viewBtn.addEventListener('click', () => viewMedia(photo, 'photo'));
             downloadBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                try {
-                    downloadMediaDirect(photo.src.original, `photo-${photo.id}.jpg`);
-                } catch (error) {
-                    console.error('Photo download failed:', error);
-                    showToast('Download failed. Please try again.', 'error');
-                    window.open(photo.src.original, '_blank');
-                }
+                downloadMediaDirect(photo.src.original, `photo-${photo.id}.jpg`);
             });
         });
     }
@@ -2590,6 +2289,7 @@
     // Display videos in the grid
     function displayVideos(videos, grid) {
         videos.forEach(video => {
+            // Find the medium quality video file
             const videoFile = video.video_files.find(file => file.quality === 'hd' && file.width <= 1280) || 
                              video.video_files[0];
             
@@ -2624,10 +2324,12 @@
             `;
             grid.appendChild(card);
             
+            // Add event listeners to action buttons
             const viewBtn = card.querySelector('.view-btn');
             const downloadBtn = card.querySelector('.download-btn');
             const videoElement = card.querySelector('video');
             
+            // Auto-play on hover
             card.addEventListener('mouseenter', () => {
                 videoElement.play();
             });
@@ -2640,13 +2342,7 @@
             viewBtn.addEventListener('click', () => viewMedia(video, 'video'));
             downloadBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                try {
-                    downloadMediaDirect(videoFile.link, `video-${video.id}.mp4`);
-                } catch (error) {
-                    console.error('Video download failed:', error);
-                    showToast('Download failed. Please try again.', 'error');
-                    window.open(videoFile.link, '_blank');
-                }
+                downloadMediaDirect(videoFile.link, `video-${video.id}.mp4`);
             });
         });
     }
@@ -2656,10 +2352,12 @@
         currentMedia = media;
         modal.style.display = 'block';
         
+        // Set modal content based on media type
         if (type === 'video') {
             modalImage.style.display = 'none';
             modalVideo.style.display = 'block';
             
+            // Find the best quality video file
             const videoFile = media.video_files.find(file => file.quality === 'hd' && file.width <= 1280) || 
                              media.video_files[0];
             modalVideo.src = videoFile.link;
@@ -2669,6 +2367,7 @@
             modalAuthor.textContent = media.user.name;
             modalAvatar.src = media.user.url;
             
+            // Update quality selector for videos
             qualitySelector.innerHTML = '';
             media.video_files.forEach(file => {
                 const option = document.createElement('option');
@@ -2685,6 +2384,7 @@
             modalAuthor.textContent = media.photographer;
             modalAvatar.src = media.src.tiny;
             
+            // Update quality selector for photos
             qualitySelector.innerHTML = `
                 <option value="${media.src.small}">Small (${Math.round(media.width/4)}x${Math.round(media.height/4)})</option>
                 <option value="${media.src.medium}">Medium (${Math.round(media.width/2)}x${Math.round(media.height/2)})</option>
@@ -2693,6 +2393,7 @@
             `;
         }
         
+        // Update download URL
         updateDownloadUrl();
     }
 
@@ -2709,12 +2410,14 @@
         modalAuthor.textContent = wallpaper.id;
         modalAvatar.src = wallpaper.thumbs ? wallpaper.thumbs.large : wallpaper.path;
         
+        // Update quality selector for wallpapers
         qualitySelector.innerHTML = `
             <option value="${wallpaper.thumbs ? wallpaper.thumbs.small : wallpaper.path}">Small</option>
             <option value="${wallpaper.thumbs ? wallpaper.thumbs.large : wallpaper.path}">Medium</option>
             <option value="${wallpaper.path}" selected>Original (${wallpaper.resolution})</option>
         `;
         
+        // Update download URL
         updateDownloadUrl();
     }
 
@@ -2724,6 +2427,141 @@
         
         const downloadUrl = qualitySelector.value;
         downloadBtn.setAttribute('data-url', downloadUrl);
+    }
+
+    // Download media from modal
+    function downloadMedia() {
+        if (!currentMedia) return;
+        
+        const downloadUrl = downloadBtn.getAttribute('data-url');
+        const isVideo = modalVideo.style.display !== 'none';
+        const fileExtension = isVideo ? 'mp4' : 'jpg';
+        const fileName = `${isVideo ? 'video' : 'photo'}-${currentMedia.id}.${fileExtension}`;
+        
+        downloadMediaDirect(downloadUrl, fileName);
+    }
+
+    // Enhanced download function with better error handling
+// Enhanced download function to prevent app crashes
+function downloadMediaDirect(url, filename) {
+    try {
+        // Method 1: Try using fetch with blob (safer approach)
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename;
+                a.style.display = 'none';
+                
+                // Add to document and trigger click
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(blobUrl);
+                }, 100);
+            })
+            .catch(error => {
+                console.warn('Blob download failed, trying direct method:', error);
+                // Fallback to direct download
+                downloadUsingAnchor(url, filename);
+            });
+    } catch (error) {
+        console.error('Download error:', error);
+        // Final fallback
+        downloadUsingAnchor(url, filename);
+    }
+}
+
+// Fallback download function
+function downloadUsingAnchor(url, filename) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    a.setAttribute('target', '_blank'); // Important for mobile apps
+    
+    document.body.appendChild(a);
+    
+    // Use setTimeout to prevent app freezing
+    setTimeout(() => {
+        try {
+            a.click();
+        } catch (e) {
+            console.error('Click failed:', e);
+            // Last resort - open in new window
+            window.open(url, '_blank');
+        }
+        
+        // Clean up with delay
+        setTimeout(() => {
+            document.body.removeChild(a);
+        }, 1000);
+    }, 100);
+}
+
+    // Special handling for images to fix common download issues
+    function downloadImageWithFallback(url, filename) {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; // Important for CORS issues
+        
+        img.onload = function() {
+            try {
+                // Method 1: Try using canvas to handle CORS issues
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                canvas.toBlob(function(blob) {
+                    const blobUrl = URL.createObjectURL(blob);
+                    downloadUsingAnchor(blobUrl, filename);
+                    
+                    // Clean up the URL after download
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                }, 'image/jpeg');
+            } catch (error) {
+                console.warn('Canvas method failed, trying direct download:', error);
+                // Fallback to direct download
+                downloadUsingAnchor(url, filename);
+            }
+        };
+        
+        img.onerror = function() {
+            console.warn('Image loading failed, trying direct download');
+            // Fallback to direct download if image fails to load
+            downloadUsingAnchor(url, filename);
+        };
+        
+        img.src = url;
+        
+        // Add timeout fallback
+        setTimeout(() => {
+            if (!img.complete) {
+                console.warn('Image load timeout, trying direct download');
+                downloadUsingAnchor(url, filename);
+            }
+        }, 5000);
+    }
+
+    // Standard download using anchor tag
+    function downloadUsingAnchor(url, filename) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        
+        // Add target="_blank" for same-origin security issues
+        a.setAttribute('target', '_blank');
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 
     // Load wallpapers using proxy
@@ -2802,384 +2640,431 @@
             viewBtn.addEventListener('click', () => viewWallpaper(wallpaper));
             downloadBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                try {
-                    downloadMediaDirect(wallpaper.path, `wallpaper-${wallpaper.id}.jpg`);
-                } catch (error) {
-                    console.error('Wallpaper download failed:', error);
-                    showToast('Download failed. Please try again.', 'error');
-                    window.open(wallpaper.path, '_blank');
-                }
+                downloadMediaDirect(wallpaper.path, `wallpaper-${wallpaper.id}.jpg`);
             });
         });
     }
 
-    // Add CSS for animations
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideUp {
-            from {
-                transform: translateX(-50%) translateY(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(-50%) translateY(0);
-                opacity: 1;
-            }
-        }
-    `;
-    document.head.appendChild(style);
+// Fixed AI Image Generation JavaScript
+const BACKEND_URL = "https://cors-for-ai.vercel.app/generate";
 
-    // AI Image Generation JavaScript (with permission handling)
-    const BACKEND_URL = "https://cors-for-ai.vercel.app/generate";
+// DOM Elements
+const aiPromptInput = document.getElementById('ai-prompt-input');
+const aiGenerateBtn = document.getElementById('ai-generate-btn');
+const aiClearBtn = document.getElementById('ai-clear-btn');
+const aiPreview = document.getElementById('ai-preview');
+const aiProgress = document.getElementById('ai-progress');
+const progressFill = document.getElementById('progress-fill');
+const progressTime = document.getElementById('progress-time');
+const charCount = document.getElementById('char-count');
+const generationCount = document.getElementById('generation-count');
 
-    // DOM Elements
-    const aiPromptInput = document.getElementById('ai-prompt-input');
-    const aiGenerateBtn = document.getElementById('ai-generate-btn');
-    const aiClearBtn = document.getElementById('ai-clear-btn');
-    const aiPreview = document.getElementById('ai-preview');
-    const aiProgress = document.getElementById('ai-progress');
-    const progressFill = document.getElementById('progress-fill');
-    const progressTime = document.getElementById('progress-time');
-    const charCount = document.getElementById('char-count');
-    const generationCount = document.getElementById('generation-count');
+// State
+let generatedImages = [];
+let generationCounter = 0;
+let progressInterval;
 
-    // State
-    let generatedImages = [];
-    let generationCounter = 0;
-    let progressInterval;
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    initAIGenerator();
+});
 
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        initAIGenerator();
+function initAIGenerator() {
+    // Event Listeners
+    aiGenerateBtn.addEventListener('click', generateAI);
+    aiClearBtn.addEventListener('click', clearAI);
+    
+    // Character count
+    aiPromptInput.addEventListener('input', updateCharCount);
+    
+    // Quick prompts
+    document.querySelectorAll('.quick-prompt').forEach(prompt => {
+        prompt.addEventListener('click', () => {
+            aiPromptInput.value = prompt.getAttribute('data-prompt');
+            updateCharCount();
+        });
     });
-
-    function initAIGenerator() {
-        aiGenerateBtn.addEventListener('click', generateAI);
-        aiClearBtn.addEventListener('click', clearAI);
-        
-        aiPromptInput.addEventListener('input', updateCharCount);
-        
-        document.querySelectorAll('.quick-prompt').forEach(prompt => {
-            prompt.addEventListener('click', () => {
-                aiPromptInput.value = prompt.getAttribute('data-prompt');
-                updateCharCount();
-            });
-        });
-        
-        aiPromptInput.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'Enter') {
-                generateAI();
-            }
-        });
-        
-        updateCharCount();
-    }
-
-    function updateCharCount() {
-        const count = aiPromptInput.value.length;
-        charCount.textContent = count;
-        
-        if (count > 500) {
-            charCount.style.color = '#ff6b6b';
-        } else if (count > 400) {
-            charCount.style.color = '#ffa726';
-        } else {
-            charCount.style.color = 'var(--gray)';
+    
+    // Keyboard shortcut
+    aiPromptInput.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'Enter') {
+            generateAI();
         }
+    });
+    
+    updateCharCount();
+}
+
+function updateCharCount() {
+    const count = aiPromptInput.value.length;
+    charCount.textContent = count;
+    
+    if (count > 500) {
+        charCount.style.color = '#ff6b6b';
+    } else if (count > 400) {
+        charCount.style.color = '#ffa726';
+    } else {
+        charCount.style.color = 'var(--gray)';
     }
+}
 
-    async function generateAI() {
-        const prompt = aiPromptInput.value.trim() || "A beautiful landscape with mountains and sunset";
-        
-        if (prompt.length > 500) {
-            alert('Prompt is too long. Please keep it under 500 characters.');
-            return;
-        }
-        
-        startProgressAnimation();
-        
-        aiGenerateBtn.disabled = true;
-        aiGenerateBtn.querySelector('.btn-text').style.display = 'none';
-        aiGenerateBtn.querySelector('.btn-loading').style.display = 'flex';
-        
-        try {
-            console.log('Sending request to:', BACKEND_URL);
-            
-            const startTime = Date.now();
-            
-            const res = await fetch(BACKEND_URL, {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Accept": "image/*"
-                },
-                body: JSON.stringify({ prompt })
-            });
-
-            console.log('Response status:', res.status);
-            
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(`Server error: ${res.status} - ${errorText}`);
-            }
-
-            const contentType = res.headers.get('content-type');
-            console.log('Content-Type:', contentType);
-            
-            if (!contentType || !contentType.includes('image')) {
-                const text = await res.text();
-                throw new Error('Server returned non-image response');
-            }
-
-            const blob = await res.blob();
-            console.log('Blob received:', blob.size, 'bytes');
-            
-            if (blob.size === 0) {
-                throw new Error('Empty image received from server');
-            }
-            
-            const endTime = Date.now();
-            console.log('Generation took:', (endTime - startTime) / 1000, 'seconds');
-            
-            completeProgress();
-            
-            const imgUrl = URL.createObjectURL(blob);
-            addGeneratedImage(prompt, imgUrl);
-            
-            generationCounter++;
-            generationCount.textContent = generationCounter;
-
-        } catch (err) {
-            console.error('AI Generation Error:', err);
-            stopProgress();
-            showError(err.message || 'Failed to generate image. Please try again.');
-        } finally {
-            resetGenerateButton();
-        }
+async function generateAI() {
+    const prompt = aiPromptInput.value.trim() || "A beautiful landscape with mountains and sunset";
+    
+    if (prompt.length > 500) {
+        alert('Prompt is too long. Please keep it under 500 characters.');
+        return;
     }
-
-    function startProgressAnimation() {
-        aiProgress.style.display = 'block';
+    
+    // Start progress animation
+    startProgressAnimation();
+    
+    // Update UI
+    aiGenerateBtn.disabled = true;
+    aiGenerateBtn.querySelector('.btn-text').style.display = 'none';
+    aiGenerateBtn.querySelector('.btn-loading').style.display = 'flex';
+    
+    try {
+        console.log('Sending request to:', BACKEND_URL);
+        console.log('Prompt:', prompt);
+        
         const startTime = Date.now();
         
-        progressInterval = setInterval(() => {
-            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            progressTime.textContent = elapsed + 's';
-        }, 1000);
+        const res = await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Accept": "image/*"
+            },
+            body: JSON.stringify({ prompt })
+        });
+
+        console.log('Response status:', res.status);
+        console.log('Response headers:', res.headers);
         
-        let progress = 0;
-        const progressBarInterval = setInterval(() => {
-            progress += 2;
-            if (progress > 85) progress = 85;
-            progressFill.style.width = progress + '%';
-        }, 200);
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('Error response:', errorText);
+            throw new Error(`Server error: ${res.status} - ${errorText}`);
+        }
+
+        // Check if response is an image
+        const contentType = res.headers.get('content-type');
+        console.log('Content-Type:', contentType);
         
-        window.progressBarInterval = progressBarInterval;
+        if (!contentType || !contentType.includes('image')) {
+            const text = await res.text();
+            console.error('Non-image response:', text);
+            throw new Error('Server returned non-image response');
+        }
+
+        const blob = await res.blob();
+        console.log('Blob received:', blob.size, 'bytes', 'Type:', blob.type);
         
-        const steps = document.querySelectorAll('.progress-step');
-        steps.forEach((step, index) => {
+        if (blob.size === 0) {
+            throw new Error('Empty image received from server');
+        }
+        
+        const endTime = Date.now();
+        console.log('Generation took:', (endTime - startTime) / 1000, 'seconds');
+        
+        // Complete progress
+        completeProgress();
+        
+        // Create and display image
+        const imgUrl = URL.createObjectURL(blob);
+        addGeneratedImage(prompt, imgUrl);
+        
+        // Update counter
+        generationCounter++;
+        generationCount.textContent = generationCounter;
+
+    } catch (err) {
+        console.error('AI Generation Error:', err);
+        stopProgress();
+        showError(err.message || 'Failed to generate image. Please try again.');
+    } finally {
+        // Reset UI
+        resetGenerateButton();
+    }
+}
+
+function startProgressAnimation() {
+    aiProgress.style.display = 'block';
+    const startTime = Date.now();
+    
+    // Update time every second
+    progressInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        progressTime.textContent = elapsed + 's';
+    }, 1000);
+    
+    // Simple progress bar animation
+    let progress = 0;
+    const progressBarInterval = setInterval(() => {
+        progress += 2;
+        if (progress > 85) progress = 85; // Cap at 85% until completion
+        progressFill.style.width = progress + '%';
+    }, 200);
+    
+    // Store interval for cleanup
+    window.progressBarInterval = progressBarInterval;
+    
+    // Animate steps sequentially
+    const steps = document.querySelectorAll('.progress-step');
+    steps.forEach((step, index) => {
+        setTimeout(() => {
+            // Remove active from all steps
+            steps.forEach(s => s.classList.remove('active'));
+            // Add active to current step
+            step.classList.add('active');
+        }, index * 3000); // Each step lasts 3 seconds
+    });
+}
+
+function completeProgress() {
+    // Quickly complete the progress bar
+    progressFill.style.width = '100%';
+    
+    // Mark all steps as complete
+    const steps = document.querySelectorAll('.progress-step');
+    steps.forEach(step => step.classList.add('active'));
+    
+    // Hide progress after a short delay
+    setTimeout(() => {
+        stopProgress();
+    }, 1000);
+}
+
+function stopProgress() {
+    // Clear all intervals
+    if (progressInterval) {
+        clearInterval(progressInterval);
+    }
+    if (window.progressBarInterval) {
+        clearInterval(window.progressBarInterval);
+    }
+    
+    // Reset progress UI
+    setTimeout(() => {
+        aiProgress.style.display = 'none';
+        progressFill.style.width = '0%';
+        document.querySelectorAll('.progress-step').forEach(step => {
+            step.classList.remove('active');
+        });
+    }, 500);
+}
+
+function resetGenerateButton() {
+    aiGenerateBtn.disabled = false;
+    aiGenerateBtn.querySelector('.btn-text').style.display = 'flex';
+    aiGenerateBtn.querySelector('.btn-loading').style.display = 'none';
+}
+
+function addGeneratedImage(prompt, imageUrl) {
+    const imageId = Date.now();
+    
+    // Remove empty state if it exists
+    const emptyState = aiPreview.querySelector('.empty-state');
+    if (emptyState) {
+        emptyState.remove();
+    }
+    
+    // Create results grid if it doesn't exist
+    let resultsGrid = aiPreview.querySelector('.ai-results-grid');
+    if (!resultsGrid) {
+        resultsGrid = document.createElement('div');
+        resultsGrid.className = 'ai-results-grid';
+        aiPreview.appendChild(resultsGrid);
+    }
+    
+    const imageCard = document.createElement('div');
+    imageCard.className = 'ai-image-card';
+    imageCard.innerHTML = `
+        <div class="ai-image-container">
+            <img src="${imageUrl}" alt="${prompt}" class="ai-generated-image" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color: #ff6b6b; padding: 20px; text-align: center;\'>Failed to load image</div>';">
+            <div class="ai-image-overlay">
+                <div class="ai-image-actions">
+                    <button class="ai-action-btn view-ai-btn" data-id="${imageId}">
+                        <i class="fas fa-expand"></i> View
+                    </button>
+                    <button class="ai-action-btn download-ai-btn" data-url="${imageUrl}" data-prompt="${prompt}">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="ai-image-info">
+            <div class="ai-prompt-preview" title="${prompt}">${prompt}</div>
+            <div class="ai-image-meta">
+                <span>AI Generated</span>
+                <span>${new Date().toLocaleDateString()}</span>
+            </div>
+        </div>
+    `;
+    
+    // Add to beginning of results grid
+    resultsGrid.insertBefore(imageCard, resultsGrid.firstChild);
+    
+    // Store in state
+    generatedImages.unshift({
+        id: imageId,
+        prompt: prompt,
+        url: imageUrl,
+        date: new Date()
+    });
+    
+    // Add event listeners
+    const viewBtn = imageCard.querySelector('.view-ai-btn');
+    const downloadBtn = imageCard.querySelector('.download-ai-btn');
+    
+    viewBtn.addEventListener('click', () => viewAiImage(imageId));
+    downloadBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const url = downloadBtn.getAttribute('data-url');
+        const prompt = downloadBtn.getAttribute('data-prompt');
+        downloadAiImage(url, prompt);
+    });
+    
+    // Test image load
+    const img = imageCard.querySelector('img');
+    img.onload = function() {
+        console.log('Image loaded successfully');
+    };
+    img.onerror = function() {
+        console.error('Failed to load generated image');
+    };
+}
+
+// Enhanced safe download function
+function downloadAiImage(url, prompt) {
+    const filename = `ai-image-${Date.now()}.jpg`;
+    
+    // Create a temporary anchor element
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    
+    // Use setTimeout to prevent blocking
+    setTimeout(() => {
+        try {
+            document.body.appendChild(a);
+            a.click();
+            
+            // Clean up after a delay
             setTimeout(() => {
-                steps.forEach(s => s.classList.remove('active'));
-                step.classList.add('active');
-            }, index * 3000);
-        });
-    }
-
-    function completeProgress() {
-        progressFill.style.width = '100%';
-        
-        const steps = document.querySelectorAll('.progress-step');
-        steps.forEach(step => step.classList.add('active'));
-        
-        setTimeout(() => {
-            stopProgress();
-        }, 1000);
-    }
-
-    function stopProgress() {
-        if (progressInterval) {
-            clearInterval(progressInterval);
+                if (document.body.contains(a)) {
+                    document.body.removeChild(a);
+                }
+            }, 1000);
+            
+        } catch (error) {
+            console.error('Download error:', error);
+            // Fallback: open in new tab
+            window.open(url, '_blank');
         }
-        if (window.progressBarInterval) {
-            clearInterval(window.progressBarInterval);
-        }
-        
-        setTimeout(() => {
-            aiProgress.style.display = 'none';
-            progressFill.style.width = '0%';
-            document.querySelectorAll('.progress-step').forEach(step => {
-                step.classList.remove('active');
-            });
-        }, 500);
-    }
+    }, 100);
+}
 
-    function resetGenerateButton() {
-        aiGenerateBtn.disabled = false;
-        aiGenerateBtn.querySelector('.btn-text').style.display = 'flex';
-        aiGenerateBtn.querySelector('.btn-loading').style.display = 'none';
-    }
-
-    function addGeneratedImage(prompt, imageUrl) {
-        const imageId = Date.now();
-        
-        const emptyState = aiPreview.querySelector('.empty-state');
-        if (emptyState) {
-            emptyState.remove();
-        }
-        
-        let resultsGrid = aiPreview.querySelector('.ai-results-grid');
-        if (!resultsGrid) {
-            resultsGrid = document.createElement('div');
-            resultsGrid.className = 'ai-results-grid';
-            aiPreview.appendChild(resultsGrid);
-        }
-        
-        const imageCard = document.createElement('div');
-        imageCard.className = 'ai-image-card';
-        imageCard.innerHTML = `
-            <div class="ai-image-container">
-                <img src="${imageUrl}" alt="${prompt}" class="ai-generated-image" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color: #ff6b6b; padding: 20px; text-align: center;\'>Failed to load image</div>';">
-                <div class="ai-image-overlay">
-                    <div class="ai-image-actions">
-                        <button class="ai-action-btn view-ai-btn" data-id="${imageId}">
-                            <i class="fas fa-expand"></i> View
-                        </button>
-                        <button class="ai-action-btn download-ai-btn" data-url="${imageUrl}" data-prompt="${prompt}">
-                            <i class="fas fa-download"></i> Download
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="ai-image-info">
-                <div class="ai-prompt-preview" title="${prompt}">${prompt}</div>
-                <div class="ai-image-meta">
-                    <span>AI Generated</span>
-                    <span>${new Date().toLocaleDateString()}</span>
-                </div>
-            </div>
-        `;
-        
-        resultsGrid.insertBefore(imageCard, resultsGrid.firstChild);
-        
-        generatedImages.unshift({
+function viewAiImage(imageId) {
+    const image = generatedImages.find(img => img.id === imageId);
+    if (!image) return;
+    
+    // Use your existing modal
+    if (typeof currentMedia !== 'undefined' && typeof modal !== 'undefined') {
+        currentMedia = {
             id: imageId,
-            prompt: prompt,
-            url: imageUrl,
-            date: new Date()
-        });
-        
-        const viewBtn = imageCard.querySelector('.view-ai-btn');
-        const downloadBtn = imageCard.querySelector('.download-ai-btn');
-        
-        viewBtn.addEventListener('click', () => viewAiImage(imageId));
-        downloadBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const url = downloadBtn.getAttribute('data-url');
-            const prompt = downloadBtn.getAttribute('data-prompt');
-            downloadAiImage(url, prompt);
-        });
-        
-        const img = imageCard.querySelector('img');
-        img.onload = function() {
-            console.log('Image loaded successfully');
-        };
-        img.onerror = function() {
-            console.error('Failed to load generated image');
-        };
-    }
-
-    function viewAiImage(imageId) {
-        const image = generatedImages.find(img => img.id === imageId);
-        if (!image) return;
-        
-        if (typeof currentMedia !== 'undefined' && typeof modal !== 'undefined') {
-            currentMedia = {
-                id: imageId,
-                photographer: 'AI Generated',
-                src: {
-                    large: image.url,
-                    tiny: image.url
-                }
-            };
-            
-            modal.style.display = 'block';
-            modalImage.style.display = 'block';
-            modalVideo.style.display = 'none';
-            modalImage.src = image.url;
-            
-            modalTitle.textContent = `AI Generated Image`;
-            modalAuthor.textContent = 'AI Generated';
-            modalAvatar.src = image.url;
-            
-            if (typeof qualitySelector !== 'undefined') {
-                qualitySelector.innerHTML = `<option value="${image.url}" selected>Original</option>`;
-                updateDownloadUrl();
+            photographer: 'AI Generated',
+            src: {
+                large: image.url,
+                tiny: image.url
             }
-        } else {
-            window.open(image.url, '_blank');
+        };
+        
+        modal.style.display = 'block';
+        modalImage.style.display = 'block';
+        modalVideo.style.display = 'none';
+        modalImage.src = image.url;
+        
+        modalTitle.textContent = `AI Generated Image`;
+        modalAuthor.textContent = 'AI Generated';
+        modalAvatar.src = image.url;
+        
+        if (typeof qualitySelector !== 'undefined') {
+            qualitySelector.innerHTML = `<option value="${image.url}" selected>Original</option>`;
+            updateDownloadUrl();
         }
+    } else {
+        // Fallback: open image in new tab
+        window.open(image.url, '_blank');
     }
+}
 
-    function clearAI() {
-        if (generatedImages.length === 0) return;
-        
-        if (confirm('Are you sure you want to clear all generated images?')) {
-            generatedImages = [];
-            aiPreview.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-robot"></i>
-                    <h4>No Images Generated Yet</h4>
-                    <p>Enter a prompt above and click "Generate Image" to create amazing AI art</p>
-                </div>
-            `;
-            
-            generatedImages.forEach(img => {
-                try {
-                    URL.revokeObjectURL(img.url);
-                } catch (e) {
-                    console.warn('Error revoking URL:', e);
-                }
-            });
-            
-            generationCounter = 0;
-            generationCount.textContent = '0';
-        }
-    }
-
-    function showError(message) {
-        const emptyState = aiPreview.querySelector('.empty-state');
-        if (emptyState) {
-            emptyState.remove();
-        }
-        
-        let resultsGrid = aiPreview.querySelector('.ai-results-grid');
-        if (!resultsGrid) {
-            resultsGrid = document.createElement('div');
-            resultsGrid.className = 'ai-results-grid';
-            aiPreview.appendChild(resultsGrid);
-        }
-        
-        const errorCard = document.createElement('div');
-        errorCard.className = 'ai-image-card';
-        errorCard.innerHTML = `
-            <div class="ai-image-container" style="background: #ffebee; display: flex; align-items: center; justify-content: center;">
-                <div style="text-align: center; color: #d32f2f; padding: 20px;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                    <h4 style="margin: 0 0 10px 0;">Generation Failed</h4>
-                    <p style="margin: 0; font-size: 0.9rem;">${message}</p>
-                </div>
-            </div>
-            <div class="ai-image-info">
-                <div class="ai-prompt-preview" style="color: #d32f2f;">Failed to generate image</div>
-                <div class="ai-image-meta">
-                    <span>Error</span>
-                    <span>${new Date().toLocaleDateString()}</span>
-                </div>
+function clearAI() {
+    if (generatedImages.length === 0) return;
+    
+    if (confirm('Are you sure you want to clear all generated images?')) {
+        generatedImages = [];
+        aiPreview.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-robot"></i>
+                <h4>No Images Generated Yet</h4>
+                <p>Enter a prompt above and click "Generate Image" to create amazing AI art</p>
             </div>
         `;
         
-        resultsGrid.insertBefore(errorCard, resultsGrid.firstChild);
+        // Revoke object URLs to free memory
+        generatedImages.forEach(img => {
+            try {
+                URL.revokeObjectURL(img.url);
+            } catch (e) {
+                console.warn('Error revoking URL:', e);
+            }
+        });
+        
+        // Reset counter
+        generationCounter = 0;
+        generationCount.textContent = '0';
     }
+}
+
+function showError(message) {
+    // Remove empty state if it exists
+    const emptyState = aiPreview.querySelector('.empty-state');
+    if (emptyState) {
+        emptyState.remove();
+    }
+    
+    // Create results grid if it doesn't exist
+    let resultsGrid = aiPreview.querySelector('.ai-results-grid');
+    if (!resultsGrid) {
+        resultsGrid = document.createElement('div');
+        resultsGrid.className = 'ai-results-grid';
+        aiPreview.appendChild(resultsGrid);
+    }
+    
+    const errorCard = document.createElement('div');
+    errorCard.className = 'ai-image-card';
+    errorCard.innerHTML = `
+        <div class="ai-image-container" style="background: #ffebee; display: flex; align-items: center; justify-content: center;">
+            <div style="text-align: center; color: #d32f2f; padding: 20px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <h4 style="margin: 0 0 10px 0;">Generation Failed</h4>
+                <p style="margin: 0; font-size: 0.9rem;">${message}</p>
+            </div>
+        </div>
+        <div class="ai-image-info">
+            <div class="ai-prompt-preview" style="color: #d32f2f;">Failed to generate image</div>
+            <div class="ai-image-meta">
+                <span>Error</span>
+                <span>${new Date().toLocaleDateString()}</span>
+            </div>
+        </div>
+    `;
+    
+    resultsGrid.insertBefore(errorCard, resultsGrid.firstChild);
+}
 </script>
 </body>
 </html>
