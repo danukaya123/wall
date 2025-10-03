@@ -1621,6 +1621,185 @@
     .progress-step.active i {
         animation: pulse 2s infinite;
     }
+
+
+  /* User Profile Styles */
+.user-profile {
+    position: relative;
+}
+
+.profile-dropdown {
+    position: relative;
+}
+
+.profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: var(--gray-light);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.profile-btn:hover {
+    background: var(--primary-light);
+}
+
+.profile-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-name {
+    font-weight: 500;
+    font-size: 0.9rem;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--light);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 8px 0;
+    min-width: 160px;
+    z-index: 1001;
+    display: none;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.dropdown-item:hover {
+    background: var(--gray-light);
+}
+
+/* Mobile User Profile */
+.mobile-user-profile {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.mobile-profile-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background: var(--gray-light);
+    border-radius: var(--radius-small);
+    margin-bottom: 10px;
+}
+
+.mobile-profile-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.mobile-profile-name {
+    font-weight: 500;
+}
+
+.mobile-profile-btn {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+/* Login Required Overlay */
+.login-required-overlay {
+    background: var(--light);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 60px 40px;
+    text-align: center;
+}
+
+.login-prompt i {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+.login-prompt h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: var(--dark);
+}
+
+.login-prompt p {
+    color: var(--gray);
+    margin-bottom: 30px;
+}
+
+.login-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.login-prompt-btn {
+    padding: 12px 24px;
+    border-radius: var(--radius-small);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.login-prompt-btn.primary {
+    background: var(--primary);
+    color: var(--light);
+}
+
+.login-prompt-btn.primary:hover {
+    background: var(--primary-dark);
+}
+
+.login-prompt-btn.secondary {
+    background: var(--gray-light);
+    color: var(--dark);
+}
+
+.login-prompt-btn.secondary:hover {
+    background: var(--gray-border);
+}
+
+/* Responsive Design for Profile */
+@media (max-width: 768px) {
+    .profile-name {
+        max-width: 80px;
+    }
+    
+    .login-actions {
+        flex-direction: column;
+    }
+    
+    .login-prompt-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+  
 </style>
 </head>
 <body>
@@ -1638,10 +1817,35 @@
                     <a href="licence.html">License</a>
                 </div>
                 
-                <div class="nav-actions">
-                    <a href="https://quizontal.cc" class="nav-btn login-btn">More Services</a>
-                    <a href="https://blog.quizontal.cc/" class="nav-btn join-btn">Blog</a>
-                </div>
+<div class="nav-actions">
+    <a href="https://quizontal.cc" class="nav-btn login-btn">More Services</a>
+    <a href="https://blog.quizontal.cc/" class="nav-btn join-btn">Blog</a>
+    
+    <!-- User Profile Section (initially hidden) -->
+    <div class="user-profile" id="user-profile" style="display: none;">
+        <div class="profile-dropdown">
+            <button class="profile-btn" id="profile-btn">
+                <img src="" alt="Profile" class="profile-avatar" id="profile-avatar">
+                <span class="profile-name" id="profile-name"></span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="dropdown-menu" id="dropdown-menu">
+                <a href="#" class="dropdown-item" id="profile-link">
+                    <i class="fas fa-user"></i> My Profile
+                </a>
+                <a href="#" class="dropdown-item" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Login/Signup buttons (initially shown) -->
+    <div class="auth-buttons" id="auth-buttons">
+        <a href="login.html" class="nav-btn login-btn">Login</a>
+        <a href="signup.html" class="nav-btn join-btn">Sign Up</a>
+    </div>
+</div>
                 
                 <!-- Mobile Menu Button -->
                 <div class="menu-toggle" id="menu-toggle">
@@ -1652,17 +1856,39 @@
             </nav>
             
             <!-- Mobile Navigation -->
-            <div class="mobile-nav" id="mobile-nav">
-                <div class="mobile-nav-links">
-                    <a href="https://wall-rust.vercel.app/">Explore</a>
-                    <a href="licence.html">License</a>
-                </div>
-                <div class="mobile-nav-actions">
-                    <a href="https://quizontal.cc" class="mobile-nav-btn mobile-login-btn">More Services</a>
-                    <a href="https://blog.quizontal.cc/" class="mobile-nav-btn mobile-join-btn">Blog</a>
-                </div>
+<!-- Mobile Navigation -->
+<div class="mobile-nav" id="mobile-nav">
+    <div class="mobile-nav-links">
+        <a href="https://wall-rust.vercel.app/">Explore</a>
+        <a href="licence.html">License</a>
+    </div>
+
+  
+    <div class="mobile-nav-actions">
+        <!-- User profile for mobile (initially hidden) -->
+        <div class="mobile-user-profile" id="mobile-user-profile" style="display: none;">
+            <div class="mobile-profile-info">
+                <img src="" alt="Profile" class="mobile-profile-avatar" id="mobile-profile-avatar">
+                <span class="mobile-profile-name" id="mobile-profile-name"></span>
             </div>
+            <a href="#" class="mobile-nav-btn mobile-profile-btn">
+                <i class="fas fa-user"></i> My Profile
+            </a>
+            <a href="#" class="mobile-nav-btn mobile-logout-btn" id="mobile-logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
         </div>
+        
+        <!-- Auth buttons for mobile (initially shown) -->
+        <div class="mobile-auth-buttons" id="mobile-auth-buttons">
+            <a href="login.html" class="mobile-nav-btn mobile-login-btn">Login</a>
+            <a href="signup.html" class="mobile-nav-btn mobile-join-btn">Sign Up</a>
+        </div>
+        
+        <a href="https://quizontal.cc" class="mobile-nav-btn mobile-login-btn">More Services</a>
+        <a href="https://blog.quizontal.cc/" class="mobile-nav-btn mobile-join-btn">Blog</a>
+    </div>
+</div>
     </header>
 
     <!-- Search Section -->
@@ -1825,7 +2051,20 @@
             </div>
         </div>
         
-        <div class="ai-generator-container">
+        <!-- Login Required Overlay -->
+        <div class="login-required-overlay" id="login-required-overlay">
+            <div class="login-prompt">
+                <i class="fas fa-lock"></i>
+                <h3>Login Required</h3>
+                <p>Access to AI Image Generator is available for registered users only.</p>
+                <div class="login-actions">
+                    <a href="login.html" class="login-prompt-btn primary">Login to Access</a>
+                    <a href="signup.html" class="login-prompt-btn secondary">Create Account</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ai-generator-container" id="ai-generator-container" style="display: none;">
             <!-- Prompt Section -->
             <div class="ai-prompt-section">
                 <div class="prompt-header">
@@ -3094,6 +3333,128 @@
         
         resultsGrid.insertBefore(errorCard, resultsGrid.firstChild);
     }
+
+  // User Authentication State Management
+let currentUser = null;
+
+// Check login status on page load
+document.addEventListener('DOMContentLoaded', function() {
+    checkLoginStatus();
+    setupAuthEventListeners();
+});
+
+// Check if user is logged in
+function checkLoginStatus() {
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+        currentUser = JSON.parse(userData);
+        updateUIForLoggedInUser();
+    } else {
+        updateUIForLoggedOutUser();
+    }
+}
+
+// Update UI when user is logged in
+function updateUIForLoggedInUser() {
+    // Show user profile, hide auth buttons
+    document.getElementById('user-profile').style.display = 'block';
+    document.getElementById('auth-buttons').style.display = 'none';
+    document.getElementById('mobile-user-profile').style.display = 'block';
+    document.getElementById('mobile-auth-buttons').style.display = 'none';
+    
+    // Update profile information
+    document.getElementById('profile-avatar').src = currentUser.avatar || 'https://github.com/danukaya123/wall/blob/main/favicon-32x32.png?raw=true';
+    document.getElementById('profile-name').textContent = currentUser.name;
+    document.getElementById('mobile-profile-avatar').src = currentUser.avatar || 'https://github.com/danukaya123/wall/blob/main/favicon-32x32.png?raw=true';
+    document.getElementById('mobile-profile-name').textContent = currentUser.name;
+    
+    // Show AI Generator
+    document.getElementById('login-required-overlay').style.display = 'none';
+    document.getElementById('ai-generator-container').style.display = 'block';
+}
+
+// Update UI when user is logged out
+function updateUIForLoggedOutUser() {
+    // Hide user profile, show auth buttons
+    document.getElementById('user-profile').style.display = 'none';
+    document.getElementById('auth-buttons').style.display = 'flex';
+    document.getElementById('mobile-user-profile').style.display = 'none';
+    document.getElementById('mobile-auth-buttons').style.display = 'flex';
+    
+    // Hide AI Generator, show login prompt
+    document.getElementById('login-required-overlay').style.display = 'block';
+    document.getElementById('ai-generator-container').style.display = 'none';
+}
+
+// Setup authentication event listeners
+function setupAuthEventListeners() {
+    // Profile dropdown toggle
+    const profileBtn = document.getElementById('profile-btn');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    
+    if (profileBtn) {
+        profileBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('show');
+        });
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+        if (dropdownMenu) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
+    
+    // Logout functionality
+    const logoutBtn = document.getElementById('logout-btn');
+    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            logoutUser();
+        });
+    }
+    
+    if (mobileLogoutBtn) {
+        mobileLogoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            logoutUser();
+        });
+    }
+}
+
+// Logout user
+function logoutUser() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('currentUser');
+        currentUser = null;
+        updateUIForLoggedOutUser();
+        
+        // Close mobile menu if open
+        const mobileNav = document.getElementById('mobile-nav');
+        const menuToggle = document.getElementById('menu-toggle');
+        if (mobileNav && mobileNav.classList.contains('active')) {
+            mobileNav.classList.remove('active');
+            menuToggle.classList.remove('active');
+        }
+    }
+}
+
+// Simulate user login (you'll integrate this with your actual login system)
+function simulateLogin(userData) {
+    localStorage.setItem('currentUser', JSON.stringify(userData));
+    currentUser = userData;
+    updateUIForLoggedInUser();
+}
+
+// Example of how to call login after successful authentication
+// This would be called from your login page after successful login
+function handleSuccessfulLogin(userData) {
+    simulateLogin(userData);
+    window.location.href = 'index.html'; // Redirect to main page
+}
 </script>
 </body>
 </html>
