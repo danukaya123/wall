@@ -11,6 +11,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 
 // Your Google OAuth Client ID
 const GOOGLE_CLIENT_ID = '1053520824725-at3vm404ps6i8v3ur946lh9ghuaiards.apps.googleusercontent.com';
@@ -25,9 +26,10 @@ checkAuthStatus();
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing Google Sign-In...');
+    console.log('DOM loaded, initializing authentication...');
     initializeGoogleSignIn();
-    addGoogleAuthButtons();
+    setupFormHandlers();
+    setupEmailAuth();
 });
 
 // Toggle between sign-in and sign-up forms
@@ -39,52 +41,6 @@ loginBtn.addEventListener('click', () => {
     container.classList.remove("active");
 });
 
-// Add Google auth buttons to forms
-function addGoogleAuthButtons() {
-    console.log('Adding Google auth buttons...');
-    
-    // Add Google Sign-In button to login form
-    const loginForm = document.querySelector('.sign-in form');
-    const loginGoogleDiv = document.createElement('div');
-    loginGoogleDiv.id = 'googleLoginBtn';
-    loginGoogleDiv.style.marginBottom = '15px';
-    loginGoogleDiv.style.textAlign = 'center';
-    
-    const socialIcons = loginForm.querySelector('.social-icons');
-    if (socialIcons) {
-        loginForm.insertBefore(loginGoogleDiv, socialIcons);
-    } else {
-        // If social icons not found, add after the span
-        const span = loginForm.querySelector('span');
-        if (span) {
-            loginForm.insertBefore(loginGoogleDiv, span.nextSibling);
-        } else {
-            loginForm.prepend(loginGoogleDiv);
-        }
-    }
-
-    // Add Google Sign-Up button to signup form
-    const signupForm = document.querySelector('.sign-up form');
-    const signupGoogleDiv = document.createElement('div');
-    signupGoogleDiv.id = 'googleSignupBtn';
-    signupGoogleDiv.style.marginBottom = '15px';
-    signupGoogleDiv.style.textAlign = 'center';
-    
-    const signupSocialIcons = signupForm.querySelector('.social-icons');
-    if (signupSocialIcons) {
-        signupForm.insertBefore(signupGoogleDiv, signupSocialIcons);
-    } else {
-        const signupSpan = signupForm.querySelector('span');
-        if (signupSpan) {
-            signupForm.insertBefore(signupGoogleDiv, signupSpan.nextSibling);
-        } else {
-            signupForm.prepend(signupGoogleDiv);
-        }
-    }
-    
-    console.log('Google auth buttons added');
-}
-
 // Initialize Google Sign In
 function initializeGoogleSignIn() {
     console.log('Initializing Google Sign-In...');
@@ -92,7 +48,7 @@ function initializeGoogleSignIn() {
     // Check if Google library is loaded
     if (typeof google === 'undefined') {
         console.error('Google Sign-In library not loaded, retrying...');
-        setTimeout(initializeGoogleSignIn, 500);
+        setTimeout(initializeGoogleSignIn, 1000);
         return;
     }
     
@@ -100,53 +56,130 @@ function initializeGoogleSignIn() {
         google.accounts.id.initialize({
             client_id: GOOGLE_CLIENT_ID,
             callback: handleGoogleSignIn,
-            auto_select: false
+            auto_select: false,
+            ux_mode: 'popup'
         });
         
         console.log('Google Sign-In initialized');
         
-        // Render buttons with delay to ensure DOM is ready
-        setTimeout(renderGoogleButtons, 100);
+        // Render buttons
+        renderGoogleButtons();
         
     } catch (error) {
         console.error('Error initializing Google Sign-In:', error);
+        createFallbackGoogleButtons();
     }
 }
 
 // Render Google buttons
 function renderGoogleButtons() {
-    const loginBtn = document.getElementById('googleLoginBtn');
-    const signupBtn = document.getElementById('googleSignupBtn');
+    const loginForm = document.querySelector('.sign-in form');
+    const signupForm = document.querySelector('.sign-up form');
     
-    if (loginBtn && google.accounts.id) {
-        try {
-            google.accounts.id.renderButton(loginBtn, {
-                theme: "filled_blue", 
-                size: "large", 
-                text: "signin_with", 
-                width: "100%",
-                type: "standard"
-            });
-            console.log('Login button rendered');
-        } catch (error) {
-            console.error('Error rendering login button:', error);
-        }
+    // Create Google button containers
+    const loginGoogleDiv = document.createElement('div');
+    loginGoogleDiv.className = 'google-auth-container';
+    loginGoogleDiv.innerHTML = `
+        <div class="google-btn-wrapper">
+            <div id="googleLoginBtn"></div>
+        </div>
+    `;
+    
+    const signupGoogleDiv = document.createElement('div');
+    signupGoogleDiv.className = 'google-auth-container';
+    signupGoogleDiv.innerHTML = `
+        <div class="google-btn-wrapper">
+            <div id="googleSignupBtn"></div>
+        </div>
+    `;
+    
+    // Insert Google buttons before social icons
+    const loginSocialIcons = loginForm.querySelector('.social-icons');
+    const signupSocialIcons = signupForm.querySelector('.social-icons');
+    
+    if (loginSocialIcons) {
+        loginForm.insertBefore(loginGoogleDiv, loginSocialIcons);
     }
     
-    if (signupBtn && google.accounts.id) {
-        try {
-            google.accounts.id.renderButton(signupBtn, {
-                theme: "filled_blue", 
-                size: "large", 
-                text: "signup_with", 
-                width: "100%",
-                type: "standard"
-            });
-            console.log('Signup button rendered');
-        } catch (error) {
-            console.error('Error rendering signup button:', error);
-        }
+    if (signupSocialIcons) {
+        signupForm.insertBefore(signupGoogleDiv, signupSocialIcons);
     }
+    
+    // Add dividers
+    const loginDivider = document.createElement('div');
+    loginDivider.className = 'divider';
+    loginDivider.innerHTML = '<span>or</span>';
+    loginForm.insertBefore(loginDivider, loginGoogleDiv);
+    
+    const signupDivider = document.createElement('div');
+    signupDivider.className = 'divider';
+    signupDivider.innerHTML = '<span>or</span>';
+    signupForm.insertBefore(signupDivider, signupGoogleDiv);
+    
+    // Render the actual Google buttons
+    setTimeout(() => {
+        if (google.accounts.id) {
+            try {
+                google.accounts.id.renderButton(
+                    document.getElementById('googleLoginBtn'),
+                    { 
+                        theme: "filled_blue", 
+                        size: "large", 
+                        text: "signin_with", 
+                        width: 300,
+                        type: "standard"
+                    }
+                );
+                
+                google.accounts.id.renderButton(
+                    document.getElementById('googleSignupBtn'),
+                    { 
+                        theme: "filled_blue", 
+                        size: "large", 
+                        text: "signup_with", 
+                        width: 300,
+                        type: "standard"
+                    }
+                );
+                
+                console.log('Google buttons rendered successfully');
+            } catch (error) {
+                console.error('Error rendering Google buttons:', error);
+                createFallbackGoogleButtons();
+            }
+        }
+    }, 100);
+}
+
+// Fallback Google buttons
+function createFallbackGoogleButtons() {
+    console.log('Creating fallback Google buttons...');
+    
+    const loginGoogleBtn = document.getElementById('googleLoginBtn');
+    const signupGoogleBtn = document.getElementById('googleSignupBtn');
+    
+    if (loginGoogleBtn) {
+        loginGoogleBtn.innerHTML = `
+            <button class="custom-google-btn" onclick="handleGoogleSignInFallback()">
+                <i class="fab fa-google"></i>
+                Sign in with Google
+            </button>
+        `;
+    }
+    
+    if (signupGoogleBtn) {
+        signupGoogleBtn.innerHTML = `
+            <button class="custom-google-btn" onclick="handleGoogleSignInFallback()">
+                <i class="fab fa-google"></i>
+                Sign up with Google
+            </button>
+        `;
+    }
+}
+
+// Fallback Google Sign-In handler
+function handleGoogleSignInFallback() {
+    alert('Google Sign-In is not available in this browser. Please try using a different browser or contact support.');
 }
 
 // Handle Google Sign In
@@ -154,8 +187,7 @@ async function handleGoogleSignIn(response) {
     console.log('Google Sign-In response received');
     
     try {
-        // Show loading state
-        document.body.style.cursor = 'wait';
+        showLoading(true);
         
         // Decode the JWT token to get user info
         const credential = response.credential;
@@ -167,7 +199,8 @@ async function handleGoogleSignIn(response) {
             email: payload.email,
             picture: payload.picture,
             email_verified: payload.email_verified,
-            loginTime: new Date().toISOString()
+            loginTime: new Date().toISOString(),
+            provider: 'google'
         };
         
         console.log('User data:', userData);
@@ -176,34 +209,171 @@ async function handleGoogleSignIn(response) {
         const storeSuccess = await storeUserData(userData);
         
         if (storeSuccess) {
+            showMessage('Login successful! Redirecting...', 'success');
+            
             // Store session data
             localStorage.setItem('currentUser', JSON.stringify(userData));
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('loginTime', new Date().toISOString());
             
-            console.log('Authentication successful, redirecting to main website...');
+            setTimeout(() => {
+                redirectToMainWebsite();
+            }, 1500);
             
-            // Redirect to main website
-            redirectToMainWebsite();
         } else {
             throw new Error('Failed to store user data');
         }
         
     } catch (error) {
         console.error('Google Sign-In error:', error);
-        alert('Authentication failed: ' + error.message);
+        showMessage('Authentication failed: ' + error.message, 'error');
     } finally {
-        document.body.style.cursor = 'default';
+        showLoading(false);
     }
 }
 
-// Store user data (Firestore with localStorage fallback)
+// Setup email/password authentication
+function setupEmailAuth() {
+    console.log('Setting up email authentication...');
+}
+
+// Setup form handlers for email/password auth
+function setupFormHandlers() {
+    const signInForm = document.querySelector('.sign-in form');
+    const signUpForm = document.querySelector('.sign-up form');
+    
+    // Sign In form
+    signInForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        await handleEmailSignIn(signInForm);
+    });
+    
+    // Sign Up form
+    signUpForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        await handleEmailSignUp(signUpForm);
+    });
+}
+
+// Handle email sign in
+async function handleEmailSignIn(form) {
+    const email = form.querySelector('input[type="email"]').value;
+    const password = form.querySelector('input[type="password"]').value;
+    
+    if (!email || !password) {
+        showMessage('Please fill in all fields', 'error');
+        return;
+    }
+    
+    if (!validateEmail(email)) {
+        showMessage('Please enter a valid email address', 'error');
+        return;
+    }
+    
+    try {
+        showLoading(true);
+        
+        // For demo purposes - in real implementation, use Firebase Auth
+        const userData = {
+            uid: 'email_' + Date.now(),
+            name: email.split('@')[0],
+            email: email,
+            picture: 'https://github.com/danukaya123/wall/blob/main/favicon-32x32.png?raw=true',
+            email_verified: false,
+            loginTime: new Date().toISOString(),
+            provider: 'email'
+        };
+        
+        // Store user data
+        const storeSuccess = await storeUserData(userData);
+        
+        if (storeSuccess) {
+            showMessage('Login successful! Redirecting...', 'success');
+            
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('loginTime', new Date().toISOString());
+            
+            setTimeout(() => {
+                redirectToMainWebsite();
+            }, 1500);
+        } else {
+            throw new Error('Failed to store user data');
+        }
+        
+    } catch (error) {
+        console.error('Email sign in error:', error);
+        showMessage('Login failed: ' + error.message, 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Handle email sign up
+async function handleEmailSignUp(form) {
+    const name = form.querySelector('input[type="text"]').value;
+    const email = form.querySelector('input[type="email"]').value;
+    const password = form.querySelector('input[type="password"]').value;
+    
+    if (!name || !email || !password) {
+        showMessage('Please fill in all fields', 'error');
+        return;
+    }
+    
+    if (!validateEmail(email)) {
+        showMessage('Please enter a valid email address', 'error');
+        return;
+    }
+    
+    if (password.length < 6) {
+        showMessage('Password must be at least 6 characters long', 'error');
+        return;
+    }
+    
+    try {
+        showLoading(true);
+        
+        // For demo purposes - in real implementation, use Firebase Auth
+        const userData = {
+            uid: 'email_' + Date.now(),
+            name: name,
+            email: email,
+            picture: 'https://github.com/danukaya123/wall/blob/main/favicon-32x32.png?raw=true',
+            email_verified: false,
+            loginTime: new Date().toISOString(),
+            provider: 'email'
+        };
+        
+        // Store user data
+        const storeSuccess = await storeUserData(userData);
+        
+        if (storeSuccess) {
+            showMessage('Account created successfully! Redirecting...', 'success');
+            
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('loginTime', new Date().toISOString());
+            
+            setTimeout(() => {
+                redirectToMainWebsite();
+            }, 1500);
+        } else {
+            throw new Error('Failed to store user data');
+        }
+        
+    } catch (error) {
+        console.error('Email sign up error:', error);
+        showMessage('Registration failed: ' + error.message, 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Store user data
 async function storeUserData(userData) {
-    // First try Firebase Firestore
     const firebaseSuccess = await storeUserInFirebase(userData);
     if (firebaseSuccess) return true;
     
-    // Fallback to localStorage
     return storeUserInLocalStorage(userData);
 }
 
@@ -214,22 +384,22 @@ async function storeUserInFirebase(userData) {
         const userDoc = await userRef.get();
         
         if (userDoc.exists) {
-            // Update existing user
             await userRef.update({
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                 name: userData.name,
                 email: userData.email,
-                picture: userData.picture
+                picture: userData.picture,
+                provider: userData.provider
             });
             console.log('User updated in Firebase');
         } else {
-            // Create new user
             await userRef.set({
                 uid: userData.uid,
                 name: userData.name,
                 email: userData.email,
                 picture: userData.picture,
                 email_verified: userData.email_verified,
+                provider: userData.provider,
                 joined: firebase.firestore.FieldValue.serverTimestamp(),
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                 plan: 'starter',
@@ -249,30 +419,63 @@ function storeUserInLocalStorage(userData) {
     try {
         let users = JSON.parse(localStorage.getItem('quizontalUsers') || '{}');
         
-        if (users[userData.uid]) {
-            // Update existing user
-            users[userData.uid].lastLogin = new Date().toISOString();
-            users[userData.uid].name = userData.name;
-            users[userData.uid].email = userData.email;
-            users[userData.uid].picture = userData.picture;
-            console.log('User updated in localStorage');
-        } else {
-            // Create new user
-            users[userData.uid] = {
-                ...userData,
-                joined: new Date().toISOString(),
-                plan: 'starter',
-                status: 'active'
-            };
-            console.log('New user created in localStorage');
-        }
+        users[userData.uid] = {
+            ...userData,
+            joined: new Date().toISOString(),
+            plan: 'starter',
+            status: 'active'
+        };
         
         localStorage.setItem('quizontalUsers', JSON.stringify(users));
+        console.log('User stored in localStorage');
         return true;
     } catch (error) {
         console.error('LocalStorage error:', error);
         return false;
     }
+}
+
+// Utility functions
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+function showLoading(show) {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        if (show) {
+            form.classList.add('loading');
+        } else {
+            form.classList.remove('loading');
+        }
+    });
+}
+
+function showMessage(message, type) {
+    // Remove existing messages
+    const existingMessages = document.querySelectorAll('.message');
+    existingMessages.forEach(msg => msg.remove());
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${type}`;
+    messageDiv.textContent = message;
+    
+    // Add message to both forms
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.insertBefore(messageDiv.cloneNode(true), form.firstChild);
+    });
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        const messages = document.querySelectorAll('.message');
+        messages.forEach(msg => {
+            if (msg.textContent === message) {
+                msg.remove();
+            }
+        });
+    }, 5000);
 }
 
 // Check if user is already logged in
@@ -281,7 +484,6 @@ function checkAuthStatus() {
     const userData = localStorage.getItem('currentUser');
     const loginTime = localStorage.getItem('loginTime');
     
-    // Check if login is within last 30 days
     if (isLoggedIn === 'true' && userData && loginTime) {
         const loginDate = new Date(loginTime);
         const currentDate = new Date();
@@ -292,7 +494,6 @@ function checkAuthStatus() {
             console.log('User already logged in, redirecting to main website...');
             redirectToMainWebsite();
         } else {
-            // Session expired
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('currentUser');
             localStorage.removeItem('loginTime');
@@ -301,24 +502,13 @@ function checkAuthStatus() {
     }
 }
 
-// Redirect to main website (CHANGED FROM DASHBOARD)
+// Redirect to main website
 function redirectToMainWebsite() {
-    // Redirect to your main website index page
-    window.location.href = '../index.html'; // Change this to your main website URL
+    window.location.href = '../index.html';
 }
 
-// Handle regular form submissions
-document.querySelector('.sign-up form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    alert('Please use Google Sign-In for registration. Email/password registration is not available yet.');
-});
-
-document.querySelector('.sign-in form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    alert('Please use Google Sign-In for login. Email/password login is not available yet.');
-});
-
-// Make logout function available globally
+// Make functions available globally
+window.handleGoogleSignInFallback = handleGoogleSignInFallback;
 window.logout = function() {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('currentUser');
