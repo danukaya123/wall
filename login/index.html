@@ -12,6 +12,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     
     <title>Login to Quizontal</title>
 </head>
@@ -19,38 +20,75 @@
     <div class="container" id="container">
         <div class="form-container sign-up">
             <form>
-                <h1>Create Account</h1>
-                <!-- Google Sign-Up button will be inserted here by JavaScript -->
-                <div class="social-icons">
-                    <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
-                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
-                    <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
+                <div class="form-header">
+                    <h1>Create Account</h1>
+                    <p>Join Quizontal to access AI Generator and more features</p>
                 </div>
+                
+                <!-- Google Sign-Up button will be inserted here by JavaScript -->
+                
+                <div class="social-icons">
+                    <a href="#" class="icon" title="Google"><i class="fa-brands fa-google-plus-g"></i></a>
+                    <a href="#" class="icon" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="icon" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="icon" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+                
                 <span>or use your email for registration</span>
-                <input type="text" placeholder="Name">
-                <input type="email" placeholder="Email">
-                <input type="password" placeholder="Password">
-                <button>Sign Up</button>
+                
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-email">Email Address</label>
+                    <input type="email" id="signup-email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" placeholder="Create a password" required minlength="6">
+                </div>
+                
+                <button type="submit">Sign Up</button>
             </form>
         </div>
+        
         <div class="form-container sign-in">
             <form>
-                <h1>Sign In</h1>
-                <!-- Google Sign-In button will be inserted here by JavaScript -->
-                <div class="social-icons">
-                    <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
-                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
-                    <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
+                <div class="form-header">
+                    <h1>Sign In</h1>
+                    <p>Welcome back to Quizontal</p>
                 </div>
+                
+                <!-- Google Sign-In button will be inserted here by JavaScript -->
+                
+                <div class="social-icons">
+                    <a href="#" class="icon" title="Google"><i class="fa-brands fa-google-plus-g"></i></a>
+                    <a href="#" class="icon" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="icon" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="icon" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+                
                 <span>or use your email password</span>
-                <input type="email" placeholder="Email">
-                <input type="password" placeholder="Password">
-                <a href="#">Forget Your Password?</a>
-                <button>Sign In</button>
+                
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required>
+                </div>
+                
+                <a href="#" class="forgot-password">Forgot Your Password?</a>
+                
+                <button type="submit">Sign In</button>
             </form>
         </div>
+        
         <div class="toggle-container">
             <div class="toggle">
                 <div class="toggle-panel toggle-left">
