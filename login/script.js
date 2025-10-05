@@ -1,3 +1,4 @@
+// script.js
 // Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyD2vYzivm2Gbgl_ee0t81d6r5GPHeI4Gqs",
@@ -30,15 +31,19 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeGoogleSignIn();
     setupFormHandlers();
     setupEmailAuth();
-});
-
-// Toggle between sign-in and sign-up forms
-registerBtn.addEventListener('click', () => {
-    container.classList.add("active");
-});
-
-loginBtn.addEventListener('click', () => {
-    container.classList.remove("active");
+    
+    // Add event listeners for toggle buttons
+    if (registerBtn && loginBtn) {
+        registerBtn.addEventListener('click', () => {
+            container.classList.add("active");
+        });
+        
+        loginBtn.addEventListener('click', () => {
+            container.classList.remove("active");
+        });
+    } else {
+        console.error('Toggle buttons not found');
+    }
 });
 
 // Initialize Google Sign In
@@ -76,6 +81,12 @@ function renderGoogleButtons() {
     const loginForm = document.querySelector('.sign-in form');
     const signupForm = document.querySelector('.sign-up form');
     
+    if (!loginForm || !signupForm) {
+        console.error('Forms not found');
+        setTimeout(renderGoogleButtons, 500);
+        return;
+    }
+    
     // Create Google button containers
     const loginGoogleDiv = document.createElement('div');
     loginGoogleDiv.className = 'google-auth-container';
@@ -99,10 +110,14 @@ function renderGoogleButtons() {
     
     if (loginSocialIcons) {
         loginForm.insertBefore(loginGoogleDiv, loginSocialIcons);
+    } else {
+        loginForm.appendChild(loginGoogleDiv);
     }
     
     if (signupSocialIcons) {
         signupForm.insertBefore(signupGoogleDiv, signupSocialIcons);
+    } else {
+        signupForm.appendChild(signupGoogleDiv);
     }
     
     // Add dividers
@@ -120,35 +135,45 @@ function renderGoogleButtons() {
     setTimeout(() => {
         if (google.accounts.id) {
             try {
-                google.accounts.id.renderButton(
-                    document.getElementById('googleLoginBtn'),
-                    { 
-                        theme: "filled_blue", 
-                        size: "large", 
-                        text: "signin_with", 
-                        width: 300,
-                        type: "standard"
-                    }
-                );
+                const loginBtnElement = document.getElementById('googleLoginBtn');
+                const signupBtnElement = document.getElementById('googleSignupBtn');
                 
-                google.accounts.id.renderButton(
-                    document.getElementById('googleSignupBtn'),
-                    { 
-                        theme: "filled_blue", 
-                        size: "large", 
-                        text: "signup_with", 
-                        width: 300,
-                        type: "standard"
-                    }
-                );
+                if (loginBtnElement) {
+                    google.accounts.id.renderButton(
+                        loginBtnElement,
+                        { 
+                            theme: "filled_blue", 
+                            size: "large", 
+                            text: "signin_with", 
+                            width: 300,
+                            type: "standard"
+                        }
+                    );
+                }
+                
+                if (signupBtnElement) {
+                    google.accounts.id.renderButton(
+                        signupBtnElement,
+                        { 
+                            theme: "filled_blue", 
+                            size: "large", 
+                            text: "signup_with", 
+                            width: 300,
+                            type: "standard"
+                        }
+                    );
+                }
                 
                 console.log('Google buttons rendered successfully');
             } catch (error) {
                 console.error('Error rendering Google buttons:', error);
                 createFallbackGoogleButtons();
             }
+        } else {
+            console.error('Google accounts API not available');
+            createFallbackGoogleButtons();
         }
-    }, 100);
+    }, 500);
 }
 
 // Fallback Google buttons
@@ -241,6 +266,12 @@ function setupEmailAuth() {
 function setupFormHandlers() {
     const signInForm = document.querySelector('.sign-in form');
     const signUpForm = document.querySelector('.sign-up form');
+    
+    if (!signInForm || !signUpForm) {
+        console.error('Forms not found for setting up handlers');
+        setTimeout(setupFormHandlers, 500);
+        return;
+    }
     
     // Sign In form
     signInForm.addEventListener('submit', async function(e) {
@@ -464,7 +495,11 @@ function showMessage(message, type) {
     // Add message to both forms
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
-        form.insertBefore(messageDiv.cloneNode(true), form.firstChild);
+        if (form.firstChild) {
+            form.insertBefore(messageDiv.cloneNode(true), form.firstChild);
+        } else {
+            form.appendChild(messageDiv.cloneNode(true));
+        }
     });
     
     // Auto remove after 5 seconds
