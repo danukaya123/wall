@@ -1624,22 +1624,19 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #05a081, #1a73e8);
+    background: var(--light);
     z-index: 9999;
     display: none;
-    align-items: center;
-    justify-content: center;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 .welcome-overlay.active {
-    display: flex;
+    display: block;
 }
 
 .welcome-container {
     width: 100%;
     height: 100%;
-    background: var(--light);
     position: relative;
     overflow: hidden;
 }
@@ -1652,15 +1649,14 @@
 }
 
 .welcome-slide {
-    width: 100%;
+    width: 25%; /* Each slide takes 25% of the slider */
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 30px;
+    padding: 60px 30px 120px;
     text-align: center;
-    flex-shrink: 0;
     position: relative;
 }
 
@@ -1671,6 +1667,7 @@
     margin-bottom: 30px;
     object-fit: cover;
     box-shadow: var(--shadow);
+    display: block;
 }
 
 .welcome-time {
@@ -1678,6 +1675,7 @@
     font-weight: 700;
     color: var(--primary);
     margin-bottom: 10px;
+    display: block;
 }
 
 .welcome-title {
@@ -1685,6 +1683,7 @@
     font-weight: 700;
     margin-bottom: 20px;
     color: var(--dark);
+    display: block;
 }
 
 .welcome-description {
@@ -1693,6 +1692,7 @@
     margin-bottom: 40px;
     font-size: 1rem;
     max-width: 300px;
+    display: block;
 }
 
 .welcome-indicators {
@@ -1701,7 +1701,7 @@
     gap: 8px;
     margin-bottom: 30px;
     position: absolute;
-    bottom: 100px;
+    bottom: 80px;
     left: 0;
     right: 0;
 }
@@ -1724,7 +1724,7 @@
     display: flex;
     gap: 10px;
     position: absolute;
-    bottom: 40px;
+    bottom: 30px;
     left: 30px;
     right: 30px;
 }
@@ -1738,6 +1738,7 @@
     transition: all 0.3s ease;
     border: none;
     font-size: 1rem;
+    display: block;
 }
 
 .welcome-btn.skip {
@@ -1775,10 +1776,19 @@
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--primary);
+    z-index: 10000;
 }
 
 .welcome-logo i {
     margin-right: 10px;
+}
+
+/* Ensure all content is visible */
+.welcome-slide > * {
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative;
+    z-index: 1;
 }
 </style>
 </head>
@@ -1823,7 +1833,7 @@
             </div>
         </div>
         
-        <div class="welcome-indicators">
+        <div class="welcome-indicators" id="welcome-indicators">
             <div class="welcome-indicator active"></div>
             <div class="welcome-indicator"></div>
             <div class="welcome-indicator"></div>
@@ -2198,10 +2208,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const hasSeenWelcome = localStorage.getItem('quizontalWelcomeSeen');
     
+    console.log('Mobile:', isMobile, 'Has seen welcome:', hasSeenWelcome);
+    
     if (isMobile && !hasSeenWelcome) {
         // Show welcome screen after a short delay
         setTimeout(() => {
-            document.getElementById('welcome-overlay').classList.add('active');
+            const welcomeOverlay = document.getElementById('welcome-overlay');
+            welcomeOverlay.classList.add('active');
+            console.log('Welcome screen activated');
         }, 1000);
     }
     
@@ -2215,7 +2229,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update slide position
     function updateSlide() {
-        welcomeSlider.style.transform = `translateX(-${currentSlide * 100}%)`;
+        const translateX = -currentSlide * 100;
+        welcomeSlider.style.transform = `translateX(${translateX}%)`;
+        console.log('Current slide:', currentSlide, 'Transform:', `translateX(${translateX}%)`);
         
         // Update indicators
         welcomeIndicators.forEach((indicator, index) => {
@@ -2252,11 +2268,15 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeWelcomeScreen() {
         document.getElementById('welcome-overlay').classList.remove('active');
         localStorage.setItem('quizontalWelcomeSeen', 'true');
+        console.log('Welcome screen closed');
     }
     
     // Event listeners for welcome screen buttons
     welcomeNextBtn.addEventListener('click', nextSlide);
     welcomeSkipBtn.addEventListener('click', closeWelcomeScreen);
+    
+    // Initialize first slide
+    updateSlide();
     
     // Swipe functionality for mobile
     let touchStartX = 0;
@@ -2290,6 +2310,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
+    
+    // Debug: Check if elements exist
+    console.log('Welcome slider:', welcomeSlider);
+    console.log('Welcome indicators:', welcomeIndicators);
+    console.log('Welcome slides:', document.querySelectorAll('.welcome-slide'));
 });
     // Mobile menu toggle functionality
     document.addEventListener('DOMContentLoaded', function() {
