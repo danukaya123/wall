@@ -1612,18 +1612,12 @@
         }
     }
 
-    /* Animation for progress steps */
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
+@media (min-width: 769px) {
+    .welcome-overlay {
+        display: none !important;
     }
+}
 
-    .progress-step.active i {
-        animation: pulse 2s infinite;
-    }
-
-  /* Onboarding Slider */
-/* Welcome Screen Overlay */
 .welcome-overlay {
     position: fixed;
     top: 0;
@@ -1643,58 +1637,73 @@
 }
 
 .welcome-container {
-    width: 90%;
-    max-width: 400px;
+    width: 100%;
+    height: 100%;
     background: var(--light);
-    border-radius: 20px;
+    position: relative;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .welcome-slider {
     display: flex;
     transition: transform 0.5s ease;
+    height: 100%;
     width: 400%; /* 4 slides */
 }
 
 .welcome-slide {
     width: 100%;
-    padding: 30px;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.welcome-icon {
-    width: 80px;
-    height: 80px;
-    background: var(--primary-light);
-    border-radius: 50%;
+    height: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 20px;
+    padding: 40px 30px;
+    text-align: center;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.welcome-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    object-fit: cover;
+    box-shadow: var(--shadow);
+}
+
+.welcome-time {
+    font-size: 3rem;
+    font-weight: 700;
     color: var(--primary);
-    font-size: 2rem;
+    margin-bottom: 10px;
 }
 
 .welcome-title {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     color: var(--dark);
 }
 
 .welcome-description {
     color: var(--gray);
     line-height: 1.6;
-    margin-bottom: 25px;
+    margin-bottom: 40px;
+    font-size: 1rem;
+    max-width: 300px;
 }
 
 .welcome-indicators {
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+    right: 0;
 }
 
 .welcome-indicator {
@@ -1714,17 +1723,21 @@
 .welcome-buttons {
     display: flex;
     gap: 10px;
+    position: absolute;
+    bottom: 40px;
+    left: 30px;
+    right: 30px;
 }
 
 .welcome-btn {
     flex: 1;
-    padding: 12px 20px;
+    padding: 16px 20px;
     border-radius: 30px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 .welcome-btn.skip {
@@ -1753,86 +1766,73 @@
     background: var(--primary-dark);
 }
 
+.welcome-logo {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.welcome-logo i {
+    margin-right: 10px;
+}
 </style>
 </head>
 <body>
 <div class="welcome-overlay" id="welcome-overlay">
     <div class="welcome-container">
+        <div class="welcome-logo">
+            <i class="fas fa-camera"></i> QUIZONTAL
+        </div>
+        
         <div class="welcome-slider" id="welcome-slider">
             <!-- Slide 1: Welcome -->
             <div class="welcome-slide">
-                <div class="welcome-icon">
-                    <i class="fas fa-camera"></i>
-                </div>
-                <h2 class="welcome-title">Welcome to Quizontal</h2>
+                <div class="welcome-time">8:30</div>
+                <h2 class="welcome-title">Ready to Explore</h2>
                 <p class="welcome-description">Discover millions of high-quality stock photos and videos for your creative projects.</p>
-                <div class="welcome-indicators">
-                    <div class="welcome-indicator active"></div>
-                    <div class="welcome-indicator"></div>
-                    <div class="welcome-indicator"></div>
-                    <div class="welcome-indicator"></div>
-                </div>
-                <div class="welcome-buttons">
-                    <button class="welcome-btn skip" id="welcome-skip">Skip</button>
-                    <button class="welcome-btn next" id="welcome-next-1">Next</button>
-                </div>
+                <img src="https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Nature" class="welcome-image">
             </div>
             
             <!-- Slide 2: Free Content -->
             <div class="welcome-slide">
-                <div class="welcome-icon">
-                    <i class="fas fa-images"></i>
-                </div>
-                <h2 class="welcome-title">Free Stock Media</h2>
+                <div class="welcome-time">8:30</div>
+                <h2 class="welcome-title">Select Your Media</h2>
                 <p class="welcome-description">Access our extensive library of royalty-free photos and videos for personal and commercial use.</p>
-                <div class="welcome-indicators">
-                    <div class="welcome-indicator"></div>
-                    <div class="welcome-indicator active"></div>
-                    <div class="welcome-indicator"></div>
-                    <div class="welcome-indicator"></div>
-                </div>
-                <div class="welcome-buttons">
-                    <button class="welcome-btn skip" id="welcome-skip-2">Skip</button>
-                    <button class="welcome-btn next" id="welcome-next-2">Next</button>
-                </div>
+                <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400" alt="People" class="welcome-image">
             </div>
             
             <!-- Slide 3: AI Generator -->
             <div class="welcome-slide">
-                <div class="welcome-icon">
-                    <i class="fas fa-robot"></i>
-                </div>
+                <div class="welcome-time">8:30</div>
                 <h2 class="welcome-title">AI Image Generator</h2>
                 <p class="welcome-description">Create unique images with our AI tool. Just describe what you want and let AI do the magic.</p>
-                <div class="welcome-indicators">
-                    <div class="welcome-indicator"></div>
-                    <div class="welcome-indicator"></div>
-                    <div class="welcome-indicator active"></div>
-                    <div class="welcome-indicator"></div>
-                </div>
-                <div class="welcome-buttons">
-                    <button class="welcome-btn skip" id="welcome-skip-3">Skip</button>
-                    <button class="welcome-btn next" id="welcome-next-3">Next</button>
-                </div>
+                <img src="https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Technology" class="welcome-image">
             </div>
             
             <!-- Slide 4: Get Started -->
             <div class="welcome-slide">
-                <div class="welcome-icon">
-                    <i class="fas fa-rocket"></i>
-                </div>
-                <h2 class="welcome-title">Ready to Explore?</h2>
+                <div class="welcome-time">8:30</div>
+                <h2 class="welcome-title">Enjoy Your Journey</h2>
                 <p class="welcome-description">Start browsing our collection or try the AI generator to create your own images.</p>
-                <div class="welcome-indicators">
-                    <div class="welcome-indicator"></div>
-                    <div class="welcome-indicator"></div>
-                    <div class="welcome-indicator"></div>
-                    <div class="welcome-indicator active"></div>
-                </div>
-                <div class="welcome-buttons">
-                    <button class="welcome-btn get-started" id="welcome-get-started">Get Started</button>
-                </div>
+                <img src="https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Travel" class="welcome-image">
             </div>
+        </div>
+        
+        <div class="welcome-indicators">
+            <div class="welcome-indicator active"></div>
+            <div class="welcome-indicator"></div>
+            <div class="welcome-indicator"></div>
+            <div class="welcome-indicator"></div>
+        </div>
+        
+        <div class="welcome-buttons">
+            <button class="welcome-btn skip" id="welcome-skip">Skip</button>
+            <button class="welcome-btn next" id="welcome-next">Next</button>
         </div>
     </div>
 </div>
@@ -2202,12 +2202,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show welcome screen after a short delay
         setTimeout(() => {
             document.getElementById('welcome-overlay').classList.add('active');
-        }, 500);
+        }, 1000);
     }
     
     // Welcome screen variables
     const welcomeSlider = document.getElementById('welcome-slider');
     const welcomeIndicators = document.querySelectorAll('.welcome-indicator');
+    const welcomeNextBtn = document.getElementById('welcome-next');
+    const welcomeSkipBtn = document.getElementById('welcome-skip');
     let currentSlide = 0;
     const totalSlides = 4;
     
@@ -2223,6 +2225,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 indicator.classList.remove('active');
             }
         });
+        
+        // Update button text on last slide
+        if (currentSlide === totalSlides - 1) {
+            welcomeNextBtn.textContent = 'Get Started';
+            welcomeNextBtn.classList.add('get-started');
+            welcomeNextBtn.classList.remove('next');
+        } else {
+            welcomeNextBtn.textContent = 'Next';
+            welcomeNextBtn.classList.add('next');
+            welcomeNextBtn.classList.remove('get-started');
+        }
     }
     
     // Next slide function
@@ -2242,15 +2255,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Event listeners for welcome screen buttons
-    document.getElementById('welcome-next-1').addEventListener('click', nextSlide);
-    document.getElementById('welcome-next-2').addEventListener('click', nextSlide);
-    document.getElementById('welcome-next-3').addEventListener('click', nextSlide);
-    
-    document.getElementById('welcome-skip').addEventListener('click', closeWelcomeScreen);
-    document.getElementById('welcome-skip-2').addEventListener('click', closeWelcomeScreen);
-    document.getElementById('welcome-skip-3').addEventListener('click', closeWelcomeScreen);
-    
-    document.getElementById('welcome-get-started').addEventListener('click', closeWelcomeScreen);
+    welcomeNextBtn.addEventListener('click', nextSlide);
+    welcomeSkipBtn.addEventListener('click', closeWelcomeScreen);
     
     // Swipe functionality for mobile
     let touchStartX = 0;
