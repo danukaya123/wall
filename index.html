@@ -46,19 +46,6 @@
         --radius: 12px;
         --radius-small: 6px;
         --transition: all 0.3s ease;
-        --tutorial-primary: #6366f1;
-  --tutorial-primary-dark: #4f46e5;
-  --tutorial-primary-light: #c7d2fe;
-  --tutorial-success: #10b981;
-  --tutorial-warning: #f59e0b;
-  --tutorial-error: #ef4444;
-  --tutorial-bg: rgba(0, 0, 0, 0.85);
-  --tutorial-card-bg: #ffffff;
-  --tutorial-text: #1f2937;
-  --tutorial-text-light: #6b7280;
-  --tutorial-border: #e5e7eb;
-  --tutorial-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  --tutorial-glow: 0 0 0 4px rgba(99, 102, 241, 0.1);
     }
 
     * {
@@ -1625,863 +1612,167 @@
         }
     }
 
-.tutorial-overlay {
+    /* Animation for progress steps */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .progress-step.active i {
+        animation: pulse 2s infinite;
+    }
+
+  /* Onboarding Slider */
+.onboarding {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #f2eaff, #e8f7ff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  z-index: 5000;
+}
+
+.slides {
   width: 100%;
   height: 100%;
-  background: var(--tutorial-bg);
-  backdrop-filter: blur(10px);
-  z-index: 9999;
-  display: none;
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.slide {
+  min-width: 100%;
+  height: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 60px 20px 40px;
+  box-sizing: border-box;
   opacity: 0;
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(0.98);
+  transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
-.tutorial-overlay.active {
-  display: block;
+.slide.active {
   opacity: 1;
+  transform: scale(1);
 }
 
-.tutorial-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.tutorial-content {
-  background: var(--tutorial-card-bg);
-  border-radius: 24px;
-  box-shadow: var(--tutorial-shadow);
-  max-width: 480px;
-  width: 100%;
-  max-height: 90vh;
-  overflow: hidden;
-  position: relative;
-  z-index: 100;
-  animation: tutorialSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  border: 1px solid var(--tutorial-border);
-}
-
-@keyframes tutorialSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Tutorial Header */
-.tutorial-header {
-  padding: 28px 28px 20px;
-  border-bottom: 1px solid var(--tutorial-border);
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.tutorial-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, var(--tutorial-primary), var(--tutorial-success));
-}
-
-.tutorial-title-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  position: relative;
-  z-index: 2;
-}
-
-.tutorial-header h2 {
-  color: var(--tutorial-text);
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0;
-  line-height: 1.3;
-  flex: 1;
-}
-
-.tutorial-progress {
-  background: white;
-  color: var(--tutorial-primary);
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--tutorial-border);
-  min-width: 70px;
-  text-align: center;
-}
-
-/* Enhanced Progress Bar */
-.tutorial-progress-bar {
-  width: 100%;
-  height: 6px;
-  background: #e5e7eb;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 20px;
-  position: relative;
-}
-
-.tutorial-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--tutorial-primary), var(--tutorial-success));
-  border-radius: 10px;
-  width: 0%;
-  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.tutorial-progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
-}
-
-/* Tutorial Body */
-.tutorial-body {
-  padding: 28px;
-  max-height: 60vh;
-  overflow-y: auto;
-}
-
-.tutorial-message {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  color: var(--tutorial-text);
-  margin-bottom: 24px;
-  text-align: center;
-  font-weight: 500;
-}
-
-/* Feature Content */
-.tutorial-feature-content {
-  margin-top: 24px;
-}
-
-.feature-demo {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+.slide-img {
+  max-width: 80%;
+  margin: 20px auto;
   border-radius: 16px;
-  padding: 30px;
-  text-align: center;
-  border: 1px solid var(--tutorial-border);
-  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
-.feature-demo:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-.feature-demo .icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-  display: block;
-}
-
-.feature-demo .icon.animated {
-  animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-10px);
-  }
-  60% {
-    transform: translateY(-5px);
-  }
-}
-
-.feature-demo h3 {
-  color: var(--tutorial-text);
-  margin: 0 0 12px 0;
-  font-size: 1.3rem;
+.text h2 {
+  font-size: 1.8rem;
   font-weight: 700;
+  color: #000;
 }
 
-.feature-demo p {
-  color: var(--tutorial-text-light);
-  margin: 0;
+.text h2 span {
+  color: #6a4cff;
+}
+
+.text p {
+  color: #555;
   font-size: 1rem;
-  line-height: 1.5;
+  margin-top: 10px;
 }
 
-/* Tutorial Footer */
-.tutorial-footer {
-  padding: 24px 28px;
-  border-top: 1px solid var(--tutorial-border);
+.bottom-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 15px;
-  background: #f8fafc;
+  margin-top: auto;
 }
 
-.tutorial-btn {
-  padding: 14px 28px;
+.bottom-bar button {
   border: none;
-  border-radius: 12px;
+  background: none;
+  font-size: 1rem;
   font-weight: 600;
+  color: #666;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 0.95rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-  overflow: hidden;
 }
 
-.tutorial-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-  transition: left 0.5s;
-}
-
-.tutorial-btn:hover::before {
-  left: 100%;
-}
-
-.tutorial-btn-primary {
-  background: linear-gradient(135deg, var(--tutorial-primary), var(--tutorial-primary-dark));
-  color: white;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-}
-
-.tutorial-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-}
-
-.tutorial-btn-secondary {
-  background: white;
-  color: var(--tutorial-text);
-  border: 1px solid var(--tutorial-border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.tutorial-btn-secondary:hover {
-  background: #f8fafc;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.tutorial-btn-success {
-  background: linear-gradient(135deg, var(--tutorial-success), #059669);
-  color: white;
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-}
-
-.tutorial-btn-success:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
-}
-
-.tutorial-nav {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-/* Tutorial Highlight */
-.tutorial-highlight {
-  position: absolute;
-  border: 3px solid var(--tutorial-primary);
-  border-radius: 16px;
-  box-shadow: 
-    0 0 0 9999px rgba(0, 0, 0, 0.7),
-    0 0 0 3px var(--tutorial-primary),
-    0 0 30px rgba(99, 102, 241, 0.6),
-    inset 0 0 30px rgba(99, 102, 241, 0.2);
-  z-index: 10;
-  pointer-events: none;
-  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  animation: highlightPulse 2s infinite;
-}
-
-@keyframes highlightPulse {
-  0%, 100% {
-    box-shadow: 
-      0 0 0 9999px rgba(0, 0, 0, 0.7),
-      0 0 0 3px var(--tutorial-primary),
-      0 0 30px rgba(99, 102, 241, 0.6),
-      inset 0 0 30px rgba(99, 102, 241, 0.2);
-  }
-  50% {
-    box-shadow: 
-      0 0 0 9999px rgba(0, 0, 0, 0.7),
-      0 0 0 3px var(--tutorial-primary),
-      0 0 40px rgba(99, 102, 241, 0.8),
-      inset 0 0 40px rgba(99, 102, 241, 0.3);
-  }
-}
-
-/* Enhanced Tooltip */
-.tutorial-tooltip {
-  position: absolute;
-  background: white;
-  color: var(--tutorial-text);
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  max-width: 280px;
-  z-index: 100;
-  pointer-events: none;
-  animation: tooltipBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  border: 1px solid var(--tutorial-border);
-}
-
-@keyframes tooltipBounce {
-  0% {
-    opacity: 0;
-    transform: scale(0.8) translateY(10px);
-  }
-  50% {
-    transform: scale(1.05) translateY(-5px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.tooltip-arrow {
-  position: absolute;
-  width: 0;
-  height: 0;
-  border: 10px solid transparent;
-}
-
-.tooltip-arrow.bottom {
-  border-top-color: white;
-  border-bottom: none;
-  bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
-}
-
-.tooltip-arrow.top {
-  border-bottom-color: white;
-  border-top: none;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  filter: drop-shadow(0 -2px 2px rgba(0,0,0,0.1));
-}
-
-.tooltip-arrow.left {
-  border-right-color: white;
-  border-left: none;
-  left: -20px;
-  top: 50%;
-  transform: translateY(-50%);
-  filter: drop-shadow(-2px 0 2px rgba(0,0,0,0.1));
-}
-
-.tooltip-arrow.right {
-  border-left-color: white;
-  border-right: none;
-  right: -20px;
-  top: 50%;
-  transform: translateY(-50%);
-  filter: drop-shadow(2px 0 2px rgba(0,0,0,0.1));
-}
-
-.tooltip-content {
-  font-size: 0.95rem;
-  line-height: 1.5;
-  font-weight: 500;
-}
-
-/* Tutorial Trigger Button */
-.tutorial-trigger-btn {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 64px;
-  height: 64px;
-  background: linear-gradient(135deg, var(--tutorial-primary), var(--tutorial-primary-dark));
-  color: white;
-  border: none;
+.next, .finish {
+  background: #6a4cff;
+  color: #fff;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
-  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
-  cursor: pointer;
-  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  animation: float 4s ease-in-out infinite;
+  font-size: 1.1rem;
+  box-shadow: 0 5px 15px rgba(106,76,255,0.3);
+  transition: 0.3s;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  33% {
-    transform: translateY(-8px) rotate(5deg);
-  }
-  66% {
-    transform: translateY(-4px) rotate(-5deg);
-  }
-}
-
-.tutorial-trigger-btn:hover {
-  transform: scale(1.1) rotate(15deg);
-  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.6);
-}
-
-.tutorial-trigger-btn.pulse {
-  animation: pulseGlow 2s infinite;
-}
-
-@keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
-  }
-  50% {
-    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.8), 0 0 0 6px rgba(99, 102, 241, 0.2);
-  }
-}
-
-/* Feature Cards Grid */
-.feature-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.feature-card {
-  background: white;
-  border: 1px solid var(--tutorial-border);
-  border-radius: 12px;
-  padding: 20px 16px;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.feature-card:hover {
+.next:hover, .finish:hover {
+  background: #5534e0;
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  border-color: var(--tutorial-primary);
 }
 
-.feature-card.active {
-  border-color: var(--tutorial-primary);
-  background: linear-gradient(135deg, #f8fafc, #e0e7ff);
+.finish {
+  width: auto;
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-size: 1rem;
 }
 
-.feature-card-icon {
-  font-size: 2rem;
-  margin-bottom: 12px;
-  display: block;
+@media (min-width: 768px) {
+  .onboarding { display: none; } /* Desktop users won't see this */
 }
 
-.feature-card-title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--tutorial-text);
-  margin: 0;
-}
-
-/* Achievement Badges */
-.achievement-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
-  color: #7c2d12;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  margin-top: 15px;
-  animation: badgePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes badgePop {
-  0% {
-    opacity: 0;
-    transform: scale(0.8) translateY(10px);
-  }
-  50% {
-    transform: scale(1.1) translateY(-5px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-/* Completion Celebration */
-.completion-celebration {
-  text-align: center;
-  padding: 30px;
-}
-
-.confetti {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: var(--tutorial-primary);
-  border-radius: 50%;
-  animation: confettiFall 1s ease-in-out;
-}
-
-@keyframes confettiFall {
-  0% {
-    transform: translateY(-100px) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* ===== RESPONSIVE DESIGN ===== */
-@media (max-width: 768px) {
-  .tutorial-container {
-    padding: 15px;
-  }
-  
-  .tutorial-content {
-    max-width: 100%;
-    border-radius: 20px;
-    margin: 0;
-  }
-  
-  .tutorial-header {
-    padding: 24px 24px 20px;
-  }
-  
-  .tutorial-header h2 {
-    font-size: 1.3rem;
-  }
-  
-  .tutorial-body {
-    padding: 24px;
-    max-height: 65vh;
-  }
-  
-  .tutorial-footer {
-    padding: 20px 24px;
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .tutorial-nav {
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  .tutorial-btn {
-    padding: 12px 24px;
-    flex: 1;
-    justify-content: center;
-  }
-  
-  .tutorial-trigger-btn {
-    bottom: 20px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    font-size: 1.4rem;
-  }
-  
-  .tutorial-tooltip {
-    max-width: 240px;
-    font-size: 0.9rem;
-    padding: 16px;
-  }
-  
-  .feature-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  
-  .feature-card {
-    padding: 16px 12px;
-  }
-  
-  .feature-card-icon {
-    font-size: 1.6rem;
-  }
-  
-  .feature-card-title {
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .tutorial-container {
-    padding: 10px;
-  }
-  
-  .tutorial-content {
-    border-radius: 16px;
-  }
-  
-  .tutorial-header {
-    padding: 20px 20px 16px;
-  }
-  
-  .tutorial-header h2 {
-    font-size: 1.2rem;
-  }
-  
-  .tutorial-body {
-    padding: 20px;
-    max-height: 70vh;
-  }
-  
-  .tutorial-message {
-    font-size: 1rem;
-  }
-  
-  .tutorial-footer {
-    padding: 16px 20px;
-  }
-  
-  .tutorial-btn {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-  }
-  
-  .tutorial-trigger-btn {
-    bottom: 15px;
-    right: 15px;
-    width: 50px;
-    height: 50px;
-    font-size: 1.2rem;
-  }
-  
-  .feature-demo {
-    padding: 24px;
-  }
-  
-  .feature-demo .icon {
-    font-size: 3rem;
-  }
-  
-  .feature-demo h3 {
-    font-size: 1.1rem;
-  }
-  
-  .feature-demo p {
-    font-size: 0.9rem;
-  }
-  
-  .feature-cards-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  .tutorial-overlay {
-    --tutorial-bg: rgba(0, 0, 0, 0.9);
-    --tutorial-card-bg: #1f2937;
-    --tutorial-text: #f9fafb;
-    --tutorial-text-light: #d1d5db;
-    --tutorial-border: #374151;
-  }
-  
-  .tutorial-header {
-    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
-  }
-  
-  .tutorial-progress {
-    background: #374151;
-    color: var(--tutorial-primary-light);
-  }
-  
-  .tutorial-footer {
-    background: #374151;
-  }
-  
-  .tutorial-btn-secondary {
-    background: #4b5563;
-    color: #f9fafb;
-    border-color: #6b7280;
-  }
-  
-  .tutorial-btn-secondary:hover {
-    background: #6b7280;
-  }
-  
-  .feature-demo {
-    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
-  }
-  
-  .feature-card {
-    background: #374151;
-    border-color: #4b5563;
-  }
-  
-  .feature-card.active {
-    background: linear-gradient(135deg, #4b5563, #6366f1);
-  }
-  
-  .tutorial-tooltip {
-    background: #374151;
-    color: #f9fafb;
-  }
-  
-  .tooltip-arrow.bottom {
-    border-top-color: #374151;
-  }
-  
-  .tooltip-arrow.top {
-    border-bottom-color: #374151;
-  }
-  
-  .tooltip-arrow.left {
-    border-right-color: #374151;
-  }
-  
-  .tooltip-arrow.right {
-    border-left-color: #374151;
-  }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .tutorial-highlight {
-    border-width: 4px;
-    border-color: #0000ff;
-  }
-  
-  .tutorial-btn {
-    border: 2px solid;
-  }
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  .tutorial-content,
-  .tutorial-tooltip,
-  .tutorial-btn,
-  .tutorial-highlight,
-  .tutorial-trigger-btn,
-  .feature-demo,
-  .feature-card {
-    animation: none;
-    transition: none;
-  }
-  
-  .tutorial-trigger-btn {
-    animation: none;
-  }
-}
-
-/* Print styles */
-@media print {
-  .tutorial-overlay,
-  .tutorial-trigger-btn {
-    display: none !important;
-  }
-}
 </style>
 </head>
 <body>
+  <div id="onboarding" class="onboarding">
+  <div class="slides">
+    <!-- Slide 1 -->
+    <div class="slide active">
+      <div class="text">
+        <h2>Empower Yourself With <br><span>Quick Knowledge</span></h2>
+      </div>
+      <div class="bottom-bar">
+        <button class="skip">Skip</button>
+        <button class="next"><i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
 
-  <!-- Interactive Tutorial Overlay -->
-<div id="tutorial-overlay" class="tutorial-overlay">
-  <div class="tutorial-container">
-    <div class="tutorial-content">
-      <div class="tutorial-header">
-        <h2 id="tutorial-title">Welcome to Quizontal! 🎉</h2>
-        <div class="tutorial-progress">
-          <span id="tutorial-step">1</span>/<span id="tutorial-total">7</span>
-        </div>
+    <!-- Slide 2 -->
+    <div class="slide">
+      <img src="https://i.ibb.co/VYgmjZs/book-stack.png" class="slide-img" alt="Books">
+      <div class="text">
+        <h2>Elevate Your Reading With <br><span>Quick Insights</span></h2>
+        <p>Get bite-sized summaries, unlock key insights, and learn smarter in minutes.</p>
       </div>
-      
-      <div class="tutorial-body">
-        <div id="tutorial-message" class="tutorial-message">
-          Let me show you around our amazing platform!
-        </div>
-        
-        <!-- Feature-specific content -->
-        <div id="tutorial-feature-content" class="tutorial-feature-content">
-          <div class="feature-preview" id="feature-preview">
-            <!-- Dynamic content will be inserted here -->
-          </div>
-        </div>
+      <div class="bottom-bar">
+        <button class="skip">Skip</button>
+        <button class="next"><i class="fas fa-arrow-right"></i></button>
       </div>
-      
-      <div class="tutorial-footer">
-        <button id="tutorial-skip" class="tutorial-btn tutorial-btn-secondary">
-          Skip Tutorial
-        </button>
-        <div class="tutorial-nav">
-          <button id="tutorial-prev" class="tutorial-btn tutorial-btn-secondary" style="display: none;">
-            <i class="fas fa-arrow-left"></i> Back
-          </button>
-          <button id="tutorial-next" class="tutorial-btn tutorial-btn-primary">
-            Next <i class="fas fa-arrow-right"></i>
-          </button>
-          <button id="tutorial-finish" class="tutorial-btn tutorial-btn-success" style="display: none;">
-            Get Started! 🚀
-          </button>
-        </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="slide">
+      <img src="https://i.ibb.co/0j3MRk5/girl-music.png" class="slide-img" alt="Girl Listening">
+      <div class="text">
+        <h2>Stay <span>Motivated</span> And <br>Achieve <span>Goals</span> 🎯</h2>
+        <p>Stay inspired and reach your creative goals with Quizontal.</p>
+      </div>
+      <div class="bottom-bar">
+        <button class="skip">Skip</button>
+        <button class="finish">Get Started</button>
       </div>
     </div>
   </div>
-  
-  <!-- Highlight element (dynamic positioning) -->
-  <div id="tutorial-highlight" class="tutorial-highlight"></div>
-  
-  <!-- Tooltip element -->
-  <div id="tutorial-tooltip" class="tutorial-tooltip">
-    <div class="tooltip-arrow"></div>
-    <div class="tooltip-content"></div>
-  </div>
 </div>
-
-<!-- Tutorial Trigger Button -->
-<button id="tutorial-trigger" class="tutorial-trigger-btn" title="Show Tutorial">
-  <i class="fas fa-question-circle"></i>
-</button>
     <!-- Header Section -->
     <header>
         <div class="container">
@@ -2838,1652 +2129,1176 @@
     </footer>
 
 <script>
-// Mobile menu toggle functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const menuToggle = document.getElementById('menu-toggle');
-    const mobileNav = document.getElementById('mobile-nav');
-    
-    menuToggle.addEventListener('click', function() {
-        mobileNav.classList.toggle('active');
-        menuToggle.classList.toggle('active');
+  document.addEventListener("DOMContentLoaded", () => {
+  const onboarding = document.getElementById("onboarding");
+  const slides = document.querySelectorAll(".slide");
+  const nextBtns = document.querySelectorAll(".next");
+  const skipBtns = document.querySelectorAll(".skip");
+  const finishBtn = document.querySelector(".finish");
+  let current = 0;
+
+  // Only show for first-time visitors on mobile
+  if (localStorage.getItem("onboardingSeen") || window.innerWidth > 768) {
+    onboarding.style.display = "none";
+    return;
+  }
+
+  function showSlide(i) {
+    slides.forEach((slide, idx) => {
+      slide.classList.remove("active");
+      if (idx === i) slide.classList.add("active");
     });
-    
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.navbar') && mobileNav.classList.contains('active')) {
-            mobileNav.classList.remove('active');
-            menuToggle.classList.remove('active');
-        }
+  }
+
+  nextBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (current < slides.length - 1) {
+        current++;
+        showSlide(current);
+      }
     });
-    
-    // Close mobile menu when clicking on a link
-    const mobileLinks = document.querySelectorAll('.mobile-nav-links a, .mobile-nav-actions a');
-    mobileLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            mobileNav.classList.remove('active');
-            menuToggle.classList.remove('active');
-        });
-    });
+  });
+
+  skipBtns.forEach(btn => {
+    btn.addEventListener("click", endOnboarding);
+  });
+
+  finishBtn.addEventListener("click", endOnboarding);
+
+  function endOnboarding() {
+    onboarding.style.opacity = "0";
+    setTimeout(() => onboarding.style.display = "none", 400);
+    localStorage.setItem("onboardingSeen", "true");
+  }
+
+  // Swipe gesture (for touch screens)
+  let startX = 0;
+  onboarding.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+  onboarding.addEventListener("touchend", e => {
+    const diff = e.changedTouches[0].clientX - startX;
+    if (diff < -50 && current < slides.length - 1) {
+      current++;
+      showSlide(current);
+    } else if (diff > 50 && current > 0) {
+      current--;
+      showSlide(current);
+    }
+  });
 });
-
-// Pexels API configuration
-const API_KEY = 'BaCBEeB2Y1gNaCYddJaRoFaVgCdDNhYu51qQe5JMUcPU56RMiJ5M3FOZ';
-const BASE_URL = 'https://api.pexels.com/v1/';
-const VIDEO_URL = 'https://api.pexels.com/videos/';
-const WALLHAVEN_URL = 'https://wall-proxy.vercel.app/api/wallpapers';
-
-// DOM Elements
-const searchInput = document.getElementById('search-input');
-const searchBtn = document.getElementById('search-btn');
-const recentSearchesEl = document.getElementById('recent-searches');
-const categoriesGrid = document.getElementById('categories-grid');
-const filterSection = document.getElementById('filter-section');
-const filterBtns = document.querySelectorAll('.filter-btn');
-const contentTabs = document.querySelectorAll('.content-tab');
-const contentSections = document.querySelectorAll('.content-section');
-
-// Photos elements
-const photosGrid = document.getElementById('photos-grid');
-const photosSpinner = document.getElementById('photos-spinner');
-const photosLoadMoreBtn = document.getElementById('photos-load-more');
-
-// Videos elements
-const videosGrid = document.getElementById('videos-grid');
-const videosSpinner = document.getElementById('videos-spinner');
-const videosLoadMoreBtn = document.getElementById('videos-load-more');
-
-// Wallpapers elements
-const wallpapersGrid = document.getElementById('wallpapers-grid');
-const wallpapersSpinner = document.getElementById('wallpapers-spinner');
-const wallpapersLoadMoreBtn = document.getElementById('wallpapers-load-more');
-const wallpaperSort = document.getElementById('wallpaper-sort');
-
-// Modal elements
-const modal = document.getElementById('media-modal');
-const modalClose = document.getElementById('modal-close');
-const modalImage = document.getElementById('modal-image');
-const modalVideo = document.getElementById('modal-video');
-const modalTitle = document.getElementById('modal-title');
-const modalAuthor = document.getElementById('modal-author');
-const modalAvatar = document.getElementById('modal-avatar');
-const qualitySelector = document.getElementById('quality-selector');
-const downloadBtn = document.getElementById('download-btn');
-
-// App State
-let currentPhotosPage = 1;
-let currentVideosPage = 1;
-let currentWallpapersPage = 1;
-let currentQuery = 'nature';
-let currentFilter = 'all';
-let currentWallpaperQuery = 'nature';
-let currentWallpaperFilter = 'all';
-let currentWallpaperSort = 'relevance';
-let currentMedia = null;
-let recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
-let isPhotosLoading = false;
-let isVideosLoading = false;
-let isWallpapersLoading = false;
-
-// Default categories with sample images
-const categories = [
-    { name: 'Nature', query: 'nature', image: 'https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-    { name: 'People', query: 'people', image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-    { name: 'Technology', query: 'technology', image: 'https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-    { name: 'Travel', query: 'travel', image: 'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-    { name: 'Business', query: 'business', image: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-    { name: 'Animals', query: 'animals', image: 'https://images.pexels.com/photos/247502/pexels-photo-247502.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-    { name: 'Food', query: 'food', image: 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
-    { name: 'Sports', query: 'sports', image: 'https://images.pexels.com/photos/248547/pexels-photo-248547.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' }
-];
-
-// Interactive Tutorial System
-// Enhanced Interactive Tutorial System
-class InteractiveTutorial {
-    constructor() {
-        this.currentStep = 0;
-        this.totalSteps = 7;
-        this.isActive = false;
-        this.tutorialCompleted = localStorage.getItem('tutorialCompleted') === 'true';
-        this.achievements = JSON.parse(localStorage.getItem('tutorialAchievements') || '{}');
+    // Mobile menu toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileNav = document.getElementById('mobile-nav');
         
-        this.initializeElements();
-        this.setupEventListeners();
-        this.createProgressBar();
-    }
-
-    initializeElements() {
-        this.elements = {
-            overlay: document.getElementById('tutorial-overlay'),
-            container: document.querySelector('.tutorial-container'),
-            content: document.querySelector('.tutorial-content'),
-            title: document.getElementById('tutorial-title'),
-            message: document.getElementById('tutorial-message'),
-            featureContent: document.getElementById('tutorial-feature-content'),
-            step: document.getElementById('tutorial-step'),
-            total: document.getElementById('tutorial-total'),
-            prev: document.getElementById('tutorial-prev'),
-            next: document.getElementById('tutorial-next'),
-            finish: document.getElementById('tutorial-finish'),
-            skip: document.getElementById('tutorial-skip'),
-            trigger: document.getElementById('tutorial-trigger'),
-            highlight: document.getElementById('tutorial-highlight'),
-            tooltip: document.getElementById('tutorial-tooltip'),
-            progressBar: null,
-            progressFill: null
-        };
-
-        this.tutorialSteps = [
-            {
-                title: "Welcome to Quizontal! 🎉",
-                message: "Discover millions of free stock photos, videos, and create AI-generated images. Let me guide you through our amazing features!",
-                feature: "welcome",
-                highlight: null,
-                tooltip: null,
-                achievement: "welcome"
-            },
-            {
-                title: "Smart Search Engine",
-                message: "Find exactly what you need with our intelligent search. Try specific keywords, categories, or even colors!",
-                feature: "search",
-                highlight: "#search-input",
-                tooltip: {
-                    text: "💡 Pro tip: Use descriptive phrases like 'sunset beach with palm trees'",
-                    position: "bottom"
-                },
-                achievement: "search_master"
-            },
-            {
-                title: "Curated Categories",
-                message: "Browse hand-picked collections for instant inspiration. Perfect for when you're not sure what you're looking for!",
-                feature: "categories",
-                highlight: "#categories-grid",
-                tooltip: {
-                    text: "🎯 Click any category to instantly explore related content",
-                    position: "top"
-                },
-                achievement: "explorer"
-            },
-            {
-                title: "Advanced Filters",
-                message: "Refine your results with powerful filters. Sort by popularity, date, or use our AI-powered recommendations.",
-                feature: "filters",
-                highlight: "#filter-section",
-                tooltip: {
-                    text: "⚡ Quick filters help you find the perfect content faster",
-                    position: "bottom"
-                },
-                achievement: "filter_pro"
-            },
-            {
-                title: "AI Image Generator",
-                message: "Create unique images that have never existed before! Describe your vision and watch our AI bring it to life.",
-                feature: "ai",
-                highlight: ".content-tab[data-tab='ai']",
-                tooltip: {
-                    text: "✨ Try: 'A futuristic city with flying cars and neon lights'",
-                    position: "left"
-                },
-                achievement: "ai_creator"
-            },
-            {
-                title: "Download & Usage",
-                message: "All content is free for personal and commercial use! Download in multiple sizes and start creating immediately.",
-                feature: "download",
-                highlight: ".download-btn",
-                tooltip: {
-                    text: "📥 Choose your preferred quality - all downloads are free!",
-                    position: "top"
-                },
-                achievement: "downloader"
-            },
-            {
-                title: "You're All Set! 🚀",
-                message: "You're now ready to create amazing content with Quizontal! Remember, you can always restart this tutorial.",
-                feature: "complete",
-                highlight: null,
-                tooltip: null,
-                achievement: "tutorial_complete"
-            }
-        ];
-
-        this.totalSteps = this.tutorialSteps.length;
-        this.elements.total.textContent = this.totalSteps;
-    }
-
-    createProgressBar() {
-        const progressBar = document.createElement('div');
-        progressBar.className = 'tutorial-progress-bar';
-        progressBar.innerHTML = '<div class="tutorial-progress-fill"></div>';
+        menuToggle.addEventListener('click', function() {
+            mobileNav.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
         
-        const header = this.elements.content.querySelector('.tutorial-header');
-        header.appendChild(progressBar);
-        
-        this.elements.progressBar = progressBar;
-        this.elements.progressFill = progressBar.querySelector('.tutorial-progress-fill');
-    }
-
-    setupEventListeners() {
-        this.elements.next.addEventListener('click', () => this.nextStep());
-        this.elements.prev.addEventListener('click', () => this.prevStep());
-        this.elements.finish.addEventListener('click', () => this.finishTutorial());
-        this.elements.skip.addEventListener('click', () => this.skipTutorial());
-        this.elements.trigger.addEventListener('click', () => this.startTutorial());
-        
-        // Close tutorial when clicking outside content
-        this.elements.overlay.addEventListener('click', (e) => {
-            if (e.target === this.elements.overlay) {
-                this.skipTutorial();
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.navbar') && mobileNav.classList.contains('active')) {
+                mobileNav.classList.remove('active');
+                menuToggle.classList.remove('active');
             }
         });
-
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (!this.isActive) return;
-            
-            switch(e.key) {
-                case 'ArrowRight':
-                case ' ':
-                    e.preventDefault();
-                    this.nextStep();
-                    break;
-                case 'ArrowLeft':
-                    e.preventDefault();
-                    this.prevStep();
-                    break;
-                case 'Escape':
-                    e.preventDefault();
-                    this.skipTutorial();
-                    break;
-            }
-        });
-
-        // Add pulse animation to trigger button for first-time users
-        if (!this.tutorialCompleted) {
-            setTimeout(() => {
-                this.elements.trigger.classList.add('pulse');
-            }, 5000);
-        }
-    }
-
-    startTutorial() {
-        this.isActive = true;
-        this.currentStep = 0;
-        this.elements.overlay.classList.add('active');
-        document.body.classList.add('tutorial-open');
-        this.elements.trigger.classList.remove('pulse');
-        this.showStep(0);
-    }
-
-    showStep(stepIndex) {
-        this.currentStep = stepIndex;
-        const step = this.tutorialSteps[stepIndex];
         
-        // Update progress
-        this.updateProgressBar((stepIndex + 1) / this.totalSteps * 100);
-        
-        // Update UI
-        this.elements.title.textContent = step.title;
-        this.elements.message.textContent = step.message;
-        this.elements.step.textContent = stepIndex + 1;
-        
-        // Update navigation buttons
-        this.elements.prev.style.display = stepIndex > 0 ? 'inline-flex' : 'none';
-        this.elements.next.style.display = stepIndex < this.totalSteps - 1 ? 'inline-flex' : 'none';
-        this.elements.finish.style.display = stepIndex === this.totalSteps - 1 ? 'inline-flex' : 'none';
-        this.elements.skip.style.display = stepIndex === this.totalSteps - 1 ? 'none' : 'inline-flex';
-        
-        // Show feature-specific content
-        this.showFeatureContent(step.feature);
-        
-        // Handle element highlighting
-        this.updateHighlight(step.highlight);
-        
-        // Show tooltip if specified
-        this.showTooltip(step.tooltip);
-        
-        // Unlock achievement
-        if (step.achievement && !this.achievements[step.achievement]) {
-            this.unlockAchievement(step.achievement);
-        }
-        
-        // Scroll to highlighted element if needed
-        if (step.highlight) {
-            this.scrollToElement(step.highlight);
-        }
-    }
-
-    updateProgressBar(percentage) {
-        if (this.elements.progressFill) {
-            this.elements.progressFill.style.width = `${percentage}%`;
-        }
-    }
-
-    showFeatureContent(feature) {
-        const content = this.elements.featureContent;
-        
-        const featureContents = {
-            welcome: `
-                <div class="feature-demo">
-                    <div class="icon animated">🎨</div>
-                    <h3>Your Creative Playground</h3>
-                    <p>Access millions of assets and AI tools to bring your ideas to life</p>
-                    <div class="feature-cards-grid">
-                        <div class="feature-card">
-                            <span class="feature-card-icon">📷</span>
-                            <div class="feature-card-title">Stock Photos</div>
-                        </div>
-                        <div class="feature-card">
-                            <span class="feature-card-icon">🎥</span>
-                            <div class="feature-card-title">HD Videos</div>
-                        </div>
-                        <div class="feature-card">
-                            <span class="feature-card-icon">🤖</span>
-                            <div class="feature-card-title">AI Generator</div>
-                        </div>
-                        <div class="feature-card">
-                            <span class="feature-card-icon">🎨</span>
-                            <div class="feature-card-title">Wallpapers</div>
-                        </div>
-                    </div>
-                </div>
-            `,
-            search: `
-                <div class="feature-demo">
-                    <i class="fas fa-search icon animated"></i>
-                    <h3>Intelligent Discovery</h3>
-                    <p>Our AI understands context and helps you find perfect matches</p>
-                    <div class="achievement-badge">
-                        <i class="fas fa-trophy"></i>
-                        Search Master Unlocked!
-                    </div>
-                </div>
-            `,
-            categories: `
-                <div class="feature-demo">
-                    <i class="fas fa-th-large icon animated"></i>
-                    <h3>Organized Collections</h3>
-                    <p>Browse by theme, color, or mood for instant inspiration</p>
-                </div>
-            `,
-            filters: `
-                <div class="feature-demo">
-                    <i class="fas fa-filter icon animated"></i>
-                    <h3>Precision Tools</h3>
-                    <p>Filter by size, orientation, color, and more</p>
-                    <div class="achievement-badge">
-                        <i class="fas fa-star"></i>
-                        Filter Pro Unlocked!
-                    </div>
-                </div>
-            `,
-            ai: `
-                <div class="feature-demo">
-                    <i class="fas fa-robot icon animated"></i>
-                    <h3>AI-Powered Creation</h3>
-                    <p>Generate unique images from simple text descriptions</p>
-                    <div class="achievement-badge">
-                        <i class="fas fa-magic"></i>
-                        AI Creator Unlocked!
-                    </div>
-                </div>
-            `,
-            download: `
-                <div class="feature-demo">
-                    <i class="fas fa-download icon animated"></i>
-                    <h3>Instant Access</h3>
-                    <p>Download in multiple resolutions for any project</p>
-                </div>
-            `,
-            complete: `
-                <div class="completion-celebration">
-                    <div class="feature-demo">
-                        <div class="icon animated">🎯</div>
-                        <h3>Ready to Create!</h3>
-                        <p>You've mastered all essential features. Time to bring your ideas to life! 🚀</p>
-                        <div class="achievement-badge">
-                            <i class="fas fa-gem"></i>
-                            Tutorial Master Completed!
-                        </div>
-                    </div>
-                </div>
-            `
-        };
-        
-        content.innerHTML = featureContents[feature] || '';
-        
-        // Add click handlers for feature cards
-        if (feature === 'welcome') {
-            setTimeout(() => {
-                document.querySelectorAll('.feature-card').forEach((card, index) => {
-                    card.addEventListener('click', () => {
-                        // Highlight the clicked card
-                        document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
-                        card.classList.add('active');
-                        
-                        // Auto-advance after selection
-                        setTimeout(() => this.nextStep(), 800);
-                    });
-                });
-            }, 100);
-        }
-    }
-
-    updateHighlight(selector) {
-        const highlight = this.elements.highlight;
-        
-        if (!selector) {
-            highlight.style.display = 'none';
-            return;
-        }
-        
-        const element = document.querySelector(selector);
-        if (!element) {
-            highlight.style.display = 'none';
-            return;
-        }
-        
-        const rect = element.getBoundingClientRect();
-        
-        highlight.style.display = 'block';
-        highlight.style.width = `${rect.width + 20}px`;
-        highlight.style.height = `${rect.height + 20}px`;
-        highlight.style.left = `${rect.left - 10}px`;
-        highlight.style.top = `${rect.top - 10}px`;
-    }
-
-    showTooltip(tooltip) {
-        const tooltipEl = this.elements.tooltip;
-        
-        if (!tooltip) {
-            tooltipEl.style.display = 'none';
-            return;
-        }
-        
-        const element = document.querySelector(this.tutorialSteps[this.currentStep].highlight);
-        if (!element) {
-            tooltipEl.style.display = 'none';
-            return;
-        }
-        
-        const rect = element.getBoundingClientRect();
-        tooltipEl.innerHTML = `
-            <div class="tooltip-arrow ${tooltip.position}"></div>
-            <div class="tooltip-content">${tooltip.text}</div>
-        `;
-        
-        tooltipEl.style.display = 'block';
-        
-        // Position tooltip based on specified position
-        const spacing = 20;
-        switch(tooltip.position) {
-            case 'top':
-                tooltipEl.style.bottom = `${window.innerHeight - rect.top + spacing}px`;
-                tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
-                tooltipEl.style.transform = 'translateX(-50%)';
-                break;
-            case 'bottom':
-                tooltipEl.style.top = `${rect.bottom + spacing}px`;
-                tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
-                tooltipEl.style.transform = 'translateX(-50%)';
-                break;
-            case 'left':
-                tooltipEl.style.top = `${rect.top + rect.height / 2}px`;
-                tooltipEl.style.right = `${window.innerWidth - rect.left + spacing}px`;
-                tooltipEl.style.transform = 'translateY(-50%)';
-                break;
-            case 'right':
-                tooltipEl.style.top = `${rect.top + rect.height / 2}px`;
-                tooltipEl.style.left = `${rect.right + spacing}px`;
-                tooltipEl.style.transform = 'translateY(-50%)';
-                break;
-        }
-    }
-
-    scrollToElement(selector) {
-        const element = document.querySelector(selector);
-        if (element) {
-            element.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-                inline: 'center'
+        // Close mobile menu when clicking on a link
+        const mobileLinks = document.querySelectorAll('.mobile-nav-links a, .mobile-nav-actions a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileNav.classList.remove('active');
+                menuToggle.classList.remove('active');
             });
-        }
-    }
+        });
+    });
 
-    nextStep() {
-        if (this.currentStep < this.totalSteps - 1) {
-            this.showStep(this.currentStep + 1);
-        }
-    }
+    // Pexels API configuration
+    const API_KEY = 'BaCBEeB2Y1gNaCYddJaRoFaVgCdDNhYu51qQe5JMUcPU56RMiJ5M3FOZ';
+    const BASE_URL = 'https://api.pexels.com/v1/';
+    const VIDEO_URL = 'https://api.pexels.com/videos/';
+    const WALLHAVEN_URL = 'https://wall-proxy.vercel.app/api/wallpapers';
 
-    prevStep() {
-        if (this.currentStep > 0) {
-            this.showStep(this.currentStep - 1);
-        }
-    }
+    // DOM Elements
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+    const recentSearchesEl = document.getElementById('recent-searches');
+    const categoriesGrid = document.getElementById('categories-grid');
+    const filterSection = document.getElementById('filter-section');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const contentTabs = document.querySelectorAll('.content-tab');
+    const contentSections = document.querySelectorAll('.content-section');
+    
+    // Photos elements
+    const photosGrid = document.getElementById('photos-grid');
+    const photosSpinner = document.getElementById('photos-spinner');
+    const photosLoadMoreBtn = document.getElementById('photos-load-more');
+    
+    // Videos elements
+    const videosGrid = document.getElementById('videos-grid');
+    const videosSpinner = document.getElementById('videos-spinner');
+    const videosLoadMoreBtn = document.getElementById('videos-load-more');
+    
+    // Wallpapers elements
+    const wallpapersGrid = document.getElementById('wallpapers-grid');
+    const wallpapersSpinner = document.getElementById('wallpapers-spinner');
+    const wallpapersLoadMoreBtn = document.getElementById('wallpapers-load-more');
+    const wallpaperSort = document.getElementById('wallpaper-sort');
+    
+    // Modal elements
+    const modal = document.getElementById('media-modal');
+    const modalClose = document.getElementById('modal-close');
+    const modalImage = document.getElementById('modal-image');
+    const modalVideo = document.getElementById('modal-video');
+    const modalTitle = document.getElementById('modal-title');
+    const modalAuthor = document.getElementById('modal-author');
+    const modalAvatar = document.getElementById('modal-avatar');
+    const qualitySelector = document.getElementById('quality-selector');
+    const downloadBtn = document.getElementById('download-btn');
 
-    finishTutorial() {
-        this.tutorialCompleted = true;
-        localStorage.setItem('tutorialCompleted', 'true');
-        
-        // Create celebration effect
-        this.createCelebration();
-        
-        setTimeout(() => {
-            this.closeTutorial();
-            this.showCompletionMessage();
-        }, 2000);
-    }
+    // App State
+    let currentPhotosPage = 1;
+    let currentVideosPage = 1;
+    let currentWallpapersPage = 1;
+    let currentQuery = 'nature';
+    let currentFilter = 'all';
+    let currentWallpaperQuery = 'nature';
+    let currentWallpaperFilter = 'all';
+    let currentWallpaperSort = 'relevance';
+    let currentMedia = null;
+    let recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || [];
+    let isPhotosLoading = false;
+    let isVideosLoading = false;
+    let isWallpapersLoading = false;
 
-    createCelebration() {
-        const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-        for (let i = 0; i < 50; i++) {
-            setTimeout(() => {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDuration = (Math.random() * 2 + 1) + 's';
-                document.body.appendChild(confetti);
+    // Default categories with sample images
+    const categories = [
+        { name: 'Nature', query: 'nature', image: 'https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'People', query: 'people', image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'Technology', query: 'technology', image: 'https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'Travel', query: 'travel', image: 'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'Business', query: 'business', image: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'Animals', query: 'animals', image: 'https://images.pexels.com/photos/247502/pexels-photo-247502.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'Food', query: 'food', image: 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' },
+        { name: 'Sports', query: 'sports', image: 'https://images.pexels.com/photos/248547/pexels-photo-248547.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=150&w=200' }
+    ];
+
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCategories();
+        loadMedia('photos', 'nature');
+        loadMedia('videos', 'nature');
+        loadWallpapers('nature');
+        updateRecentSearches();
+        setupEventListeners();
+        initAIGenerator();
+    });
+
+    // Set up event listeners
+    function setupEventListeners() {
+        // Search functionality
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        // Filter buttons
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active filter button
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
                 
-                setTimeout(() => confetti.remove(), 2000);
-            }, i * 50);
-        }
-    }
-
-    skipTutorial() {
-        this.closeTutorial();
-        
-        if (!this.tutorialCompleted) {
-            setTimeout(() => {
-                if (confirm("Would you like to restart the tutorial later? You can always access it from the help button.")) {
-                    // User might restart later
-                }
-            }, 500);
-        }
-    }
-
-    closeTutorial() {
-        this.isActive = false;
-        this.elements.overlay.classList.remove('active');
-        document.body.classList.remove('tutorial-open');
-        
-        // Reset highlights and tooltips
-        this.elements.highlight.style.display = 'none';
-        this.elements.tooltip.style.display = 'none';
-    }
-
-    unlockAchievement(achievement) {
-        this.achievements[achievement] = true;
-        localStorage.setItem('tutorialAchievements', JSON.stringify(this.achievements));
-        
-        // You could add analytics or notifications here
-        console.log(`Achievement unlocked: ${achievement}`);
-    }
-
-    showCompletionMessage() {
-        const completionMsg = document.createElement('div');
-        completionMsg.className = 'completion-message';
-        completionMsg.innerHTML = `
-            <div style="position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 10000; animation: slideInRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); max-width: 300px;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    <i class="fas fa-trophy" style="font-size: 1.5rem;"></i>
-                    <strong style="font-size: 1.1rem;">Tutorial Completed!</strong>
-                </div>
-                <p style="margin: 0; font-size: 0.95em; opacity: 0.9;">You're now ready to create amazing content! 🚀</p>
-            </div>
-        `;
-        
-        document.body.appendChild(completionMsg);
-        
-        setTimeout(() => {
-            completionMsg.style.animation = 'slideOutRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-            setTimeout(() => completionMsg.remove(), 600);
-        }, 4000);
-    }
-
-    // Method to reset tutorial
-    resetTutorial() {
-        localStorage.removeItem('tutorialCompleted');
-        localStorage.removeItem('tutorialAchievements');
-        this.tutorialCompleted = false;
-        this.achievements = {};
-        this.startTutorial();
-    }
-}
-
-// Initialize the app
-document.addEventListener('DOMContentLoaded', () => {
-    loadCategories();
-    loadMedia('photos', 'nature');
-    loadMedia('videos', 'nature');
-    loadWallpapers('nature');
-    updateRecentSearches();
-    setupEventListeners();
-    initAIGenerator();
-    
-    // Initialize tutorial (auto-start for first-time users)
-    setTimeout(() => {
-        if (!localStorage.getItem('tutorialCompleted')) {
-            window.quizontalTutorial = new InteractiveTutorial();
-            // Auto-start tutorial after a short delay for first-time users
-            setTimeout(() => {
-                if (window.quizontalTutorial && !window.quizontalTutorial.tutorialCompleted) {
-                    window.quizontalTutorial.startTutorial();
-                }
-            }, 3000);
-        } else {
-            // Initialize tutorial but don't auto-start for returning users
-            window.quizontalTutorial = new InteractiveTutorial();
-        }
-    }, 1000);
-});
-
-// Set up event listeners
-function setupEventListeners() {
-    // Search functionality
-    searchBtn.addEventListener('click', performSearch);
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') performSearch();
-    });
-
-    // Filter buttons
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Update active filter button
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            // Set current filter and perform search
-            currentFilter = btn.getAttribute('data-filter');
-            if (currentFilter !== 'all') {
-                currentQuery = currentFilter;
-                searchInput.value = currentQuery;
-                performSearch();
-            }
-        });
-    });
-
-    // Content tabs
-    contentTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const tabType = tab.getAttribute('data-tab');
-            
-            // Update active tab
-            contentTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            
-            // Show corresponding section
-            contentSections.forEach(section => {
-                section.classList.remove('active');
-                if (section.id === `${tabType}-section`) {
-                    section.classList.add('active');
+                // Set current filter and perform search
+                currentFilter = btn.getAttribute('data-filter');
+                if (currentFilter !== 'all') {
+                    currentQuery = currentFilter;
+                    searchInput.value = currentQuery;
+                    performSearch();
                 }
             });
         });
-    });
 
-    // Load more buttons
-    photosLoadMoreBtn.addEventListener('click', () => {
-        currentPhotosPage++;
-        loadMedia('photos', currentQuery, false);
-    });
+        // Content tabs
+        contentTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabType = tab.getAttribute('data-tab');
+                
+                // Update active tab
+                contentTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show corresponding section
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === `${tabType}-section`) {
+                        section.classList.add('active');
+                    }
+                });
+            });
+        });
 
-    videosLoadMoreBtn.addEventListener('click', () => {
-        currentVideosPage++;
-        loadMedia('videos', currentQuery, false);
-    });
+        // Load more buttons
+        photosLoadMoreBtn.addEventListener('click', () => {
+            currentPhotosPage++;
+            loadMedia('photos', currentQuery, false);
+        });
 
-    wallpapersLoadMoreBtn.addEventListener('click', () => {
-        currentWallpapersPage++;
-        loadWallpapers(currentWallpaperQuery, false);
-    });
+        videosLoadMoreBtn.addEventListener('click', () => {
+            currentVideosPage++;
+            loadMedia('videos', currentQuery, false);
+        });
 
-    // Wallpaper filter buttons
-    const wallpaperFilterBtns = document.querySelectorAll('#wallpaper-filter-section .filter-btn');
-    wallpaperFilterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            wallpaperFilterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentWallpaperFilter = btn.getAttribute('data-filter');
+        wallpapersLoadMoreBtn.addEventListener('click', () => {
+            currentWallpapersPage++;
+            loadWallpapers(currentWallpaperQuery, false);
+        });
+
+        // Wallpaper filter buttons
+        const wallpaperFilterBtns = document.querySelectorAll('#wallpaper-filter-section .filter-btn');
+        wallpaperFilterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                wallpaperFilterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentWallpaperFilter = btn.getAttribute('data-filter');
+                currentWallpapersPage = 1;
+                wallpapersGrid.innerHTML = '';
+                loadWallpapers(currentWallpaperQuery);
+            });
+        });
+
+        // Wallpaper sort
+        wallpaperSort.addEventListener('change', () => {
+            currentWallpaperSort = wallpaperSort.value;
             currentWallpapersPage = 1;
             wallpapersGrid.innerHTML = '';
             loadWallpapers(currentWallpaperQuery);
         });
-    });
 
-    // Wallpaper sort
-    wallpaperSort.addEventListener('change', () => {
-        currentWallpaperSort = wallpaperSort.value;
-        currentWallpapersPage = 1;
-        wallpapersGrid.innerHTML = '';
-        loadWallpapers(currentWallpaperQuery);
-    });
-
-    // Modal functionality
-    modalClose.addEventListener('click', () => {
-        modal.style.display = 'none';
-        document.body.classList.remove('modal-open');
-        if (modalVideo.style.display !== 'none') {
-            modalVideo.pause();
-        }
-    });
-
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) {
+        // Modal functionality
+        modalClose.addEventListener('click', () => {
             modal.style.display = 'none';
             document.body.classList.remove('modal-open');
             if (modalVideo.style.display !== 'none') {
                 modalVideo.pause();
             }
-        }
-    });
-
-    // Add touch event for better mobile interaction
-    modal.addEventListener('touchstart', function(e) {
-        e.stopPropagation();
-    }, { passive: true });
-
-    // Download functionality
-    downloadBtn.addEventListener('click', downloadMedia);
-    qualitySelector.addEventListener('change', updateDownloadUrl);
-}
-
-// Load categories
-function loadCategories() {
-    categories.forEach(category => {
-        const card = document.createElement('div');
-        card.className = 'category-card';
-        card.innerHTML = `
-            <img src="${category.image}" alt="${category.name}" class="category-image">
-            <div class="category-name">${category.name}</div>
-        `;
-        card.addEventListener('click', () => {
-            currentQuery = category.query;
-            currentWallpaperQuery = category.query;
-            searchInput.value = currentQuery;
-            performSearch();
         });
-        categoriesGrid.appendChild(card);
-    });
-}
 
-// Perform search
-function performSearch() {
-    const query = searchInput.value.trim();
-    if (query) {
-        currentQuery = query;
-        currentWallpaperQuery = query;
-        currentPhotosPage = 1;
-        currentVideosPage = 1;
-        currentWallpapersPage = 1;
-        
-        // Add to recent searches
-        if (!recentSearches.includes(query)) {
-            recentSearches.unshift(query);
-            if (recentSearches.length > 5) {
-                recentSearches.pop();
-            }
-            localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
-            updateRecentSearches();
-        }
-        
-        // Clear grids and load new content
-        photosGrid.innerHTML = '';
-        videosGrid.innerHTML = '';
-        wallpapersGrid.innerHTML = '';
-        loadMedia('photos', query);
-        loadMedia('videos', query);
-        loadWallpapers(query);
-    }
-}
-
-// Update recent searches display
-function updateRecentSearches() {
-    if (recentSearches.length === 0) {
-        recentSearchesEl.innerHTML = '';
-        return;
-    }
-    
-    recentSearchesEl.innerHTML = '<span style="margin-right: 10px; color: var(--gray);">Recent:</span>';
-    recentSearches.forEach(search => {
-        const tag = document.createElement('span');
-        tag.className = 'recent-tag';
-        tag.textContent = search;
-        tag.addEventListener('click', () => {
-            searchInput.value = search;
-            performSearch();
-        });
-        recentSearchesEl.appendChild(tag);
-    });
-}
-
-// Load media from Pexels API
-async function loadMedia(type, query, reset = true) {
-    if ((type === 'photos' && isPhotosLoading) || (type === 'videos' && isVideosLoading)) return;
-    
-    if (type === 'photos') {
-        isPhotosLoading = true;
-        photosSpinner.style.display = 'block';
-        photosLoadMoreBtn.style.display = 'none';
-    } else {
-        isVideosLoading = true;
-        videosSpinner.style.display = 'block';
-        videosLoadMoreBtn.style.display = 'none';
-    }
-
-    try {
-        const url = type === 'photos' 
-            ? `${BASE_URL}search?query=${query}&per_page=15&page=${currentPhotosPage}`
-            : `${VIDEO_URL}search?query=${query}&per_page=15&page=${currentVideosPage}`;
-
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': API_KEY
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                if (modalVideo.style.display !== 'none') {
+                    modalVideo.pause();
+                }
             }
         });
 
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const grid = type === 'photos' ? photosGrid : videosGrid;
-
-        if (reset) {
-            grid.innerHTML = '';
-        }
-
-        if (type === 'photos') {
-            displayPhotos(data.photos, grid);
-        } else {
-            displayVideos(data.videos, grid);
-        }
-
-        // Show/hide load more button based on whether there are more results
-        if (data.next_page) {
-            if (type === 'photos') {
-                photosLoadMoreBtn.style.display = 'inline-flex';
-            } else {
-                videosLoadMoreBtn.style.display = 'inline-flex';
-            }
-        }
-
-    } catch (error) {
-        console.error('Error fetching media:', error);
-        const grid = type === 'photos' ? photosGrid : videosGrid;
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px;">Sorry, there was an error loading content. Please try again later.</p>';
-    } finally {
-        if (type === 'photos') {
-            isPhotosLoading = false;
-            photosSpinner.style.display = 'none';
-        } else {
-            isVideosLoading = false;
-            videosSpinner.style.display = 'none';
-        }
-    }
-}
-
-// Display photos in the grid
-function displayPhotos(photos, grid) {
-    photos.forEach(photo => {
-        const card = document.createElement('div');
-        card.className = 'media-card';
-        card.innerHTML = `
-            <img src="${photo.src.medium}" alt="${photo.photographer}" class="media-image">
-            <div class="media-overlay">
-                <div class="media-actions">
-                    <button class="action-btn view-btn" data-id="${photo.id}">
-                        <i class="fas fa-expand"></i>
-                    </button>
-                    <button class="action-btn like-btn">
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <button class="action-btn download-btn" data-url="${photo.src.original}">
-                        <i class="fas fa-download"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="media-info">
-                <div class="media-author">
-                    <img src="${photo.src.tiny}" alt="${photo.photographer}" class="author-avatar">
-                    <div class="author-name">${photo.photographer}</div>
-                </div>
-                <div class="media-like">
-                    <i class="far fa-heart"></i> ${photo.liked ? photo.liked : Math.floor(Math.random() * 100)}
-                </div>
-            </div>
-        `;
-        grid.appendChild(card);
-        
-        // Add event listeners to action buttons
-        const viewBtn = card.querySelector('.view-btn');
-        const downloadBtn = card.querySelector('.download-btn');
-        
-        viewBtn.addEventListener('click', () => viewMedia(photo, 'photo'));
-        downloadBtn.addEventListener('click', (e) => {
+        // Add touch event for better mobile interaction
+        modal.addEventListener('touchstart', function(e) {
             e.stopPropagation();
-            downloadMediaDirect(photo.src.original, `photo-${photo.id}.jpg`);
-        });
-    });
-}
+        }, { passive: true });
 
-// Display videos in the grid
-function displayVideos(videos, grid) {
-    videos.forEach(video => {
-        // Find the medium quality video file
-        const videoFile = video.video_files.find(file => file.quality === 'hd' && file.width <= 1280) || 
-                         video.video_files[0];
-        
-        const card = document.createElement('div');
-        card.className = 'media-card';
-        card.innerHTML = `
-            <video class="media-video" muted loop poster="${video.image}">
-                <source src="${videoFile.link}" type="video/mp4">
-            </video>
-            <div class="media-overlay">
-                <div class="media-actions">
-                    <button class="action-btn view-btn" data-id="${video.id}">
-                        <i class="fas fa-expand"></i>
-                    </button>
-                    <button class="action-btn like-btn">
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <button class="action-btn download-btn" data-url="${videoFile.link}">
-                        <i class="fas fa-download"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="media-info">
-                <div class="media-author">
-                    <img src="${video.user.url}" alt="${video.user.name}" class="author-avatar">
-                    <div class="author-name">${video.user.name}</div>
-                </div>
-                <div class="media-like">
-                    <i class="far fa-heart"></i> ${video.liked ? video.liked : Math.floor(Math.random() * 100)}
-                </div>
-            </div>
-        `;
-        grid.appendChild(card);
-        
-        // Add event listeners to action buttons
-        const viewBtn = card.querySelector('.view-btn');
-        const downloadBtn = card.querySelector('.download-btn');
-        const videoElement = card.querySelector('video');
-        
-        // Auto-play on hover
-        card.addEventListener('mouseenter', () => {
-            videoElement.play();
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            videoElement.pause();
-            videoElement.currentTime = 0;
-        });
-        
-        viewBtn.addEventListener('click', () => viewMedia(video, 'video'));
-        downloadBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            downloadMediaDirect(videoFile.link, `video-${video.id}.mp4`);
-        });
-    });
-}
-
-// View media in modal
-function viewMedia(media, type) {
-    currentMedia = media;
-    modal.style.display = 'block';
-    document.body.classList.add('modal-open');
-    
-    // Set modal content based on media type
-    if (type === 'video') {
-        modalImage.style.display = 'none';
-        modalVideo.style.display = 'block';
-        
-        // Find the best quality video file
-        const videoFile = media.video_files.find(file => file.quality === 'hd' && file.width <= 1280) || 
-                         media.video_files[0];
-        modalVideo.src = videoFile.link;
-        modalVideo.load();
-        
-        modalTitle.textContent = `Video by ${media.user.name}`;
-        modalAuthor.textContent = media.user.name;
-        modalAvatar.src = media.user.url;
-        
-        // Update quality selector for videos
-        qualitySelector.innerHTML = '';
-        media.video_files.forEach(file => {
-            const option = document.createElement('option');
-            option.value = file.link;
-            option.textContent = `${file.quality} (${file.width}x${file.height})`;
-            qualitySelector.appendChild(option);
-        });
-    } else {
-        modalImage.style.display = 'block';
-        modalVideo.style.display = 'none';
-        modalImage.src = media.src.large;
-        
-        modalTitle.textContent = `Photo by ${media.photographer}`;
-        modalAuthor.textContent = media.photographer;
-        modalAvatar.src = media.src.tiny;
-        
-        // Update quality selector for photos
-        qualitySelector.innerHTML = `
-            <option value="${media.src.small}">Small (${Math.round(media.width/4)}x${Math.round(media.height/4)})</option>
-            <option value="${media.src.medium}">Medium (${Math.round(media.width/2)}x${Math.round(media.height/2)})</option>
-            <option value="${media.src.large}">Large (${media.width}x${media.height})</option>
-            <option value="${media.src.original}" selected>Original (${media.width}x${media.height})</option>
-        `;
+        // Download functionality
+        downloadBtn.addEventListener('click', downloadMedia);
+        qualitySelector.addEventListener('change', updateDownloadUrl);
     }
-    
-    // Update download URL
-    updateDownloadUrl();
-}
 
-// View wallpaper in modal
-function viewWallpaper(wallpaper) {
-    currentMedia = wallpaper;
-    modal.style.display = 'block';
-    document.body.classList.add('modal-open');
-    
-    modalImage.style.display = 'block';
-    modalVideo.style.display = 'none';
-    modalImage.src = wallpaper.path;
-    
-    modalTitle.textContent = `Wallpaper ${wallpaper.id}`;
-    modalAuthor.textContent = wallpaper.id;
-    modalAvatar.src = wallpaper.thumbs ? wallpaper.thumbs.large : wallpaper.path;
-    
-    // Update quality selector for wallpapers
-    qualitySelector.innerHTML = `
-        <option value="${wallpaper.thumbs ? wallpaper.thumbs.small : wallpaper.path}">Small</option>
-        <option value="${wallpaper.thumbs ? wallpaper.thumbs.large : wallpaper.path}">Medium</option>
-        <option value="${wallpaper.path}" selected>Original (${wallpaper.resolution})</option>
-    `;
-    
-    // Update download URL
-    updateDownloadUrl();
-}
-
-// Update download URL based on quality selection
-function updateDownloadUrl() {
-    if (!currentMedia) return;
-    
-    const downloadUrl = qualitySelector.value;
-    downloadBtn.setAttribute('data-url', downloadUrl);
-}
-
-// Download media from modal
-function downloadMedia() {
-    if (!currentMedia) return;
-    
-    const downloadUrl = downloadBtn.getAttribute('data-url');
-    const isVideo = modalVideo.style.display !== 'none';
-    const fileExtension = isVideo ? 'mp4' : 'jpg';
-    const fileName = `${isVideo ? 'video' : 'photo'}-${currentMedia.id}.${fileExtension}`;
-    
-    downloadMediaDirect(downloadUrl, fileName);
-}
-
-// Enhanced download function to prevent app crashes
-function downloadMediaDirect(url, filename) {
-    try {
-        // Method 1: Try using fetch with blob (safer approach)
-        fetch(url)
-            .then(response => response.blob())
-            .then(blob => {
-                const blobUrl = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = blobUrl;
-                a.download = filename;
-                a.style.display = 'none';
-                
-                // Add to document and trigger click
-                document.body.appendChild(a);
-                a.click();
-                
-                // Clean up
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(blobUrl);
-                }, 100);
-            })
-            .catch(error => {
-                console.warn('Blob download failed, trying direct method:', error);
-                // Fallback to direct download
-                downloadUsingAnchor(url, filename);
+    // Load categories
+    function loadCategories() {
+        categories.forEach(category => {
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.innerHTML = `
+                <img src="${category.image}" alt="${category.name}" class="category-image">
+                <div class="category-name">${category.name}</div>
+            `;
+            card.addEventListener('click', () => {
+                currentQuery = category.query;
+                currentWallpaperQuery = category.query;
+                searchInput.value = currentQuery;
+                performSearch();
             });
-    } catch (error) {
-        console.error('Download error:', error);
-        // Final fallback
-        downloadUsingAnchor(url, filename);
+            categoriesGrid.appendChild(card);
+        });
     }
-}
 
-// Fallback download function
-function downloadUsingAnchor(url, filename) {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.style.display = 'none';
-    a.setAttribute('target', '_blank'); // Important for mobile apps
-    
-    document.body.appendChild(a);
-    
-    // Use setTimeout to prevent app freezing
-    setTimeout(() => {
-        try {
-            a.click();
-        } catch (e) {
-            console.error('Click failed:', e);
-            // Last resort - open in new window
-            window.open(url, '_blank');
+    // Perform search
+    function performSearch() {
+        const query = searchInput.value.trim();
+        if (query) {
+            currentQuery = query;
+            currentWallpaperQuery = query;
+            currentPhotosPage = 1;
+            currentVideosPage = 1;
+            currentWallpapersPage = 1;
+            
+            // Add to recent searches
+            if (!recentSearches.includes(query)) {
+                recentSearches.unshift(query);
+                if (recentSearches.length > 5) {
+                    recentSearches.pop();
+                }
+                localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+                updateRecentSearches();
+            }
+            
+            // Clear grids and load new content
+            photosGrid.innerHTML = '';
+            videosGrid.innerHTML = '';
+            wallpapersGrid.innerHTML = '';
+            loadMedia('photos', query);
+            loadMedia('videos', query);
+            loadWallpapers(query);
+        }
+    }
+
+    // Update recent searches display
+    function updateRecentSearches() {
+        if (recentSearches.length === 0) {
+            recentSearchesEl.innerHTML = '';
+            return;
         }
         
-        // Clean up with delay
-        setTimeout(() => {
-            document.body.removeChild(a);
-        }, 1000);
-    }, 100);
-}
-
-// Load wallpapers using proxy
-async function loadWallpapers(query, reset = true) {
-    if (isWallpapersLoading) return;
-    isWallpapersLoading = true;
-    wallpapersSpinner.style.display = 'block';
-    wallpapersLoadMoreBtn.style.display = 'none';
-
-    try {
-        let url = `${WALLHAVEN_URL}?q=${encodeURIComponent(query)}&page=${currentWallpapersPage}`;
-        if (currentWallpaperSort !== 'relevance') url += `&sorting=${currentWallpaperSort}`;
-        if (currentWallpaperFilter !== 'all') url += `&categories=${currentWallpaperFilter}`;
-
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`Proxy API error: ${response.status}`);
-
-        const data = await response.json();
-        const wallpapers = Array.isArray(data.data) ? data.data : [];
-
-        if (reset) wallpapersGrid.innerHTML = '';
-
-        if (wallpapers.length === 0) {
-            wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px;">No wallpapers found for this search.</p>';
-        } else {
-            displayWallpapers(wallpapers);
-            if (wallpapers.length === 24) wallpapersLoadMoreBtn.style.display = 'inline-flex';
-        }
-    } catch (error) {
-        console.error('Error fetching wallpapers:', error);
-        wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px;">Sorry, there was an error loading wallpapers. Please try again later.</p>';
-    } finally {
-        isWallpapersLoading = false;
-        wallpapersSpinner.style.display = 'none';
+        recentSearchesEl.innerHTML = '<span style="margin-right: 10px; color: var(--gray);">Recent:</span>';
+        recentSearches.forEach(search => {
+            const tag = document.createElement('span');
+            tag.className = 'recent-tag';
+            tag.textContent = search;
+            tag.addEventListener('click', () => {
+                searchInput.value = search;
+                performSearch();
+            });
+            recentSearchesEl.appendChild(tag);
+        });
     }
-}
 
-// Display wallpapers
-function displayWallpapers(wallpapers) {
-    wallpapers.forEach(wallpaper => {
-        const card = document.createElement('div');
-        card.className = 'media-card';
+    // Load media from Pexels API
+    async function loadMedia(type, query, reset = true) {
+        if ((type === 'photos' && isPhotosLoading) || (type === 'videos' && isVideosLoading)) return;
+        
+        if (type === 'photos') {
+            isPhotosLoading = true;
+            photosSpinner.style.display = 'block';
+            photosLoadMoreBtn.style.display = 'none';
+        } else {
+            isVideosLoading = true;
+            videosSpinner.style.display = 'block';
+            videosLoadMoreBtn.style.display = 'none';
+        }
 
-        const thumbnailUrl = wallpaper.thumbs ? wallpaper.thumbs.large : wallpaper.path;
+        try {
+            const url = type === 'photos' 
+                ? `${BASE_URL}search?query=${query}&per_page=15&page=${currentPhotosPage}`
+                : `${VIDEO_URL}search?query=${query}&per_page=15&page=${currentVideosPage}`;
 
-        card.innerHTML = `
-            <div class="wallpaper-ratio">
-                <img src="${thumbnailUrl}" alt="${wallpaper.id}" class="wallpaper-image" loading="lazy">
-                <div class="wallpaper-info">
-                    <span class="wallpaper-resolution">${wallpaper.resolution}</span>
-                    <div class="wallpaper-favorites">
-                        <i class="fas fa-heart"></i> ${wallpaper.favorites}
-                    </div>
-                </div>
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': API_KEY
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const grid = type === 'photos' ? photosGrid : videosGrid;
+
+            if (reset) {
+                grid.innerHTML = '';
+            }
+
+            if (type === 'photos') {
+                displayPhotos(data.photos, grid);
+            } else {
+                displayVideos(data.videos, grid);
+            }
+
+            // Show/hide load more button based on whether there are more results
+            if (data.next_page) {
+                if (type === 'photos') {
+                    photosLoadMoreBtn.style.display = 'inline-flex';
+                } else {
+                    videosLoadMoreBtn.style.display = 'inline-flex';
+                }
+            }
+
+        } catch (error) {
+            console.error('Error fetching media:', error);
+            const grid = type === 'photos' ? photosGrid : videosGrid;
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px;">Sorry, there was an error loading content. Please try again later.</p>';
+        } finally {
+            if (type === 'photos') {
+                isPhotosLoading = false;
+                photosSpinner.style.display = 'none';
+            } else {
+                isVideosLoading = false;
+                videosSpinner.style.display = 'none';
+            }
+        }
+    }
+
+    // Display photos in the grid
+    function displayPhotos(photos, grid) {
+        photos.forEach(photo => {
+            const card = document.createElement('div');
+            card.className = 'media-card';
+            card.innerHTML = `
+                <img src="${photo.src.medium}" alt="${photo.photographer}" class="media-image">
                 <div class="media-overlay">
                     <div class="media-actions">
-                        <button class="action-btn view-btn" data-id="${wallpaper.id}">
+                        <button class="action-btn view-btn" data-id="${photo.id}">
                             <i class="fas fa-expand"></i>
                         </button>
                         <button class="action-btn like-btn">
                             <i class="far fa-heart"></i>
                         </button>
-                        <button class="action-btn download-btn" data-url="${wallpaper.path}">
+                        <button class="action-btn download-btn" data-url="${photo.src.original}">
                             <i class="fas fa-download"></i>
                         </button>
                     </div>
                 </div>
-            </div>
-        `;
-
-        wallpapersGrid.appendChild(card);
-
-        const viewBtn = card.querySelector('.view-btn');
-        const downloadBtn = card.querySelector('.download-btn');
-
-        viewBtn.addEventListener('click', () => viewWallpaper(wallpaper));
-        downloadBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            downloadMediaDirect(wallpaper.path, `wallpaper-${wallpaper.id}.jpg`);
-        });
-    });
-}
-
-// Fixed AI Image Generation JavaScript
-const BACKEND_URL = "https://cors-for-ai.vercel.app/generate";
-
-// DOM Elements for AI
-const aiPromptInput = document.getElementById('ai-prompt-input');
-const aiGenerateBtn = document.getElementById('ai-generate-btn');
-const aiClearBtn = document.getElementById('ai-clear-btn');
-const aiPreview = document.getElementById('ai-preview');
-const aiProgress = document.getElementById('ai-progress');
-const progressFill = document.getElementById('progress-fill');
-const progressTime = document.getElementById('progress-time');
-const charCount = document.getElementById('char-count');
-const generationCount = document.getElementById('generation-count');
-
-// State for AI
-let generatedImages = [];
-let generationCounter = 0;
-let progressInterval;
-
-function initAIGenerator() {
-    // Event Listeners
-    aiGenerateBtn.addEventListener('click', generateAI);
-    aiClearBtn.addEventListener('click', clearAI);
-    
-    // Character count
-    aiPromptInput.addEventListener('input', updateCharCount);
-    
-    // Quick prompts
-    document.querySelectorAll('.quick-prompt').forEach(prompt => {
-        prompt.addEventListener('click', () => {
-            aiPromptInput.value = prompt.getAttribute('data-prompt');
-            updateCharCount();
-        });
-    });
-    
-    // Keyboard shortcut
-    aiPromptInput.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.key === 'Enter') {
-            generateAI();
-        }
-    });
-    
-    updateCharCount();
-}
-
-function updateCharCount() {
-    const count = aiPromptInput.value.length;
-    charCount.textContent = count;
-    
-    if (count > 500) {
-        charCount.style.color = '#ff6b6b';
-    } else if (count > 400) {
-        charCount.style.color = '#ffa726';
-    } else {
-        charCount.style.color = 'var(--gray)';
-    }
-}
-
-async function generateAI() {
-    const prompt = aiPromptInput.value.trim() || "A beautiful landscape with mountains and sunset";
-    
-    if (prompt.length > 500) {
-        alert('Prompt is too long. Please keep it under 500 characters.');
-        return;
-    }
-    
-    // Start progress animation
-    startProgressAnimation();
-    
-    // Update UI
-    aiGenerateBtn.disabled = true;
-    aiGenerateBtn.querySelector('.btn-text').style.display = 'none';
-    aiGenerateBtn.querySelector('.btn-loading').style.display = 'flex';
-    
-    try {
-        console.log('Sending request to:', BACKEND_URL);
-        console.log('Prompt:', prompt);
-        
-        const startTime = Date.now();
-        
-        const res = await fetch(BACKEND_URL, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Accept": "image/*"
-            },
-            body: JSON.stringify({ prompt })
-        });
-
-        console.log('Response status:', res.status);
-        console.log('Response headers:', res.headers);
-        
-        if (!res.ok) {
-            const errorText = await res.text();
-            console.error('Error response:', errorText);
-            throw new Error(`Server error: ${res.status} - ${errorText}`);
-        }
-
-        // Check if response is an image
-        const contentType = res.headers.get('content-type');
-        console.log('Content-Type:', contentType);
-        
-        if (!contentType || !contentType.includes('image')) {
-            const text = await res.text();
-            console.error('Non-image response:', text);
-            throw new Error('Server returned non-image response');
-        }
-
-        const blob = await res.blob();
-        console.log('Blob received:', blob.size, 'bytes', 'Type:', blob.type);
-        
-        if (blob.size === 0) {
-            throw new Error('Empty image received from server');
-        }
-        
-        const endTime = Date.now();
-        console.log('Generation took:', (endTime - startTime) / 1000, 'seconds');
-        
-        // Complete progress
-        completeProgress();
-        
-        // Create and display image
-        const imgUrl = URL.createObjectURL(blob);
-        addGeneratedImage(prompt, imgUrl);
-        
-        // Update counter
-        generationCounter++;
-        generationCount.textContent = generationCounter;
-
-    } catch (err) {
-        console.error('AI Generation Error:', err);
-        stopProgress();
-        showError(err.message || 'Failed to generate image. Please try again.');
-    } finally {
-        // Reset UI
-        resetGenerateButton();
-    }
-}
-
-function startProgressAnimation() {
-    aiProgress.style.display = 'block';
-    const startTime = Date.now();
-    
-    // Update time every second
-    progressInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        progressTime.textContent = elapsed + 's';
-    }, 1000);
-    
-    // Simple progress bar animation
-    let progress = 0;
-    const progressBarInterval = setInterval(() => {
-        progress += 2;
-        if (progress > 85) progress = 85; // Cap at 85% until completion
-        progressFill.style.width = progress + '%';
-    }, 200);
-    
-    // Store interval for cleanup
-    window.progressBarInterval = progressBarInterval;
-    
-    // Animate steps sequentially
-    const steps = document.querySelectorAll('.progress-step');
-    steps.forEach((step, index) => {
-        setTimeout(() => {
-            // Remove active from all steps
-            steps.forEach(s => s.classList.remove('active'));
-            // Add active to current step
-            step.classList.add('active');
-        }, index * 3000); // Each step lasts 3 seconds
-    });
-}
-
-function completeProgress() {
-    // Quickly complete the progress bar
-    progressFill.style.width = '100%';
-    
-    // Mark all steps as complete
-    const steps = document.querySelectorAll('.progress-step');
-    steps.forEach(step => step.classList.add('active'));
-    
-    // Hide progress after a short delay
-    setTimeout(() => {
-        stopProgress();
-    }, 1000);
-}
-
-function stopProgress() {
-    // Clear all intervals
-    if (progressInterval) {
-        clearInterval(progressInterval);
-    }
-    if (window.progressBarInterval) {
-        clearInterval(window.progressBarInterval);
-    }
-    
-    // Reset progress UI
-    setTimeout(() => {
-        aiProgress.style.display = 'none';
-        progressFill.style.width = '0%';
-        document.querySelectorAll('.progress-step').forEach(step => {
-            step.classList.remove('active');
-        });
-    }, 500);
-}
-
-function resetGenerateButton() {
-    aiGenerateBtn.disabled = false;
-    aiGenerateBtn.querySelector('.btn-text').style.display = 'flex';
-    aiGenerateBtn.querySelector('.btn-loading').style.display = 'none';
-}
-
-function addGeneratedImage(prompt, imageUrl) {
-    const imageId = Date.now();
-    
-    // Remove empty state if it exists
-    const emptyState = aiPreview.querySelector('.empty-state');
-    if (emptyState) {
-        emptyState.remove();
-    }
-    
-    // Create results grid if it doesn't exist
-    let resultsGrid = aiPreview.querySelector('.ai-results-grid');
-    if (!resultsGrid) {
-        resultsGrid = document.createElement('div');
-        resultsGrid.className = 'ai-results-grid';
-        aiPreview.appendChild(resultsGrid);
-    }
-    
-    const imageCard = document.createElement('div');
-    imageCard.className = 'ai-image-card';
-    imageCard.innerHTML = `
-        <div class="ai-image-container">
-            <img src="${imageUrl}" alt="${prompt}" class="ai-generated-image" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color: #ff6b6b; padding: 20px; text-align: center;\'>Failed to load image</div>';">
-            <div class="ai-image-overlay">
-                <div class="ai-image-actions">
-                    <button class="ai-action-btn view-ai-btn" data-id="${imageId}">
-                        <i class="fas fa-expand"></i> View
-                    </button>
-                    <button class="ai-action-btn download-ai-btn" data-url="${imageUrl}" data-prompt="${prompt}">
-                        <i class="fas fa-download"></i> Download
-                    </button>
+                <div class="media-info">
+                    <div class="media-author">
+                        <img src="${photo.src.tiny}" alt="${photo.photographer}" class="author-avatar">
+                        <div class="author-name">${photo.photographer}</div>
+                    </div>
+                    <div class="media-like">
+                        <i class="far fa-heart"></i> ${photo.liked ? photo.liked : Math.floor(Math.random() * 100)}
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="ai-image-info">
-            <div class="ai-prompt-preview" title="${prompt}">${prompt}</div>
-            <div class="ai-image-meta">
-                <span>AI Generated</span>
-                <span>${new Date().toLocaleDateString()}</span>
-            </div>
-        </div>
-    `;
-    
-    // Add to beginning of results grid
-    resultsGrid.insertBefore(imageCard, resultsGrid.firstChild);
-    
-    // Store in state
-    generatedImages.unshift({
-        id: imageId,
-        prompt: prompt,
-        url: imageUrl,
-        date: new Date()
-    });
-    
-    // Add event listeners
-    const viewBtn = imageCard.querySelector('.view-ai-btn');
-    const downloadBtn = imageCard.querySelector('.download-ai-btn');
-    
-    viewBtn.addEventListener('click', () => viewAiImage(imageId));
-    downloadBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const url = downloadBtn.getAttribute('data-url');
-        const prompt = downloadBtn.getAttribute('data-prompt');
-        downloadAiImage(url, prompt);
-    });
-    
-    // Test image load
-    const img = imageCard.querySelector('img');
-    img.onload = function() {
-        console.log('Image loaded successfully');
-    };
-    img.onerror = function() {
-        console.error('Failed to load generated image');
-    };
-}
-
-// Enhanced safe download function
-function downloadAiImage(url, prompt) {
-    const filename = `ai-image-${Date.now()}.jpg`;
-    
-    // Create a temporary anchor element
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.style.display = 'none';
-    
-    // Use setTimeout to prevent blocking
-    setTimeout(() => {
-        try {
-            document.body.appendChild(a);
-            a.click();
+            `;
+            grid.appendChild(card);
             
-            // Clean up after a delay
-            setTimeout(() => {
-                if (document.body.contains(a)) {
-                    document.body.removeChild(a);
-                }
-            }, 1000);
+            // Add event listeners to action buttons
+            const viewBtn = card.querySelector('.view-btn');
+            const downloadBtn = card.querySelector('.download-btn');
             
-        } catch (error) {
-            console.error('Download error:', error);
-            // Fallback: open in new tab
-            window.open(url, '_blank');
-        }
-    }, 100);
-}
+            viewBtn.addEventListener('click', () => viewMedia(photo, 'photo'));
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadMediaDirect(photo.src.original, `photo-${photo.id}.jpg`);
+            });
+        });
+    }
 
-function viewAiImage(imageId) {
-    const image = generatedImages.find(img => img.id === imageId);
-    if (!image) return;
-    
-    // Use your existing modal
-    if (typeof currentMedia !== 'undefined' && typeof modal !== 'undefined') {
-        currentMedia = {
-            id: imageId,
-            photographer: 'AI Generated',
-            src: {
-                large: image.url,
-                tiny: image.url
-            }
-        };
-        
+    // Display videos in the grid
+    function displayVideos(videos, grid) {
+        videos.forEach(video => {
+            // Find the medium quality video file
+            const videoFile = video.video_files.find(file => file.quality === 'hd' && file.width <= 1280) || 
+                             video.video_files[0];
+            
+            const card = document.createElement('div');
+            card.className = 'media-card';
+            card.innerHTML = `
+                <video class="media-video" muted loop poster="${video.image}">
+                    <source src="${videoFile.link}" type="video/mp4">
+                </video>
+                <div class="media-overlay">
+                    <div class="media-actions">
+                        <button class="action-btn view-btn" data-id="${video.id}">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <button class="action-btn like-btn">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <button class="action-btn download-btn" data-url="${videoFile.link}">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="media-info">
+                    <div class="media-author">
+                        <img src="${video.user.url}" alt="${video.user.name}" class="author-avatar">
+                        <div class="author-name">${video.user.name}</div>
+                    </div>
+                    <div class="media-like">
+                        <i class="far fa-heart"></i> ${video.liked ? video.liked : Math.floor(Math.random() * 100)}
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+            
+            // Add event listeners to action buttons
+            const viewBtn = card.querySelector('.view-btn');
+            const downloadBtn = card.querySelector('.download-btn');
+            const videoElement = card.querySelector('video');
+            
+            // Auto-play on hover
+            card.addEventListener('mouseenter', () => {
+                videoElement.play();
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                videoElement.pause();
+                videoElement.currentTime = 0;
+            });
+            
+            viewBtn.addEventListener('click', () => viewMedia(video, 'video'));
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadMediaDirect(videoFile.link, `video-${video.id}.mp4`);
+            });
+        });
+    }
+
+    // View media in modal
+    function viewMedia(media, type) {
+        currentMedia = media;
         modal.style.display = 'block';
         document.body.classList.add('modal-open');
+        
+        // Set modal content based on media type
+        if (type === 'video') {
+            modalImage.style.display = 'none';
+            modalVideo.style.display = 'block';
+            
+            // Find the best quality video file
+            const videoFile = media.video_files.find(file => file.quality === 'hd' && file.width <= 1280) || 
+                             media.video_files[0];
+            modalVideo.src = videoFile.link;
+            modalVideo.load();
+            
+            modalTitle.textContent = `Video by ${media.user.name}`;
+            modalAuthor.textContent = media.user.name;
+            modalAvatar.src = media.user.url;
+            
+            // Update quality selector for videos
+            qualitySelector.innerHTML = '';
+            media.video_files.forEach(file => {
+                const option = document.createElement('option');
+                option.value = file.link;
+                option.textContent = `${file.quality} (${file.width}x${file.height})`;
+                qualitySelector.appendChild(option);
+            });
+        } else {
+            modalImage.style.display = 'block';
+            modalVideo.style.display = 'none';
+            modalImage.src = media.src.large;
+            
+            modalTitle.textContent = `Photo by ${media.photographer}`;
+            modalAuthor.textContent = media.photographer;
+            modalAvatar.src = media.src.tiny;
+            
+            // Update quality selector for photos
+            qualitySelector.innerHTML = `
+                <option value="${media.src.small}">Small (${Math.round(media.width/4)}x${Math.round(media.height/4)})</option>
+                <option value="${media.src.medium}">Medium (${Math.round(media.width/2)}x${Math.round(media.height/2)})</option>
+                <option value="${media.src.large}">Large (${media.width}x${media.height})</option>
+                <option value="${media.src.original}" selected>Original (${media.width}x${media.height})</option>
+            `;
+        }
+        
+        // Update download URL
+        updateDownloadUrl();
+    }
+
+    // View wallpaper in modal
+    function viewWallpaper(wallpaper) {
+        currentMedia = wallpaper;
+        modal.style.display = 'block';
+        document.body.classList.add('modal-open');
+        
         modalImage.style.display = 'block';
         modalVideo.style.display = 'none';
-        modalImage.src = image.url;
+        modalImage.src = wallpaper.path;
         
-        modalTitle.textContent = `AI Generated Image`;
-        modalAuthor.textContent = 'AI Generated';
-        modalAvatar.src = image.url;
+        modalTitle.textContent = `Wallpaper ${wallpaper.id}`;
+        modalAuthor.textContent = wallpaper.id;
+        modalAvatar.src = wallpaper.thumbs ? wallpaper.thumbs.large : wallpaper.path;
         
-        if (typeof qualitySelector !== 'undefined') {
-            qualitySelector.innerHTML = `<option value="${image.url}" selected>Original</option>`;
-            updateDownloadUrl();
-        }
-    } else {
-        // Fallback: open image in new tab
-        window.open(image.url, '_blank');
-    }
-}
-
-function clearAI() {
-    if (generatedImages.length === 0) return;
-    
-    if (confirm('Are you sure you want to clear all generated images?')) {
-        generatedImages = [];
-        aiPreview.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-robot"></i>
-                <h4>No Images Generated Yet</h4>
-                <p>Enter a prompt above and click "Generate Image" to create amazing AI art</p>
-            </div>
+        // Update quality selector for wallpapers
+        qualitySelector.innerHTML = `
+            <option value="${wallpaper.thumbs ? wallpaper.thumbs.small : wallpaper.path}">Small</option>
+            <option value="${wallpaper.thumbs ? wallpaper.thumbs.large : wallpaper.path}">Medium</option>
+            <option value="${wallpaper.path}" selected>Original (${wallpaper.resolution})</option>
         `;
         
-        // Revoke object URLs to free memory
-        generatedImages.forEach(img => {
+        // Update download URL
+        updateDownloadUrl();
+    }
+
+    // Update download URL based on quality selection
+    function updateDownloadUrl() {
+        if (!currentMedia) return;
+        
+        const downloadUrl = qualitySelector.value;
+        downloadBtn.setAttribute('data-url', downloadUrl);
+    }
+
+    // Download media from modal
+    function downloadMedia() {
+        if (!currentMedia) return;
+        
+        const downloadUrl = downloadBtn.getAttribute('data-url');
+        const isVideo = modalVideo.style.display !== 'none';
+        const fileExtension = isVideo ? 'mp4' : 'jpg';
+        const fileName = `${isVideo ? 'video' : 'photo'}-${currentMedia.id}.${fileExtension}`;
+        
+        downloadMediaDirect(downloadUrl, fileName);
+    }
+
+    // Enhanced download function to prevent app crashes
+    function downloadMediaDirect(url, filename) {
+        try {
+            // Method 1: Try using fetch with blob (safer approach)
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    const blobUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = filename;
+                    a.style.display = 'none';
+                    
+                    // Add to document and trigger click
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(blobUrl);
+                    }, 100);
+                })
+                .catch(error => {
+                    console.warn('Blob download failed, trying direct method:', error);
+                    // Fallback to direct download
+                    downloadUsingAnchor(url, filename);
+                });
+        } catch (error) {
+            console.error('Download error:', error);
+            // Final fallback
+            downloadUsingAnchor(url, filename);
+        }
+    }
+
+    // Fallback download function
+    function downloadUsingAnchor(url, filename) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        a.setAttribute('target', '_blank'); // Important for mobile apps
+        
+        document.body.appendChild(a);
+        
+        // Use setTimeout to prevent app freezing
+        setTimeout(() => {
             try {
-                URL.revokeObjectURL(img.url);
+                a.click();
             } catch (e) {
-                console.warn('Error revoking URL:', e);
+                console.error('Click failed:', e);
+                // Last resort - open in new window
+                window.open(url, '_blank');
+            }
+            
+            // Clean up with delay
+            setTimeout(() => {
+                document.body.removeChild(a);
+            }, 1000);
+        }, 100);
+    }
+
+    // Load wallpapers using proxy
+    async function loadWallpapers(query, reset = true) {
+        if (isWallpapersLoading) return;
+        isWallpapersLoading = true;
+        wallpapersSpinner.style.display = 'block';
+        wallpapersLoadMoreBtn.style.display = 'none';
+
+        try {
+            let url = `${WALLHAVEN_URL}?q=${encodeURIComponent(query)}&page=${currentWallpapersPage}`;
+            if (currentWallpaperSort !== 'relevance') url += `&sorting=${currentWallpaperSort}`;
+            if (currentWallpaperFilter !== 'all') url += `&categories=${currentWallpaperFilter}`;
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Proxy API error: ${response.status}`);
+
+            const data = await response.json();
+            const wallpapers = Array.isArray(data.data) ? data.data : [];
+
+            if (reset) wallpapersGrid.innerHTML = '';
+
+            if (wallpapers.length === 0) {
+                wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px;">No wallpapers found for this search.</p>';
+            } else {
+                displayWallpapers(wallpapers);
+                if (wallpapers.length === 24) wallpapersLoadMoreBtn.style.display = 'inline-flex';
+            }
+        } catch (error) {
+            console.error('Error fetching wallpapers:', error);
+            wallpapersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:40px;">Sorry, there was an error loading wallpapers. Please try again later.</p>';
+        } finally {
+            isWallpapersLoading = false;
+            wallpapersSpinner.style.display = 'none';
+        }
+    }
+
+    // Display wallpapers
+    function displayWallpapers(wallpapers) {
+        wallpapers.forEach(wallpaper => {
+            const card = document.createElement('div');
+            card.className = 'media-card';
+
+            const thumbnailUrl = wallpaper.thumbs ? wallpaper.thumbs.large : wallpaper.path;
+
+            card.innerHTML = `
+                <div class="wallpaper-ratio">
+                    <img src="${thumbnailUrl}" alt="${wallpaper.id}" class="wallpaper-image" loading="lazy">
+                    <div class="wallpaper-info">
+                        <span class="wallpaper-resolution">${wallpaper.resolution}</span>
+                        <div class="wallpaper-favorites">
+                            <i class="fas fa-heart"></i> ${wallpaper.favorites}
+                        </div>
+                    </div>
+                    <div class="media-overlay">
+                        <div class="media-actions">
+                            <button class="action-btn view-btn" data-id="${wallpaper.id}">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button class="action-btn like-btn">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <button class="action-btn download-btn" data-url="${wallpaper.path}">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            wallpapersGrid.appendChild(card);
+
+            const viewBtn = card.querySelector('.view-btn');
+            const downloadBtn = card.querySelector('.download-btn');
+
+            viewBtn.addEventListener('click', () => viewWallpaper(wallpaper));
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadMediaDirect(wallpaper.path, `wallpaper-${wallpaper.id}.jpg`);
+            });
+        });
+    }
+
+    // Fixed AI Image Generation JavaScript
+    const BACKEND_URL = "https://cors-for-ai.vercel.app/generate";
+
+    // DOM Elements for AI
+    const aiPromptInput = document.getElementById('ai-prompt-input');
+    const aiGenerateBtn = document.getElementById('ai-generate-btn');
+    const aiClearBtn = document.getElementById('ai-clear-btn');
+    const aiPreview = document.getElementById('ai-preview');
+    const aiProgress = document.getElementById('ai-progress');
+    const progressFill = document.getElementById('progress-fill');
+    const progressTime = document.getElementById('progress-time');
+    const charCount = document.getElementById('char-count');
+    const generationCount = document.getElementById('generation-count');
+
+    // State for AI
+    let generatedImages = [];
+    let generationCounter = 0;
+    let progressInterval;
+
+    function initAIGenerator() {
+        // Event Listeners
+        aiGenerateBtn.addEventListener('click', generateAI);
+        aiClearBtn.addEventListener('click', clearAI);
+        
+        // Character count
+        aiPromptInput.addEventListener('input', updateCharCount);
+        
+        // Quick prompts
+        document.querySelectorAll('.quick-prompt').forEach(prompt => {
+            prompt.addEventListener('click', () => {
+                aiPromptInput.value = prompt.getAttribute('data-prompt');
+                updateCharCount();
+            });
+        });
+        
+        // Keyboard shortcut
+        aiPromptInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                generateAI();
             }
         });
         
-        // Reset counter
-        generationCounter = 0;
-        generationCount.textContent = '0';
+        updateCharCount();
     }
-}
 
-function showError(message) {
-    // Remove empty state if it exists
-    const emptyState = aiPreview.querySelector('.empty-state');
-    if (emptyState) {
-        emptyState.remove();
+    function updateCharCount() {
+        const count = aiPromptInput.value.length;
+        charCount.textContent = count;
+        
+        if (count > 500) {
+            charCount.style.color = '#ff6b6b';
+        } else if (count > 400) {
+            charCount.style.color = '#ffa726';
+        } else {
+            charCount.style.color = 'var(--gray)';
+        }
     }
-    
-    // Create results grid if it doesn't exist
-    let resultsGrid = aiPreview.querySelector('.ai-results-grid');
-    if (!resultsGrid) {
-        resultsGrid = document.createElement('div');
-        resultsGrid.className = 'ai-results-grid';
-        aiPreview.appendChild(resultsGrid);
+
+    async function generateAI() {
+        const prompt = aiPromptInput.value.trim() || "A beautiful landscape with mountains and sunset";
+        
+        if (prompt.length > 500) {
+            alert('Prompt is too long. Please keep it under 500 characters.');
+            return;
+        }
+        
+        // Start progress animation
+        startProgressAnimation();
+        
+        // Update UI
+        aiGenerateBtn.disabled = true;
+        aiGenerateBtn.querySelector('.btn-text').style.display = 'none';
+        aiGenerateBtn.querySelector('.btn-loading').style.display = 'flex';
+        
+        try {
+            console.log('Sending request to:', BACKEND_URL);
+            console.log('Prompt:', prompt);
+            
+            const startTime = Date.now();
+            
+            const res = await fetch(BACKEND_URL, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Accept": "image/*"
+                },
+                body: JSON.stringify({ prompt })
+            });
+
+            console.log('Response status:', res.status);
+            console.log('Response headers:', res.headers);
+            
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error('Error response:', errorText);
+                throw new Error(`Server error: ${res.status} - ${errorText}`);
+            }
+
+            // Check if response is an image
+            const contentType = res.headers.get('content-type');
+            console.log('Content-Type:', contentType);
+            
+            if (!contentType || !contentType.includes('image')) {
+                const text = await res.text();
+                console.error('Non-image response:', text);
+                throw new Error('Server returned non-image response');
+            }
+
+            const blob = await res.blob();
+            console.log('Blob received:', blob.size, 'bytes', 'Type:', blob.type);
+            
+            if (blob.size === 0) {
+                throw new Error('Empty image received from server');
+            }
+            
+            const endTime = Date.now();
+            console.log('Generation took:', (endTime - startTime) / 1000, 'seconds');
+            
+            // Complete progress
+            completeProgress();
+            
+            // Create and display image
+            const imgUrl = URL.createObjectURL(blob);
+            addGeneratedImage(prompt, imgUrl);
+            
+            // Update counter
+            generationCounter++;
+            generationCount.textContent = generationCounter;
+
+        } catch (err) {
+            console.error('AI Generation Error:', err);
+            stopProgress();
+            showError(err.message || 'Failed to generate image. Please try again.');
+        } finally {
+            // Reset UI
+            resetGenerateButton();
+        }
     }
-    
-    const errorCard = document.createElement('div');
-    errorCard.className = 'ai-image-card';
-    errorCard.innerHTML = `
-        <div class="ai-image-container" style="background: #ffebee; display: flex; align-items: center; justify-content: center;">
-            <div style="text-align: center; color: #d32f2f; padding: 20px;">
-                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                <h4 style="margin: 0 0 10px 0;">Generation Failed</h4>
-                <p style="margin: 0; font-size: 0.9rem;">${message}</p>
+
+    function startProgressAnimation() {
+        aiProgress.style.display = 'block';
+        const startTime = Date.now();
+        
+        // Update time every second
+        progressInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            progressTime.textContent = elapsed + 's';
+        }, 1000);
+        
+        // Simple progress bar animation
+        let progress = 0;
+        const progressBarInterval = setInterval(() => {
+            progress += 2;
+            if (progress > 85) progress = 85; // Cap at 85% until completion
+            progressFill.style.width = progress + '%';
+        }, 200);
+        
+        // Store interval for cleanup
+        window.progressBarInterval = progressBarInterval;
+        
+        // Animate steps sequentially
+        const steps = document.querySelectorAll('.progress-step');
+        steps.forEach((step, index) => {
+            setTimeout(() => {
+                // Remove active from all steps
+                steps.forEach(s => s.classList.remove('active'));
+                // Add active to current step
+                step.classList.add('active');
+            }, index * 3000); // Each step lasts 3 seconds
+        });
+    }
+
+    function completeProgress() {
+        // Quickly complete the progress bar
+        progressFill.style.width = '100%';
+        
+        // Mark all steps as complete
+        const steps = document.querySelectorAll('.progress-step');
+        steps.forEach(step => step.classList.add('active'));
+        
+        // Hide progress after a short delay
+        setTimeout(() => {
+            stopProgress();
+        }, 1000);
+    }
+
+    function stopProgress() {
+        // Clear all intervals
+        if (progressInterval) {
+            clearInterval(progressInterval);
+        }
+        if (window.progressBarInterval) {
+            clearInterval(window.progressBarInterval);
+        }
+        
+        // Reset progress UI
+        setTimeout(() => {
+            aiProgress.style.display = 'none';
+            progressFill.style.width = '0%';
+            document.querySelectorAll('.progress-step').forEach(step => {
+                step.classList.remove('active');
+            });
+        }, 500);
+    }
+
+    function resetGenerateButton() {
+        aiGenerateBtn.disabled = false;
+        aiGenerateBtn.querySelector('.btn-text').style.display = 'flex';
+        aiGenerateBtn.querySelector('.btn-loading').style.display = 'none';
+    }
+
+    function addGeneratedImage(prompt, imageUrl) {
+        const imageId = Date.now();
+        
+        // Remove empty state if it exists
+        const emptyState = aiPreview.querySelector('.empty-state');
+        if (emptyState) {
+            emptyState.remove();
+        }
+        
+        // Create results grid if it doesn't exist
+        let resultsGrid = aiPreview.querySelector('.ai-results-grid');
+        if (!resultsGrid) {
+            resultsGrid = document.createElement('div');
+            resultsGrid.className = 'ai-results-grid';
+            aiPreview.appendChild(resultsGrid);
+        }
+        
+        const imageCard = document.createElement('div');
+        imageCard.className = 'ai-image-card';
+        imageCard.innerHTML = `
+            <div class="ai-image-container">
+                <img src="${imageUrl}" alt="${prompt}" class="ai-generated-image" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color: #ff6b6b; padding: 20px; text-align: center;\'>Failed to load image</div>';">
+                <div class="ai-image-overlay">
+                    <div class="ai-image-actions">
+                        <button class="ai-action-btn view-ai-btn" data-id="${imageId}">
+                            <i class="fas fa-expand"></i> View
+                        </button>
+                        <button class="ai-action-btn download-ai-btn" data-url="${imageUrl}" data-prompt="${prompt}">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="ai-image-info">
-            <div class="ai-prompt-preview" style="color: #d32f2f;">Failed to generate image</div>
-            <div class="ai-image-meta">
-                <span>Error</span>
-                <span>${new Date().toLocaleDateString()}</span>
+            <div class="ai-image-info">
+                <div class="ai-prompt-preview" title="${prompt}">${prompt}</div>
+                <div class="ai-image-meta">
+                    <span>AI Generated</span>
+                    <span>${new Date().toLocaleDateString()}</span>
+                </div>
             </div>
-        </div>
-    `;
-    
-    resultsGrid.insertBefore(errorCard, resultsGrid.firstChild);
-}
+        `;
+        
+        // Add to beginning of results grid
+        resultsGrid.insertBefore(imageCard, resultsGrid.firstChild);
+        
+        // Store in state
+        generatedImages.unshift({
+            id: imageId,
+            prompt: prompt,
+            url: imageUrl,
+            date: new Date()
+        });
+        
+        // Add event listeners
+        const viewBtn = imageCard.querySelector('.view-ai-btn');
+        const downloadBtn = imageCard.querySelector('.download-ai-btn');
+        
+        viewBtn.addEventListener('click', () => viewAiImage(imageId));
+        downloadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const url = downloadBtn.getAttribute('data-url');
+            const prompt = downloadBtn.getAttribute('data-prompt');
+            downloadAiImage(url, prompt);
+        });
+        
+        // Test image load
+        const img = imageCard.querySelector('img');
+        img.onload = function() {
+            console.log('Image loaded successfully');
+        };
+        img.onerror = function() {
+            console.error('Failed to load generated image');
+        };
+    }
+
+    // Enhanced safe download function
+    function downloadAiImage(url, prompt) {
+        const filename = `ai-image-${Date.now()}.jpg`;
+        
+        // Create a temporary anchor element
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        
+        // Use setTimeout to prevent blocking
+        setTimeout(() => {
+            try {
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up after a delay
+                setTimeout(() => {
+                    if (document.body.contains(a)) {
+                        document.body.removeChild(a);
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                // Fallback: open in new tab
+                window.open(url, '_blank');
+            }
+        }, 100);
+    }
+
+    function viewAiImage(imageId) {
+        const image = generatedImages.find(img => img.id === imageId);
+        if (!image) return;
+        
+        // Use your existing modal
+        if (typeof currentMedia !== 'undefined' && typeof modal !== 'undefined') {
+            currentMedia = {
+                id: imageId,
+                photographer: 'AI Generated',
+                src: {
+                    large: image.url,
+                    tiny: image.url
+                }
+            };
+            
+            modal.style.display = 'block';
+            document.body.classList.add('modal-open');
+            modalImage.style.display = 'block';
+            modalVideo.style.display = 'none';
+            modalImage.src = image.url;
+            
+            modalTitle.textContent = `AI Generated Image`;
+            modalAuthor.textContent = 'AI Generated';
+            modalAvatar.src = image.url;
+            
+            if (typeof qualitySelector !== 'undefined') {
+                qualitySelector.innerHTML = `<option value="${image.url}" selected>Original</option>`;
+                updateDownloadUrl();
+            }
+        } else {
+            // Fallback: open image in new tab
+            window.open(image.url, '_blank');
+        }
+    }
+
+    function clearAI() {
+        if (generatedImages.length === 0) return;
+        
+        if (confirm('Are you sure you want to clear all generated images?')) {
+            generatedImages = [];
+            aiPreview.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-robot"></i>
+                    <h4>No Images Generated Yet</h4>
+                    <p>Enter a prompt above and click "Generate Image" to create amazing AI art</p>
+                </div>
+            `;
+            
+            // Revoke object URLs to free memory
+            generatedImages.forEach(img => {
+                try {
+                    URL.revokeObjectURL(img.url);
+                } catch (e) {
+                    console.warn('Error revoking URL:', e);
+                }
+            });
+            
+            // Reset counter
+            generationCounter = 0;
+            generationCount.textContent = '0';
+        }
+    }
+
+    function showError(message) {
+        // Remove empty state if it exists
+        const emptyState = aiPreview.querySelector('.empty-state');
+        if (emptyState) {
+            emptyState.remove();
+        }
+        
+        // Create results grid if it doesn't exist
+        let resultsGrid = aiPreview.querySelector('.ai-results-grid');
+        if (!resultsGrid) {
+            resultsGrid = document.createElement('div');
+            resultsGrid.className = 'ai-results-grid';
+            aiPreview.appendChild(resultsGrid);
+        }
+        
+        const errorCard = document.createElement('div');
+        errorCard.className = 'ai-image-card';
+        errorCard.innerHTML = `
+            <div class="ai-image-container" style="background: #ffebee; display: flex; align-items: center; justify-content: center;">
+                <div style="text-align: center; color: #d32f2f; padding: 20px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <h4 style="margin: 0 0 10px 0;">Generation Failed</h4>
+                    <p style="margin: 0; font-size: 0.9rem;">${message}</p>
+                </div>
+            </div>
+            <div class="ai-image-info">
+                <div class="ai-prompt-preview" style="color: #d32f2f;">Failed to generate image</div>
+                <div class="ai-image-meta">
+                    <span>Error</span>
+                    <span>${new Date().toLocaleDateString()}</span>
+                </div>
+            </div>
+        `;
+        
+        resultsGrid.insertBefore(errorCard, resultsGrid.firstChild);
+    }
 </script>
 </body>
 </html>
