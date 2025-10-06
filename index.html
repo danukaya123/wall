@@ -1612,6 +1612,7 @@
         }
     }
 
+/* Welcome Screen Styles - Mobile Only */
 @media (min-width: 769px) {
     .welcome-overlay {
         display: none !important;
@@ -1645,11 +1646,11 @@
     display: flex;
     transition: transform 0.5s ease;
     height: 100%;
-    width: 400%; /* 4 slides */
+    width: 400%;
 }
 
 .welcome-slide {
-    width: 25%; /* Each slide takes 25% of the slider */
+    width: 100vw;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -1658,6 +1659,7 @@
     padding: 60px 30px 120px;
     text-align: center;
     position: relative;
+    flex-shrink: 0;
 }
 
 .welcome-image {
@@ -1667,7 +1669,6 @@
     margin-bottom: 30px;
     object-fit: cover;
     box-shadow: var(--shadow);
-    display: block;
 }
 
 .welcome-time {
@@ -1675,7 +1676,6 @@
     font-weight: 700;
     color: var(--primary);
     margin-bottom: 10px;
-    display: block;
 }
 
 .welcome-title {
@@ -1683,7 +1683,6 @@
     font-weight: 700;
     margin-bottom: 20px;
     color: var(--dark);
-    display: block;
 }
 
 .welcome-description {
@@ -1692,7 +1691,6 @@
     margin-bottom: 40px;
     font-size: 1rem;
     max-width: 300px;
-    display: block;
 }
 
 .welcome-indicators {
@@ -1738,7 +1736,6 @@
     transition: all 0.3s ease;
     border: none;
     font-size: 1rem;
-    display: block;
 }
 
 .welcome-btn.skip {
@@ -1757,16 +1754,6 @@
     width: 100%;
 }
 
-.welcome-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.welcome-btn.next:hover,
-.welcome-btn.get-started:hover {
-    background: var(--primary-dark);
-}
-
 .welcome-logo {
     position: absolute;
     top: 40px;
@@ -1782,14 +1769,6 @@
 .welcome-logo i {
     margin-right: 10px;
 }
-
-/* Ensure all content is visible */
-.welcome-slide > * {
-    opacity: 1 !important;
-    visibility: visible !important;
-    position: relative;
-    z-index: 1;
-}
 </style>
 </head>
 <body>
@@ -1800,7 +1779,6 @@
         </div>
         
         <div class="welcome-slider" id="welcome-slider">
-            <!-- Slide 1: Welcome -->
             <div class="welcome-slide">
                 <div class="welcome-time">8:30</div>
                 <h2 class="welcome-title">Ready to Explore</h2>
@@ -1808,7 +1786,6 @@
                 <img src="https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Nature" class="welcome-image">
             </div>
             
-            <!-- Slide 2: Free Content -->
             <div class="welcome-slide">
                 <div class="welcome-time">8:30</div>
                 <h2 class="welcome-title">Select Your Media</h2>
@@ -1816,7 +1793,6 @@
                 <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400" alt="People" class="welcome-image">
             </div>
             
-            <!-- Slide 3: AI Generator -->
             <div class="welcome-slide">
                 <div class="welcome-time">8:30</div>
                 <h2 class="welcome-title">AI Image Generator</h2>
@@ -1824,7 +1800,6 @@
                 <img src="https://images.pexels.com/photos/1714208/pexels-photo-1714208.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Technology" class="welcome-image">
             </div>
             
-            <!-- Slide 4: Get Started -->
             <div class="welcome-slide">
                 <div class="welcome-time">8:30</div>
                 <h2 class="welcome-title">Enjoy Your Journey</h2>
@@ -2203,23 +2178,17 @@
 
 <script>
  // Welcome Screen Functionality
+// Welcome Screen Functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if user is on mobile and hasn't seen the welcome screen
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const hasSeenWelcome = localStorage.getItem('quizontalWelcomeSeen');
     
-    console.log('Mobile:', isMobile, 'Has seen welcome:', hasSeenWelcome);
-    
     if (isMobile && !hasSeenWelcome) {
-        // Show welcome screen after a short delay
         setTimeout(() => {
-            const welcomeOverlay = document.getElementById('welcome-overlay');
-            welcomeOverlay.classList.add('active');
-            console.log('Welcome screen activated');
+            document.getElementById('welcome-overlay').classList.add('active');
         }, 1000);
     }
     
-    // Welcome screen variables
     const welcomeSlider = document.getElementById('welcome-slider');
     const welcomeIndicators = document.querySelectorAll('.welcome-indicator');
     const welcomeNextBtn = document.getElementById('welcome-next');
@@ -2227,34 +2196,23 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentSlide = 0;
     const totalSlides = 4;
     
-    // Update slide position
     function updateSlide() {
         const translateX = -currentSlide * 100;
         welcomeSlider.style.transform = `translateX(${translateX}%)`;
-        console.log('Current slide:', currentSlide, 'Transform:', `translateX(${translateX}%)`);
         
-        // Update indicators
         welcomeIndicators.forEach((indicator, index) => {
-            if (index === currentSlide) {
-                indicator.classList.add('active');
-            } else {
-                indicator.classList.remove('active');
-            }
+            indicator.classList.toggle('active', index === currentSlide);
         });
         
-        // Update button text on last slide
         if (currentSlide === totalSlides - 1) {
             welcomeNextBtn.textContent = 'Get Started';
-            welcomeNextBtn.classList.add('get-started');
-            welcomeNextBtn.classList.remove('next');
+            welcomeNextBtn.className = 'welcome-btn get-started';
         } else {
             welcomeNextBtn.textContent = 'Next';
-            welcomeNextBtn.classList.add('next');
-            welcomeNextBtn.classList.remove('get-started');
+            welcomeNextBtn.className = 'welcome-btn next';
         }
     }
     
-    // Next slide function
     function nextSlide() {
         if (currentSlide < totalSlides - 1) {
             currentSlide++;
@@ -2264,21 +2222,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Close welcome screen
     function closeWelcomeScreen() {
         document.getElementById('welcome-overlay').classList.remove('active');
         localStorage.setItem('quizontalWelcomeSeen', 'true');
-        console.log('Welcome screen closed');
     }
     
-    // Event listeners for welcome screen buttons
     welcomeNextBtn.addEventListener('click', nextSlide);
     welcomeSkipBtn.addEventListener('click', closeWelcomeScreen);
     
-    // Initialize first slide
     updateSlide();
     
-    // Swipe functionality for mobile
     let touchStartX = 0;
     let touchEndX = 0;
     
@@ -2288,33 +2241,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     document.getElementById('welcome-overlay').addEventListener('touchend', e => {
         touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    }, { passive: true });
-    
-    function handleSwipe() {
         const swipeThreshold = 50;
         
-        if (touchEndX < touchStartX - swipeThreshold) {
-            // Swipe left - next slide
-            if (currentSlide < totalSlides - 1) {
-                currentSlide++;
-                updateSlide();
-            }
+        if (touchEndX < touchStartX - swipeThreshold && currentSlide < totalSlides - 1) {
+            currentSlide++;
+            updateSlide();
         }
         
-        if (touchEndX > touchStartX + swipeThreshold) {
-            // Swipe right - previous slide
-            if (currentSlide > 0) {
-                currentSlide--;
-                updateSlide();
-            }
+        if (touchEndX > touchStartX + swipeThreshold && currentSlide > 0) {
+            currentSlide--;
+            updateSlide();
         }
-    }
-    
-    // Debug: Check if elements exist
-    console.log('Welcome slider:', welcomeSlider);
-    console.log('Welcome indicators:', welcomeIndicators);
-    console.log('Welcome slides:', document.querySelectorAll('.welcome-slide'));
+    }, { passive: true });
 });
     // Mobile menu toggle functionality
     document.addEventListener('DOMContentLoaded', function() {
