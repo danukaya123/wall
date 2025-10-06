@@ -46,6 +46,19 @@
         --radius: 12px;
         --radius-small: 6px;
         --transition: all 0.3s ease;
+        --tutorial-primary: #6366f1;
+  --tutorial-primary-dark: #4f46e5;
+  --tutorial-primary-light: #c7d2fe;
+  --tutorial-success: #10b981;
+  --tutorial-warning: #f59e0b;
+  --tutorial-error: #ef4444;
+  --tutorial-bg: rgba(0, 0, 0, 0.85);
+  --tutorial-card-bg: #ffffff;
+  --tutorial-text: #1f2937;
+  --tutorial-text-light: #6b7280;
+  --tutorial-border: #e5e7eb;
+  --tutorial-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --tutorial-glow: 0 0 0 4px rgba(99, 102, 241, 0.1);
     }
 
     * {
@@ -1612,29 +1625,18 @@
         }
     }
 
-    /* Animation for progress steps */
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-    }
-
-    .progress-step.active i {
-        animation: pulse 2s infinite;
-    }
-
-  /* Tutorial Overlay */
 .tutorial-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(5px);
+  background: var(--tutorial-bg);
+  backdrop-filter: blur(10px);
   z-index: 9999;
   display: none;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tutorial-overlay.active {
@@ -1653,16 +1655,17 @@
 }
 
 .tutorial-content {
-  background: var(--light);
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 500px;
+  background: var(--tutorial-card-bg);
+  border-radius: 24px;
+  box-shadow: var(--tutorial-shadow);
+  max-width: 480px;
   width: 100%;
   max-height: 90vh;
   overflow: hidden;
   position: relative;
   z-index: 100;
-  animation: tutorialSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: tutorialSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid var(--tutorial-border);
 }
 
 @keyframes tutorialSlideIn {
@@ -1676,32 +1679,95 @@
   }
 }
 
+/* Tutorial Header */
 .tutorial-header {
-  padding: 25px 25px 15px;
-  border-bottom: 1px solid var(--gray-border);
+  padding: 28px 28px 20px;
+  border-bottom: 1px solid var(--tutorial-border);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.tutorial-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--tutorial-primary), var(--tutorial-success));
+}
+
+.tutorial-title-wrapper {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  position: relative;
+  z-index: 2;
 }
 
 .tutorial-header h2 {
-  color: var(--dark);
+  color: var(--tutorial-text);
   font-size: 1.5rem;
-  margin: 0;
   font-weight: 700;
+  margin: 0;
+  line-height: 1.3;
+  flex: 1;
 }
 
 .tutorial-progress {
-  background: var(--primary-light);
-  color: var(--primary);
+  background: white;
+  color: var(--tutorial-primary);
   padding: 8px 16px;
   border-radius: 20px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--tutorial-border);
+  min-width: 70px;
+  text-align: center;
 }
 
+/* Enhanced Progress Bar */
+.tutorial-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 20px;
+  position: relative;
+}
+
+.tutorial-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--tutorial-primary), var(--tutorial-success));
+  border-radius: 10px;
+  width: 0%;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.tutorial-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Tutorial Body */
 .tutorial-body {
-  padding: 25px;
+  padding: 28px;
   max-height: 60vh;
   overflow-y: auto;
 }
@@ -1709,140 +1775,195 @@
 .tutorial-message {
   font-size: 1.1rem;
   line-height: 1.6;
-  color: var(--dark);
-  margin-bottom: 20px;
+  color: var(--tutorial-text);
+  margin-bottom: 24px;
   text-align: center;
+  font-weight: 500;
 }
 
+/* Feature Content */
 .tutorial-feature-content {
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
-.feature-preview {
-  background: var(--gray-light);
-  border-radius: 12px;
-  padding: 20px;
+.feature-demo {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 16px;
+  padding: 30px;
   text-align: center;
-  min-height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 1px solid var(--tutorial-border);
+  transition: all 0.3s ease;
 }
 
-.feature-preview i {
-  font-size: 3rem;
-  color: var(--primary);
-  margin-bottom: 15px;
+.feature-demo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-.feature-preview h4 {
-  color: var(--dark);
-  margin: 10px 0 5px;
-  font-size: 1.2rem;
+.feature-demo .icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  display: block;
 }
 
-.feature-preview p {
-  color: var(--gray);
+.feature-demo .icon.animated {
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.feature-demo h3 {
+  color: var(--tutorial-text);
+  margin: 0 0 12px 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.feature-demo p {
+  color: var(--tutorial-text-light);
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
+/* Tutorial Footer */
 .tutorial-footer {
-  padding: 20px 25px;
-  border-top: 1px solid var(--gray-border);
+  padding: 24px 28px;
+  border-top: 1px solid var(--tutorial-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 15px;
+  background: #f8fafc;
 }
 
 .tutorial-btn {
-  padding: 12px 24px;
+  padding: 14px 28px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 0.95rem;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tutorial-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.5s;
+}
+
+.tutorial-btn:hover::before {
+  left: 100%;
 }
 
 .tutorial-btn-primary {
-  background: var(--primary);
-  color: var(--light);
+  background: linear-gradient(135deg, var(--tutorial-primary), var(--tutorial-primary-dark));
+  color: white;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
 }
 
 .tutorial-btn-primary:hover {
-  background: var(--primary-dark);
   transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
 }
 
 .tutorial-btn-secondary {
-  background: var(--gray-light);
-  color: var(--dark);
+  background: white;
+  color: var(--tutorial-text);
+  border: 1px solid var(--tutorial-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .tutorial-btn-secondary:hover {
-  background: var(--gray-border);
+  background: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .tutorial-btn-success {
-  background: #10b981;
+  background: linear-gradient(135deg, var(--tutorial-success), #059669);
   color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
 }
 
 .tutorial-btn-success:hover {
-  background: #059669;
   transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
 }
 
 .tutorial-nav {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
 }
 
 /* Tutorial Highlight */
 .tutorial-highlight {
   position: absolute;
-  border: 3px solid var(--primary);
-  border-radius: 12px;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7),
-              0 0 20px rgba(5, 160, 129, 0.5),
-              inset 0 0 20px rgba(5, 160, 129, 0.2);
+  border: 3px solid var(--tutorial-primary);
+  border-radius: 16px;
+  box-shadow: 
+    0 0 0 9999px rgba(0, 0, 0, 0.7),
+    0 0 0 3px var(--tutorial-primary),
+    0 0 30px rgba(99, 102, 241, 0.6),
+    inset 0 0 30px rgba(99, 102, 241, 0.2);
   z-index: 10;
   pointer-events: none;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   animation: highlightPulse 2s infinite;
 }
 
 @keyframes highlightPulse {
   0%, 100% {
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7),
-                0 0 20px rgba(5, 160, 129, 0.5),
-                inset 0 0 20px rgba(5, 160, 129, 0.2);
+    box-shadow: 
+      0 0 0 9999px rgba(0, 0, 0, 0.7),
+      0 0 0 3px var(--tutorial-primary),
+      0 0 30px rgba(99, 102, 241, 0.6),
+      inset 0 0 30px rgba(99, 102, 241, 0.2);
   }
   50% {
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7),
-                0 0 30px rgba(5, 160, 129, 0.8),
-                inset 0 0 30px rgba(5, 160, 129, 0.4);
+    box-shadow: 
+      0 0 0 9999px rgba(0, 0, 0, 0.7),
+      0 0 0 3px var(--tutorial-primary),
+      0 0 40px rgba(99, 102, 241, 0.8),
+      inset 0 0 40px rgba(99, 102, 241, 0.3);
   }
 }
 
-/* Tutorial Tooltip */
+/* Enhanced Tooltip */
 .tutorial-tooltip {
   position: absolute;
-  background: var(--light);
-  color: var(--dark);
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  max-width: 300px;
+  background: white;
+  color: var(--tutorial-text);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-width: 280px;
   z-index: 100;
   pointer-events: none;
-  animation: tooltipBounce 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: tooltipBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid var(--tutorial-border);
 }
 
 @keyframes tooltipBounce {
@@ -1863,44 +1984,49 @@
   position: absolute;
   width: 0;
   height: 0;
-  border: 8px solid transparent;
+  border: 10px solid transparent;
 }
 
 .tooltip-arrow.bottom {
-  border-top-color: var(--light);
+  border-top-color: white;
   border-bottom: none;
-  bottom: -8px;
+  bottom: -20px;
   left: 50%;
   transform: translateX(-50%);
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
 }
 
 .tooltip-arrow.top {
-  border-bottom-color: var(--light);
+  border-bottom-color: white;
   border-top: none;
-  top: -8px;
+  top: -20px;
   left: 50%;
   transform: translateX(-50%);
+  filter: drop-shadow(0 -2px 2px rgba(0,0,0,0.1));
 }
 
 .tooltip-arrow.left {
-  border-right-color: var(--light);
+  border-right-color: white;
   border-left: none;
-  left: -8px;
+  left: -20px;
   top: 50%;
   transform: translateY(-50%);
+  filter: drop-shadow(-2px 0 2px rgba(0,0,0,0.1));
 }
 
 .tooltip-arrow.right {
-  border-left-color: var(--light);
+  border-left-color: white;
   border-right: none;
-  right: -8px;
+  right: -20px;
   top: 50%;
   transform: translateY(-50%);
+  filter: drop-shadow(2px 0 2px rgba(0,0,0,0.1));
 }
 
 .tooltip-content {
   font-size: 0.95rem;
   line-height: 1.5;
+  font-weight: 500;
 }
 
 /* Tutorial Trigger Button */
@@ -1908,51 +2034,164 @@
   position: fixed;
   bottom: 30px;
   right: 30px;
-  width: 60px;
-  height: 60px;
-  background: var(--primary);
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--tutorial-primary), var(--tutorial-primary-dark));
   color: white;
   border: none;
   border-radius: 50%;
-  box-shadow: 0 8px 25px rgba(5, 160, 129, 0.4);
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
   cursor: pointer;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  transition: all 0.3s ease;
-  animation: float 3s ease-in-out infinite;
+  font-size: 1.6rem;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: float 4s ease-in-out infinite;
 }
 
 @keyframes float {
   0%, 100% {
-    transform: translateY(0);
+    transform: translateY(0) rotate(0deg);
   }
-  50% {
-    transform: translateY(-10px);
+  33% {
+    transform: translateY(-8px) rotate(5deg);
+  }
+  66% {
+    transform: translateY(-4px) rotate(-5deg);
   }
 }
 
 .tutorial-trigger-btn:hover {
-  background: var(--primary-dark);
-  transform: scale(1.1);
-  box-shadow: 0 12px 35px rgba(5, 160, 129, 0.6);
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.6);
 }
 
-/* Mobile Responsive */
+.tutorial-trigger-btn.pulse {
+  animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.8), 0 0 0 6px rgba(99, 102, 241, 0.2);
+  }
+}
+
+/* Feature Cards Grid */
+.feature-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.feature-card {
+  background: white;
+  border: 1px solid var(--tutorial-border);
+  border-radius: 12px;
+  padding: 20px 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: var(--tutorial-primary);
+}
+
+.feature-card.active {
+  border-color: var(--tutorial-primary);
+  background: linear-gradient(135deg, #f8fafc, #e0e7ff);
+}
+
+.feature-card-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.feature-card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--tutorial-text);
+  margin: 0;
+}
+
+/* Achievement Badges */
+.achievement-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #7c2d12;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-top: 15px;
+  animation: badgePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+  }
+  50% {
+    transform: scale(1.1) translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Completion Celebration */
+.completion-celebration {
+  text-align: center;
+  padding: 30px;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--tutorial-primary);
+  border-radius: 50%;
+  animation: confettiFall 1s ease-in-out;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
   .tutorial-container {
-    padding: 10px;
+    padding: 15px;
   }
   
   .tutorial-content {
     max-width: 100%;
-    border-radius: 15px;
+    border-radius: 20px;
+    margin: 0;
   }
   
   .tutorial-header {
-    padding: 20px 20px 15px;
+    padding: 24px 24px 20px;
   }
   
   .tutorial-header h2 {
@@ -1960,14 +2199,14 @@
   }
   
   .tutorial-body {
-    padding: 20px;
-    max-height: 70vh;
+    padding: 24px;
+    max-height: 65vh;
   }
   
   .tutorial-footer {
-    padding: 15px 20px;
+    padding: 20px 24px;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
   
   .tutorial-nav {
@@ -1975,41 +2214,212 @@
     justify-content: space-between;
   }
   
+  .tutorial-btn {
+    padding: 12px 24px;
+    flex: 1;
+    justify-content: center;
+  }
+  
   .tutorial-trigger-btn {
     bottom: 20px;
     right: 20px;
-    width: 50px;
-    height: 50px;
-    font-size: 1.3rem;
+    width: 56px;
+    height: 56px;
+    font-size: 1.4rem;
   }
   
   .tutorial-tooltip {
-    max-width: 250px;
+    max-width: 240px;
     font-size: 0.9rem;
+    padding: 16px;
+  }
+  
+  .feature-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .feature-card {
+    padding: 16px 12px;
+  }
+  
+  .feature-card-icon {
+    font-size: 1.6rem;
+  }
+  
+  .feature-card-title {
+    font-size: 0.8rem;
   }
 }
 
-/* Feature-specific styles */
-.feature-demo {
-  text-align: center;
-  padding: 20px;
+@media (max-width: 480px) {
+  .tutorial-container {
+    padding: 10px;
+  }
+  
+  .tutorial-content {
+    border-radius: 16px;
+  }
+  
+  .tutorial-header {
+    padding: 20px 20px 16px;
+  }
+  
+  .tutorial-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .tutorial-body {
+    padding: 20px;
+    max-height: 70vh;
+  }
+  
+  .tutorial-message {
+    font-size: 1rem;
+  }
+  
+  .tutorial-footer {
+    padding: 16px 20px;
+  }
+  
+  .tutorial-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .tutorial-trigger-btn {
+    bottom: 15px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+  
+  .feature-demo {
+    padding: 24px;
+  }
+  
+  .feature-demo .icon {
+    font-size: 3rem;
+  }
+  
+  .feature-demo h3 {
+    font-size: 1.1rem;
+  }
+  
+  .feature-demo p {
+    font-size: 0.9rem;
+  }
+  
+  .feature-cards-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.feature-demo .icon {
-  font-size: 4rem;
-  color: var(--primary);
-  margin-bottom: 20px;
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .tutorial-overlay {
+    --tutorial-bg: rgba(0, 0, 0, 0.9);
+    --tutorial-card-bg: #1f2937;
+    --tutorial-text: #f9fafb;
+    --tutorial-text-light: #d1d5db;
+    --tutorial-border: #374151;
+  }
+  
+  .tutorial-header {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+  }
+  
+  .tutorial-progress {
+    background: #374151;
+    color: var(--tutorial-primary-light);
+  }
+  
+  .tutorial-footer {
+    background: #374151;
+  }
+  
+  .tutorial-btn-secondary {
+    background: #4b5563;
+    color: #f9fafb;
+    border-color: #6b7280;
+  }
+  
+  .tutorial-btn-secondary:hover {
+    background: #6b7280;
+  }
+  
+  .feature-demo {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+  }
+  
+  .feature-card {
+    background: #374151;
+    border-color: #4b5563;
+  }
+  
+  .feature-card.active {
+    background: linear-gradient(135deg, #4b5563, #6366f1);
+  }
+  
+  .tutorial-tooltip {
+    background: #374151;
+    color: #f9fafb;
+  }
+  
+  .tooltip-arrow.bottom {
+    border-top-color: #374151;
+  }
+  
+  .tooltip-arrow.top {
+    border-bottom-color: #374151;
+  }
+  
+  .tooltip-arrow.left {
+    border-right-color: #374151;
+  }
+  
+  .tooltip-arrow.right {
+    border-left-color: #374151;
+  }
 }
 
-.feature-demo h3 {
-  color: var(--dark);
-  margin-bottom: 10px;
-  font-size: 1.3rem;
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .tutorial-highlight {
+    border-width: 4px;
+    border-color: #0000ff;
+  }
+  
+  .tutorial-btn {
+    border: 2px solid;
+  }
 }
 
-.feature-demo p {
-  color: var(--gray);
-  line-height: 1.6;
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-content,
+  .tutorial-tooltip,
+  .tutorial-btn,
+  .tutorial-highlight,
+  .tutorial-trigger-btn,
+  .feature-demo,
+  .feature-card {
+    animation: none;
+    transition: none;
+  }
+  
+  .tutorial-trigger-btn {
+    animation: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .tutorial-overlay,
+  .tutorial-trigger-btn {
+    display: none !important;
+  }
 }
 </style>
 </head>
@@ -2527,15 +2937,18 @@ const categories = [
 ];
 
 // Interactive Tutorial System
+// Enhanced Interactive Tutorial System
 class InteractiveTutorial {
     constructor() {
         this.currentStep = 0;
         this.totalSteps = 7;
         this.isActive = false;
         this.tutorialCompleted = localStorage.getItem('tutorialCompleted') === 'true';
+        this.achievements = JSON.parse(localStorage.getItem('tutorialAchievements') || '{}');
         
         this.initializeElements();
         this.setupEventListeners();
+        this.createProgressBar();
     }
 
     initializeElements() {
@@ -2554,78 +2967,99 @@ class InteractiveTutorial {
             skip: document.getElementById('tutorial-skip'),
             trigger: document.getElementById('tutorial-trigger'),
             highlight: document.getElementById('tutorial-highlight'),
-            tooltip: document.getElementById('tutorial-tooltip')
+            tooltip: document.getElementById('tutorial-tooltip'),
+            progressBar: null,
+            progressFill: null
         };
 
         this.tutorialSteps = [
             {
                 title: "Welcome to Quizontal! 🎉",
-                message: "Let me show you around our amazing platform for free stock photos, videos, and AI-generated images!",
+                message: "Discover millions of free stock photos, videos, and create AI-generated images. Let me guide you through our amazing features!",
                 feature: "welcome",
                 highlight: null,
-                tooltip: null
+                tooltip: null,
+                achievement: "welcome"
             },
             {
-                title: "Powerful Search",
-                message: "Search through millions of high-quality stock photos and videos. Use specific keywords for best results!",
+                title: "Smart Search Engine",
+                message: "Find exactly what you need with our intelligent search. Try specific keywords, categories, or even colors!",
                 feature: "search",
                 highlight: "#search-input",
                 tooltip: {
-                    text: "Try searching for 'sunset beach' or 'business meeting'",
+                    text: "💡 Pro tip: Use descriptive phrases like 'sunset beach with palm trees'",
                     position: "bottom"
-                }
+                },
+                achievement: "search_master"
             },
             {
-                title: "Browse Categories",
-                message: "Explore popular categories to quickly find what you're looking for. Perfect for inspiration!",
+                title: "Curated Categories",
+                message: "Browse hand-picked collections for instant inspiration. Perfect for when you're not sure what you're looking for!",
                 feature: "categories",
                 highlight: "#categories-grid",
                 tooltip: {
-                    text: "Click any category to instantly see related content",
+                    text: "🎯 Click any category to instantly explore related content",
                     position: "top"
-                }
+                },
+                achievement: "explorer"
             },
             {
-                title: "Filter & Sort",
-                message: "Narrow down your results with our powerful filters. Find exactly what you need in seconds.",
+                title: "Advanced Filters",
+                message: "Refine your results with powerful filters. Sort by popularity, date, or use our AI-powered recommendations.",
                 feature: "filters",
                 highlight: "#filter-section",
                 tooltip: {
-                    text: "Filter by type, category, or use advanced options",
+                    text: "⚡ Quick filters help you find the perfect content faster",
                     position: "bottom"
-                }
+                },
+                achievement: "filter_pro"
             },
             {
                 title: "AI Image Generator",
-                message: "Create stunning custom images with our AI generator. Just describe what you want to see!",
+                message: "Create unique images that have never existed before! Describe your vision and watch our AI bring it to life.",
                 feature: "ai",
                 highlight: ".content-tab[data-tab='ai']",
                 tooltip: {
-                    text: "Generate unique images that don't exist anywhere else",
+                    text: "✨ Try: 'A futuristic city with flying cars and neon lights'",
                     position: "left"
-                }
+                },
+                achievement: "ai_creator"
             },
             {
-                title: "Download & Use",
-                message: "All our content is free to use! Download in multiple sizes and use for personal or commercial projects.",
+                title: "Download & Usage",
+                message: "All content is free for personal and commercial use! Download in multiple sizes and start creating immediately.",
                 feature: "download",
                 highlight: ".download-btn",
                 tooltip: {
-                    text: "Choose your preferred quality and download instantly",
+                    text: "📥 Choose your preferred quality - all downloads are free!",
                     position: "top"
-                }
+                },
+                achievement: "downloader"
             },
             {
                 title: "You're All Set! 🚀",
-                message: "You're now ready to explore Quizontal! Remember, you can always restart this tutorial from the help button.",
+                message: "You're now ready to create amazing content with Quizontal! Remember, you can always restart this tutorial.",
                 feature: "complete",
                 highlight: null,
-                tooltip: null
+                tooltip: null,
+                achievement: "tutorial_complete"
             }
         ];
 
         this.totalSteps = this.tutorialSteps.length;
         this.elements.total.textContent = this.totalSteps;
+    }
+
+    createProgressBar() {
+        const progressBar = document.createElement('div');
+        progressBar.className = 'tutorial-progress-bar';
+        progressBar.innerHTML = '<div class="tutorial-progress-fill"></div>';
+        
+        const header = this.elements.content.querySelector('.tutorial-header');
+        header.appendChild(progressBar);
+        
+        this.elements.progressBar = progressBar;
+        this.elements.progressFill = progressBar.querySelector('.tutorial-progress-fill');
     }
 
     setupEventListeners() {
@@ -2648,6 +3082,7 @@ class InteractiveTutorial {
             
             switch(e.key) {
                 case 'ArrowRight':
+                case ' ':
                     e.preventDefault();
                     this.nextStep();
                     break;
@@ -2661,6 +3096,13 @@ class InteractiveTutorial {
                     break;
             }
         });
+
+        // Add pulse animation to trigger button for first-time users
+        if (!this.tutorialCompleted) {
+            setTimeout(() => {
+                this.elements.trigger.classList.add('pulse');
+            }, 5000);
+        }
     }
 
     startTutorial() {
@@ -2668,12 +3110,16 @@ class InteractiveTutorial {
         this.currentStep = 0;
         this.elements.overlay.classList.add('active');
         document.body.classList.add('tutorial-open');
+        this.elements.trigger.classList.remove('pulse');
         this.showStep(0);
     }
 
     showStep(stepIndex) {
         this.currentStep = stepIndex;
         const step = this.tutorialSteps[stepIndex];
+        
+        // Update progress
+        this.updateProgressBar((stepIndex + 1) / this.totalSteps * 100);
         
         // Update UI
         this.elements.title.textContent = step.title;
@@ -2684,6 +3130,7 @@ class InteractiveTutorial {
         this.elements.prev.style.display = stepIndex > 0 ? 'inline-flex' : 'none';
         this.elements.next.style.display = stepIndex < this.totalSteps - 1 ? 'inline-flex' : 'none';
         this.elements.finish.style.display = stepIndex === this.totalSteps - 1 ? 'inline-flex' : 'none';
+        this.elements.skip.style.display = stepIndex === this.totalSteps - 1 ? 'none' : 'inline-flex';
         
         // Show feature-specific content
         this.showFeatureContent(step.feature);
@@ -2694,9 +3141,20 @@ class InteractiveTutorial {
         // Show tooltip if specified
         this.showTooltip(step.tooltip);
         
+        // Unlock achievement
+        if (step.achievement && !this.achievements[step.achievement]) {
+            this.unlockAchievement(step.achievement);
+        }
+        
         // Scroll to highlighted element if needed
         if (step.highlight) {
             this.scrollToElement(step.highlight);
+        }
+    }
+
+    updateProgressBar(percentage) {
+        if (this.elements.progressFill) {
+            this.elements.progressFill.style.width = `${percentage}%`;
         }
     }
 
@@ -2706,56 +3164,108 @@ class InteractiveTutorial {
         const featureContents = {
             welcome: `
                 <div class="feature-demo">
-                    <div class="icon">🎨</div>
-                    <h3>Your Creative Companion</h3>
-                    <p>Discover, create, and download amazing visual content for all your projects</p>
+                    <div class="icon animated">🎨</div>
+                    <h3>Your Creative Playground</h3>
+                    <p>Access millions of assets and AI tools to bring your ideas to life</p>
+                    <div class="feature-cards-grid">
+                        <div class="feature-card">
+                            <span class="feature-card-icon">📷</span>
+                            <div class="feature-card-title">Stock Photos</div>
+                        </div>
+                        <div class="feature-card">
+                            <span class="feature-card-icon">🎥</span>
+                            <div class="feature-card-title">HD Videos</div>
+                        </div>
+                        <div class="feature-card">
+                            <span class="feature-card-icon">🤖</span>
+                            <div class="feature-card-title">AI Generator</div>
+                        </div>
+                        <div class="feature-card">
+                            <span class="feature-card-icon">🎨</span>
+                            <div class="feature-card-title">Wallpapers</div>
+                        </div>
+                    </div>
                 </div>
             `,
             search: `
                 <div class="feature-demo">
-                    <i class="fas fa-search icon"></i>
-                    <h3>Smart Search</h3>
-                    <p>Find exactly what you need with our intelligent search system</p>
+                    <i class="fas fa-search icon animated"></i>
+                    <h3>Intelligent Discovery</h3>
+                    <p>Our AI understands context and helps you find perfect matches</p>
+                    <div class="achievement-badge">
+                        <i class="fas fa-trophy"></i>
+                        Search Master Unlocked!
+                    </div>
                 </div>
             `,
             categories: `
                 <div class="feature-demo">
-                    <i class="fas fa-th-large icon"></i>
-                    <h3>Curated Collections</h3>
-                    <p>Browse hand-picked categories for instant inspiration</p>
+                    <i class="fas fa-th-large icon animated"></i>
+                    <h3>Organized Collections</h3>
+                    <p>Browse by theme, color, or mood for instant inspiration</p>
                 </div>
             `,
             filters: `
                 <div class="feature-demo">
-                    <i class="fas fa-filter icon"></i>
-                    <h3>Precise Filtering</h3>
-                    <p>Refine your results with multiple filter options</p>
+                    <i class="fas fa-filter icon animated"></i>
+                    <h3>Precision Tools</h3>
+                    <p>Filter by size, orientation, color, and more</p>
+                    <div class="achievement-badge">
+                        <i class="fas fa-star"></i>
+                        Filter Pro Unlocked!
+                    </div>
                 </div>
             `,
             ai: `
                 <div class="feature-demo">
-                    <i class="fas fa-robot icon"></i>
-                    <h3>AI Magic</h3>
-                    <p>Create unique images that have never existed before</p>
+                    <i class="fas fa-robot icon animated"></i>
+                    <h3>AI-Powered Creation</h3>
+                    <p>Generate unique images from simple text descriptions</p>
+                    <div class="achievement-badge">
+                        <i class="fas fa-magic"></i>
+                        AI Creator Unlocked!
+                    </div>
                 </div>
             `,
             download: `
                 <div class="feature-demo">
-                    <i class="fas fa-download icon"></i>
-                    <h3>Free Downloads</h3>
-                    <p>High-quality content ready for your projects</p>
+                    <i class="fas fa-download icon animated"></i>
+                    <h3>Instant Access</h3>
+                    <p>Download in multiple resolutions for any project</p>
                 </div>
             `,
             complete: `
-                <div class="feature-demo">
-                    <div class="icon">🎯</div>
-                    <h3>Ready to Create!</h3>
-                    <p>You now know all the essential features. Happy creating! 🚀</p>
+                <div class="completion-celebration">
+                    <div class="feature-demo">
+                        <div class="icon animated">🎯</div>
+                        <h3>Ready to Create!</h3>
+                        <p>You've mastered all essential features. Time to bring your ideas to life! 🚀</p>
+                        <div class="achievement-badge">
+                            <i class="fas fa-gem"></i>
+                            Tutorial Master Completed!
+                        </div>
+                    </div>
                 </div>
             `
         };
         
         content.innerHTML = featureContents[feature] || '';
+        
+        // Add click handlers for feature cards
+        if (feature === 'welcome') {
+            setTimeout(() => {
+                document.querySelectorAll('.feature-card').forEach((card, index) => {
+                    card.addEventListener('click', () => {
+                        // Highlight the clicked card
+                        document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+                        
+                        // Auto-advance after selection
+                        setTimeout(() => this.nextStep(), 800);
+                    });
+                });
+            }, 100);
+        }
     }
 
     updateHighlight(selector) {
@@ -2804,25 +3314,26 @@ class InteractiveTutorial {
         tooltipEl.style.display = 'block';
         
         // Position tooltip based on specified position
+        const spacing = 20;
         switch(tooltip.position) {
             case 'top':
-                tooltipEl.style.bottom = `${window.innerHeight - rect.top + 20}px`;
+                tooltipEl.style.bottom = `${window.innerHeight - rect.top + spacing}px`;
                 tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
                 tooltipEl.style.transform = 'translateX(-50%)';
                 break;
             case 'bottom':
-                tooltipEl.style.top = `${rect.bottom + 20}px`;
+                tooltipEl.style.top = `${rect.bottom + spacing}px`;
                 tooltipEl.style.left = `${rect.left + rect.width / 2}px`;
                 tooltipEl.style.transform = 'translateX(-50%)';
                 break;
             case 'left':
                 tooltipEl.style.top = `${rect.top + rect.height / 2}px`;
-                tooltipEl.style.right = `${window.innerWidth - rect.left + 20}px`;
+                tooltipEl.style.right = `${window.innerWidth - rect.left + spacing}px`;
                 tooltipEl.style.transform = 'translateY(-50%)';
                 break;
             case 'right':
                 tooltipEl.style.top = `${rect.top + rect.height / 2}px`;
-                tooltipEl.style.left = `${rect.right + 20}px`;
+                tooltipEl.style.left = `${rect.right + spacing}px`;
                 tooltipEl.style.transform = 'translateY(-50%)';
                 break;
         }
@@ -2833,7 +3344,8 @@ class InteractiveTutorial {
         if (element) {
             element.scrollIntoView({
                 behavior: 'smooth',
-                block: 'center'
+                block: 'center',
+                inline: 'center'
             });
         }
     }
@@ -2853,19 +3365,38 @@ class InteractiveTutorial {
     finishTutorial() {
         this.tutorialCompleted = true;
         localStorage.setItem('tutorialCompleted', 'true');
-        this.closeTutorial();
         
-        // Show completion message
-        this.showCompletionMessage();
+        // Create celebration effect
+        this.createCelebration();
+        
+        setTimeout(() => {
+            this.closeTutorial();
+            this.showCompletionMessage();
+        }, 2000);
+    }
+
+    createCelebration() {
+        const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 2000);
+            }, i * 50);
+        }
     }
 
     skipTutorial() {
         this.closeTutorial();
         
-        // Ask if they want to restart later
         if (!this.tutorialCompleted) {
             setTimeout(() => {
-                if (confirm("Would you like to restart the tutorial later? You can always access it from the help button in the bottom right.")) {
+                if (confirm("Would you like to restart the tutorial later? You can always access it from the help button.")) {
                     // User might restart later
                 }
             }, 500);
@@ -2882,29 +3413,41 @@ class InteractiveTutorial {
         this.elements.tooltip.style.display = 'none';
     }
 
+    unlockAchievement(achievement) {
+        this.achievements[achievement] = true;
+        localStorage.setItem('tutorialAchievements', JSON.stringify(this.achievements));
+        
+        // You could add analytics or notifications here
+        console.log(`Achievement unlocked: ${achievement}`);
+    }
+
     showCompletionMessage() {
-        // Create a nice completion message
         const completionMsg = document.createElement('div');
         completionMsg.className = 'completion-message';
         completionMsg.innerHTML = `
-            <div style="position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 10000; animation: slideInRight 0.5s ease;">
-                <i class="fas fa-check-circle"></i>
-                <strong>Tutorial Completed!</strong>
-                <p style="margin: 5px 0 0 0; font-size: 0.9em;">Happy exploring! 🚀</p>
+            <div style="position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 10000; animation: slideInRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); max-width: 300px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <i class="fas fa-trophy" style="font-size: 1.5rem;"></i>
+                    <strong style="font-size: 1.1rem;">Tutorial Completed!</strong>
+                </div>
+                <p style="margin: 0; font-size: 0.95em; opacity: 0.9;">You're now ready to create amazing content! 🚀</p>
             </div>
         `;
         
         document.body.appendChild(completionMsg);
         
         setTimeout(() => {
-            completionMsg.remove();
+            completionMsg.style.animation = 'slideOutRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+            setTimeout(() => completionMsg.remove(), 600);
         }, 4000);
     }
 
-    // Method to reset tutorial (for testing or user preference)
+    // Method to reset tutorial
     resetTutorial() {
         localStorage.removeItem('tutorialCompleted');
+        localStorage.removeItem('tutorialAchievements');
         this.tutorialCompleted = false;
+        this.achievements = {};
         this.startTutorial();
     }
 }
