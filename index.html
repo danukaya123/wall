@@ -2804,11 +2804,8 @@ function showCelebration() {
     // Add some confetti
     createConfetti();
     
-    // Hide celebration after 4 seconds and complete onboarding
-    setTimeout(() => {
-        celebration.classList.remove('active');
-        completeOnboarding();
-    }, 4000);
+    // Remove the auto-hide timeout since we want users to click the button
+    // The celebration will only close when user clicks "Start Exploring"
 }
 
 function createBalloons() {
@@ -2899,8 +2896,10 @@ function completeOnboarding() {
             style.remove();
         }
     });
+    
+    // Clear the balloons container
+    document.querySelector('.balloons-container').innerHTML = '';
 }
-
 // Touch swipe functionality for mobile
 function initOnboardingTouch() {
     let touchStartX = 0;
