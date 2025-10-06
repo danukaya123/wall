@@ -1908,6 +1908,189 @@
         margin: 15px 0;
     }
 }
+
+
+  /* Balloon Celebration Styles */
+.balloon-celebration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+.balloon-celebration.active {
+    display: flex;
+    animation: fadeInCelebration 0.5s ease;
+}
+
+.balloons-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.balloon {
+    position: absolute;
+    bottom: -100px;
+    width: 40px;
+    height: 50px;
+    border-radius: 50%;
+    animation: floatUp 8s ease-in forwards;
+    opacity: 0.9;
+}
+
+.balloon::before {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.balloon::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 2px;
+}
+
+.balloon-1 { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); left: 10%; animation-delay: 0s; }
+.balloon-2 { background: linear-gradient(135deg, #4ecdc4, #88d8d0); left: 20%; animation-delay: 0.5s; }
+.balloon-3 { background: linear-gradient(135deg, #45b7d1, #7acde3); left: 30%; animation-delay: 1s; }
+.balloon-4 { background: linear-gradient(135deg, #96ceb4, #b8e0c8); left: 40%; animation-delay: 1.5s; }
+.balloon-5 { background: linear-gradient(135deg, #feca57, #ffda8c); left: 50%; animation-delay: 2s; }
+.balloon-6 { background: linear-gradient(135deg, #ff9ff3, #ffbdf7); left: 60%; animation-delay: 2.5s; }
+.balloon-7 { background: linear-gradient(135deg, #54a0ff, #85baff); left: 70%; animation-delay: 3s; }
+.balloon-8 { background: linear-gradient(135deg, #5f27cd, #8c5ce6); left: 80%; animation-delay: 3.5s; }
+.balloon-9 { background: linear-gradient(135deg, #00d2d3, #4de3e3); left: 90%; animation-delay: 4s; }
+.balloon-10 { background: linear-gradient(135deg, #ff9f43, #ffb87a); left: 15%; animation-delay: 4.5s; }
+
+.celebration-message {
+    text-align: center;
+    z-index: 10001;
+    background: white;
+    padding: 30px 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    animation: bounceIn 0.8s ease;
+    pointer-events: auto;
+}
+
+.celebration-message h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #4a6cf7, #7c5cff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.celebration-message p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.celebration-continue-btn {
+    background: linear-gradient(135deg, #4a6cf7, #7c5cff);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(74, 108, 247, 0.3);
+}
+
+.celebration-continue-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(74, 108, 247, 0.4);
+}
+
+/* Animations */
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-300px) rotate(5deg);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translateY(-600px) rotate(10deg);
+        opacity: 0;
+    }
+}
+
+@keyframes fadeInCelebration {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Confetti effect */
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #f00;
+    opacity: 0.8;
+    animation: confettiFall 3s ease-in forwards;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(500px) rotate(360deg);
+        opacity: 0;
+    }
+}
 </style>
 </head>
 <body>
@@ -2167,6 +2350,20 @@
             </div>
         </div>
     </div>
+
+  <!-- Balloon Celebration Effect -->
+<div class="balloon-celebration" id="balloon-celebration">
+    <div class="balloons-container">
+        <!-- Balloons will be generated here by JavaScript -->
+    </div>
+<div class="celebration-message">
+    <h2>Welcome to Quizontal! 🎉</h2>
+    <p>Let's start exploring amazing free content</p>
+    <button class="celebration-continue-btn" onclick="completeOnboarding()">
+        Start Exploring
+    </button>
+</div>
+</div>
 </div>
     <!-- Header Section -->
     <header>
@@ -2589,13 +2786,119 @@ function onboardingPrev() {
 }
 
 function skipOnboarding() {
-    finishOnboarding();
+    showCelebration();
 }
 
 function finishOnboarding() {
+    showCelebration();
+}
+
+function showCelebration() {
+    // Create balloons
+    createBalloons();
+    
+    // Show celebration overlay
+    const celebration = document.getElementById('balloon-celebration');
+    celebration.classList.add('active');
+    
+    // Add some confetti
+    createConfetti();
+    
+    // Hide celebration after 4 seconds and complete onboarding
+    setTimeout(() => {
+        celebration.classList.remove('active');
+        completeOnboarding();
+    }, 4000);
+}
+
+function createBalloons() {
+    const container = document.querySelector('.balloons-container');
+    container.innerHTML = '';
+    
+    // Create 15 balloons at different positions
+    for (let i = 1; i <= 15; i++) {
+        const balloon = document.createElement('div');
+        balloon.className = `balloon balloon-${(i % 10) + 1}`;
+        
+        // Randomize positions and animations
+        const left = Math.random() * 85 + 5; // 5% to 90%
+        const delay = Math.random() * 3; // 0 to 3 seconds
+        const duration = 6 + Math.random() * 4; // 6 to 10 seconds
+        
+        balloon.style.left = `${left}%`;
+        balloon.style.animationDelay = `${delay}s`;
+        balloon.style.animationDuration = `${duration}s`;
+        
+        // Add slight horizontal movement
+        const horizontalMove = (Math.random() - 0.5) * 50; // -25px to 25px
+        balloon.style.setProperty('--horizontal-move', `${horizontalMove}px`);
+        
+        // Add custom animation for this balloon
+        const keyframes = `
+            @keyframes floatUp-${i} {
+                0% {
+                    transform: translateY(0) translateX(0) rotate(0deg);
+                    opacity: 1;
+                }
+                50% {
+                    transform: translateY(-300px) translateX(var(--horizontal-move)) rotate(${Math.random() * 20 - 10}deg);
+                    opacity: 0.9;
+                }
+                100% {
+                    transform: translateY(-600px) translateX(calc(var(--horizontal-move) * 2)) rotate(${Math.random() * 20 - 10}deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        
+        // Add the keyframes to the document
+        const style = document.createElement('style');
+        style.textContent = keyframes;
+        document.head.appendChild(style);
+        
+        balloon.style.animationName = `floatUp-${i}`;
+        
+        container.appendChild(balloon);
+    }
+}
+
+function createConfetti() {
+    const container = document.querySelector('.balloons-container');
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
+    
+    // Create 50 confetti pieces
+    for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        
+        const left = Math.random() * 100;
+        const delay = Math.random() * 2;
+        const duration = 2 + Math.random() * 2;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        confetti.style.left = `${left}%`;
+        confetti.style.animationDelay = `${delay}s`;
+        confetti.style.animationDuration = `${duration}s`;
+        confetti.style.background = color;
+        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+        
+        container.appendChild(confetti);
+    }
+}
+
+function completeOnboarding() {
     localStorage.setItem('quizontal_onboarding_seen', 'true');
     document.getElementById('onboarding-overlay').style.display = 'none';
+    document.getElementById('balloon-celebration').classList.remove('active');
     document.body.style.overflow = 'auto';
+    
+    // Clean up any added styles
+    const styles = document.querySelectorAll('style');
+    styles.forEach(style => {
+        if (style.textContent.includes('floatUp-')) {
+            style.remove();
+        }
+    });
 }
 
 // Touch swipe functionality for mobile
