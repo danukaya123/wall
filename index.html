@@ -1623,59 +1623,71 @@
     }
 
   /* Onboarding Slider */
-/* Onboarding Slider */
 .onboarding {
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
   z-index: 5000;
+  overflow: hidden;
+  flex-direction: column;
 }
 
-.onboarding .overlay {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  z-index: 1;
+/* Wrapper */
+.slide-container {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: center;
 }
 
-.slides {
+/* Fixed Image Area */
+.image-area {
+  width: 100%;
+  height: 280px;
+  flex-shrink: 0;
+}
+
+.onboard-img {
   width: 100%;
   height: 100%;
-  display: flex;
-  transition: transform 0.5s ease;
-  z-index: 2;
+  object-fit: cover;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+/* Slides */
+.slides {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 30px 20px 50px;
+  box-sizing: border-box;
 }
 
 .slide {
-  min-width: 100%;
-  height: 100%;
-  text-align: center;
-  display: flex;
+  display: none;
   flex-direction: column;
   justify-content: space-between;
-  padding: 60px 20px 40px;
-  box-sizing: border-box;
-  opacity: 0;
-  transform: scale(0.97);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  align-items: center;
+  transition: all 0.4s ease;
+  animation: fadeIn 0.5s ease;
 }
 
 .slide.active {
-  opacity: 1;
-  transform: scale(1);
+  display: flex;
 }
 
 .text h2 {
-  font-size: 1.9rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #111;
 }
@@ -1685,15 +1697,16 @@
 }
 
 .text p {
-  color: #333;
-  font-size: 1rem;
-  margin-top: 10px;
-  max-width: 300px;
-  margin-left: auto;
-  margin-right: auto;
+  color: #555;
+  font-size: 0.95rem;
+  margin-top: 12px;
+  max-width: 320px;
+  line-height: 1.5;
 }
 
 .bottom-bar {
+  margin-top: 30px;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1704,7 +1717,7 @@
   background: none;
   font-size: 1rem;
   font-weight: 600;
-  color: #444;
+  color: #666;
   cursor: pointer;
 }
 
@@ -1714,10 +1727,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   box-shadow: 0 5px 15px rgba(106,76,255,0.3);
   transition: 0.3s;
 }
@@ -1734,6 +1744,11 @@
   font-size: 1rem;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @media (min-width: 768px) {
   .onboarding { display: none; } /* Hide on desktop */
 }
@@ -1742,42 +1757,49 @@
 </style>
 </head>
 <body>
-<div id="onboarding" class="onboarding" style="background-image: url('https://github.com/danukaya123/wall/blob/main/10808.jpg?raw=true');">
-  <div class="overlay"></div>
+<div id="onboarding" class="onboarding">
+  <div class="slide-container">
 
-  <div class="slides">
-    <!-- Slide 1 -->
-    <div class="slide active">
-      <div class="text">
-        <h2>Empower Yourself With <br><span>Quick Knowledge</span></h2>
-      </div>
-      <div class="bottom-bar">
-        <button class="skip">Skip</button>
-        <button class="next"><i class="fas fa-arrow-right"></i></button>
-      </div>
+    <!-- Shared Top Image (Fixed for all slides) -->
+    <div class="image-area">
+      <img src="https://github.com/danukaya123/wall/blob/main/10808.jpg?raw=true" alt="Intro Image" class="onboard-img">
     </div>
 
-    <!-- Slide 2 -->
-    <div class="slide">
-      <div class="text">
-        <h2>Elevate Your Reading With <br><span>Quick Insights</span></h2>
-        <p>Get bite-sized summaries, unlock key insights, and learn smarter in minutes.</p>
+    <!-- Slides Wrapper -->
+    <div class="slides">
+      <!-- Slide 1 -->
+      <div class="slide active">
+        <div class="text">
+          <h2>Empower Yourself With <br><span>Quick Knowledge</span></h2>
+        </div>
+        <div class="bottom-bar">
+          <button class="skip">Skip</button>
+          <button class="next">→</button>
+        </div>
       </div>
-      <div class="bottom-bar">
-        <button class="skip">Skip</button>
-        <button class="next"><i class="fas fa-arrow-right"></i></button>
-      </div>
-    </div>
 
-    <!-- Slide 3 -->
-    <div class="slide">
-      <div class="text">
-        <h2>Stay <span>Motivated</span> And <br>Achieve <span>Goals</span> 🎯</h2>
-        <p>Stay inspired and reach your creative goals with Quizontal.</p>
+      <!-- Slide 2 -->
+      <div class="slide">
+        <div class="text">
+          <h2>Elevate Your Reading With <br><span>Quick Insights</span></h2>
+          <p>Get bite-sized summaries, unlock key insights, and learn smarter in minutes.</p>
+        </div>
+        <div class="bottom-bar">
+          <button class="skip">Skip</button>
+          <button class="next">→</button>
+        </div>
       </div>
-      <div class="bottom-bar">
-        <button class="skip">Skip</button>
-        <button class="finish">Get Started</button>
+
+      <!-- Slide 3 -->
+      <div class="slide">
+        <div class="text">
+          <h2>Stay <span>Motivated</span> And <br>Achieve <span>Goals</span> 🎯</h2>
+          <p>Stay inspired and reach your creative goals with Quizontal.</p>
+        </div>
+        <div class="bottom-bar">
+          <button class="skip">Skip</button>
+          <button class="finish">Get Started</button>
+        </div>
       </div>
     </div>
   </div>
@@ -2138,15 +2160,14 @@
     </footer>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-  const onboarding = document.getElementById("onboarding");
+ const onboarding = document.getElementById("onboarding");
   const slides = document.querySelectorAll(".slide");
   const nextBtns = document.querySelectorAll(".next");
   const skipBtns = document.querySelectorAll(".skip");
   const finishBtn = document.querySelector(".finish");
   let current = 0;
 
-  // Only show for first-time visitors on mobile
+  // Only for first-time users
   if (localStorage.getItem("onboardingSeen") || window.innerWidth > 768) {
     onboarding.style.display = "none";
     return;
@@ -2164,6 +2185,8 @@
       if (current < slides.length - 1) {
         current++;
         showSlide(current);
+      } else {
+        endOnboarding();
       }
     });
   });
@@ -2180,7 +2203,7 @@
     localStorage.setItem("onboardingSeen", "true");
   }
 
-  // Swipe gesture (for touch screens)
+  // Swipe gesture (mobile)
   let startX = 0;
   onboarding.addEventListener("touchstart", e => startX = e.touches[0].clientX);
   onboarding.addEventListener("touchend", e => {
