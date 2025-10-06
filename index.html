@@ -1623,11 +1623,14 @@
     }
 
   /* Onboarding Slider */
+/* Onboarding Slider */
 .onboarding {
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  background: linear-gradient(135deg, #f2eaff, #e8f7ff);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1635,11 +1638,21 @@
   z-index: 5000;
 }
 
+.onboarding .overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  z-index: 1;
+}
+
 .slides {
   width: 100%;
   height: 100%;
   display: flex;
   transition: transform 0.5s ease;
+  z-index: 2;
 }
 
 .slide {
@@ -1652,7 +1665,7 @@
   padding: 60px 20px 40px;
   box-sizing: border-box;
   opacity: 0;
-  transform: scale(0.98);
+  transform: scale(0.97);
   transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
@@ -1661,17 +1674,10 @@
   transform: scale(1);
 }
 
-.slide-img {
-  max-width: 80%;
-  margin: 20px auto;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-
 .text h2 {
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   font-weight: 700;
-  color: #000;
+  color: #111;
 }
 
 .text h2 span {
@@ -1679,16 +1685,18 @@
 }
 
 .text p {
-  color: #555;
+  color: #333;
   font-size: 1rem;
   margin-top: 10px;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .bottom-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: auto;
 }
 
 .bottom-bar button {
@@ -1696,15 +1704,15 @@
   background: none;
   font-size: 1rem;
   font-weight: 600;
-  color: #666;
+  color: #444;
   cursor: pointer;
 }
 
 .next, .finish {
   background: #6a4cff;
   color: #fff;
-  width: 45px;
-  height: 45px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1716,7 +1724,7 @@
 
 .next:hover, .finish:hover {
   background: #5534e0;
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 
 .finish {
@@ -1727,13 +1735,16 @@
 }
 
 @media (min-width: 768px) {
-  .onboarding { display: none; } /* Desktop users won't see this */
+  .onboarding { display: none; } /* Hide on desktop */
 }
+
 
 </style>
 </head>
 <body>
-  <div id="onboarding" class="onboarding">
+<div id="onboarding" class="onboarding" style="background-image: url('https://github.com/danukaya123/wall/blob/main/10808.jpg?raw=true');">
+  <div class="overlay"></div>
+
   <div class="slides">
     <!-- Slide 1 -->
     <div class="slide active">
@@ -1748,7 +1759,6 @@
 
     <!-- Slide 2 -->
     <div class="slide">
-      <img src="https://github.com/danukaya123/wall/blob/main/10808.jpg?raw=true" class="slide-img" alt="Books">
       <div class="text">
         <h2>Elevate Your Reading With <br><span>Quick Insights</span></h2>
         <p>Get bite-sized summaries, unlock key insights, and learn smarter in minutes.</p>
@@ -1761,7 +1771,6 @@
 
     <!-- Slide 3 -->
     <div class="slide">
-      <img src="https://i.ibb.co/0j3MRk5/girl-music.png" class="slide-img" alt="Girl Listening">
       <div class="text">
         <h2>Stay <span>Motivated</span> And <br>Achieve <span>Goals</span> 🎯</h2>
         <p>Stay inspired and reach your creative goals with Quizontal.</p>
